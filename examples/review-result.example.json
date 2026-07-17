@@ -1,0 +1,11 @@
+{
+  "candidate_sha": "0123456789abcdef0123456789abcdef01234567",
+  "verdict": "ACCEPT_WITH_P2",
+  "review_report": "docs/reviews/G1_INDEPENDENT_REVIEW.md",
+  "open_findings": [
+    "P2: Document the non-blocking compatibility limitation."
+  ],
+  "current_gate": "G1 independent review complete",
+  "next_gate": "G2 bounded integration",
+  "next_action": "Design the exact G2 Goal without changing experimental authorization."
+}

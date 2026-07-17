@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc">
+  <title id="title">Evidence-gated handoff workflow</title>
+  <desc id="desc">Four steps connect a candidate commit to independent review, governance-state recording, and verified resume or compaction.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#7b8286"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="388" rx="8" fill="#17191b" stroke="#17191b" stroke-width="2"/>
+  <text x="48" y="48" fill="#f7f5ef" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="700">One candidate. One qualified review. One recorded state.</text>
+  <text x="1152" y="47" text-anchor="end" fill="#9ca3a7" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">EVIDENCE BEFORE PROGRESS</text>
+  <line x1="48" y1="68" x2="1152" y2="68" stroke="#4b5054"/>
+
+  <g id="steps" transform="translate(48 96)">
+    <line x1="238" y1="88" x2="292" y2="88" stroke="#7b8286" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="518" y1="88" x2="572" y2="88" stroke="#7b8286" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="798" y1="88" x2="852" y2="88" stroke="#7b8286" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <g transform="translate(0 0)">
+      <rect width="238" height="176" rx="6" fill="#f7f5ef"/>
+      <rect width="238" height="7" rx="3" fill="#2f7d62"/>
+      <text x="20" y="39" fill="#2f7d62" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">01 / CANDIDATE</text>
+      <text x="20" y="71" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Implement one Goal</text>
+      <text x="20" y="105" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">source + tests</text>
+      <text x="20" y="129" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">exact base / candidate</text>
+      <text x="20" y="155" fill="#17191b" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">CODE COMMIT</text>
+    </g>
+
+    <g transform="translate(280 0)">
+      <rect width="238" height="176" rx="6" fill="#f7f5ef"/>
+      <rect width="238" height="7" rx="3" fill="#c78b2d"/>
+      <text x="20" y="39" fill="#a16d1f" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">02 / REVIEW</text>
+      <text x="20" y="71" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Independent verdict</text>
+      <text x="20" y="105" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">actual diff + evidence</text>
+      <text x="20" y="129" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">P0 / P1 / P2 findings</text>
+      <text x="20" y="155" fill="#17191b" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">ACCEPT / REJECT / BLOCKED</text>
+    </g>
+
+    <g transform="translate(560 0)">
+      <rect width="238" height="176" rx="6" fill="#f7f5ef"/>
+      <rect width="238" height="7" rx="3" fill="#b94d4d"/>
+      <text x="20" y="39" fill="#b94d4d" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">03 / RECORD</text>
+      <text x="20" y="71" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Close review state</text>
+      <text x="20" y="105" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">detailed review report</text>
+      <text x="20" y="129" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">CURRENT_STAGE update</text>
+      <text x="20" y="155" fill="#17191b" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">DOCS-ONLY COMMIT</text>
+    </g>
+
+    <g transform="translate(840 0)">
+      <rect width="264" height="176" rx="6" fill="#f7f5ef"/>
+      <rect width="264" height="7" rx="3" fill="#697075"/>
+      <text x="20" y="39" fill="#697075" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">04 / CONTINUE</text>
+      <text x="20" y="71" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Resume or compact</text>
+      <text x="20" y="105" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">reload three authorities</text>
+      <text x="20" y="129" fill="#50565a" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">verify branch + actual HEAD</text>
+      <text x="20" y="155" fill="#17191b" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">NO CHAT-ONLY TRUTH</text>
+    </g>
+  </g>
+
+  <g transform="translate(48 314)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+    <text x="0" y="0" fill="#9ca3a7">CANONICAL RAILS</text>
+    <line x1="142" y1="-5" x2="1104" y2="-5" stroke="#4b5054"/>
+    <circle cx="170" cy="-5" r="5" fill="#2f7d62"/>
+    <text x="186" y="0" fill="#f7f5ef">AGENTS.md / rules</text>
+    <circle cx="410" cy="-5" r="5" fill="#c78b2d"/>
+    <text x="426" y="0" fill="#f7f5ef">PROJECT_CORE.md / strategy</text>
+    <circle cx="746" cy="-5" r="5" fill="#b94d4d"/>
+    <text x="762" y="0" fill="#f7f5ef">CURRENT_STAGE.md / Gate</text>
+  </g>
+  <text x="48" y="362" fill="#9ca3a7" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">Automatic compaction continues the same task. Explicit handoff is reserved for a new task, demonstrated context loss, or a natural Gate boundary.</text>
+</svg>

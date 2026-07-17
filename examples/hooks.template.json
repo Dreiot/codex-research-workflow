@@ -1,0 +1,87 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Loading canonical project handoff"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "^research-reviewer$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Loading independent review rules"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^research-reviewer$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking review handoff"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|shell_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking handoff before Git action"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|shell_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Validating handoff after Git action"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "timeout": 15,
+            "statusMessage": "Checking project handoff closure"
+          }
+        ]
+      }
+    ]
+  }
+}
