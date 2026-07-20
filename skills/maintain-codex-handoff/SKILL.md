@@ -71,6 +71,21 @@ Never put branch, current HEAD, current Gate, latest verdict, or next action in
 reviews, and experiment results stay in their own reports; the core links to
 them instead of copying them.
 
+## Research Delivery Economy
+
+Optimize method development for the shortest credible path from a research
+question to reproducible evidence and a defensible paper claim. Work should
+define the smallest decision-complete Goal and experiment matrix sufficient to
+test the current hypothesis; Codex should implement the simplest bounded
+solution that is correct, testable, reproducible, and robust at material
+failure boundaries. Prefer existing components, small diffs, early end-to-end
+experiments, and measurable results over speculative abstractions, duplicate
+mechanisms, broad refactors, exhaustive generalization, or unnecessary
+design-only Gates. Expand scope only when evidence, independent review, or the
+target publication claim requires it. Never trade away data integrity,
+statistical validity, reproducibility, fail-closed safeguards, or claim
+boundaries for speed or smaller code.
+
 ## Gate Workflow
 
 1. Read `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, the current
