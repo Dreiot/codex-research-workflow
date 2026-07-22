@@ -71,6 +71,18 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("kept existing docs/PROJECT_CORE.md", second)
         self.assertEqual(before, after)
 
+        agents_text = (self.repo / "AGENTS.md").read_text(encoding="utf-8")
+        for required_rule in (
+            "## Authority",
+            "Execute one bounded Goal at a time.",
+            "prefer the smallest sufficient implementation and experiment matrix",
+            "Do not advance a Gate or scientific claim without explicit evidence.",
+            "Require one qualified independent review",
+            "Automatic context compaction alone is not a reason",
+            "Do not amend, rebase, force-push, rewrite history",
+        ):
+            self.assertIn(required_rule, agents_text)
+
         self.run_command(
             "git",
             "-C",
