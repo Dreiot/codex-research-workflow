@@ -39,6 +39,14 @@ Research Handoff** 将操作规则、科研战略和当前 Gate 分别写入仓�
 生命周期 Hook 会在启动、恢复、清空和自动压缩时注入精简的战略/Gate 摘要，并在
 review-state commit 与 push 前后发出警告。**Hook 永远不会修改仓库。**
 
+## Browser Work 输出契约
+
+生成的 Work 恢复 Prompt 会链接公开的
+[输出契约](./skills/maintain-codex-handoff/references/work-response-contract.md)。
+Work 的回复固定为审查结果、设计目标、验收目标，以及一个只包含单一 Codex Goal 的
+Markdown 指令块。candidate 审查落库和下一 candidate 必须分开；对 review-state
+commit 的机械验收不会再产生 acceptance commit。
+
 ## 安装
 
 ```bash

@@ -18,6 +18,10 @@ STATE_START = "<!-- codex-handoff-state"
 ENVELOPE_END = "-->"
 VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
 STRATEGIC_STATUSES = {"unaudited", "active", "paused", "redirected", "completed"}
+WORK_CONTRACT_URL = (
+    "https://github.com/Dreiot/codex-research-handoff/blob/main/"
+    "skills/maintain-codex-handoff/references/work-response-contract.md"
+)
 STATE_REQUIRED_FIELDS = (
     "schema_version",
     "project",
@@ -458,6 +462,13 @@ def command_initialize(args: argparse.Namespace) -> int:
             "strategic, innovation, component, evidence, or claim-boundary change.\n"
             "- Do not treat chat summaries, local tests, or candidate-local validation as "
             "independent acceptance.\n"
+            "- Browser Work responses must follow the public Work Response Contract: exactly "
+            "`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`, with one fenced "
+            "Markdown block containing one Codex Goal. Never combine review-state recording "
+            "with the next candidate.\n"
+            "- Work verification of a review-state commit is mechanical closure, not a new "
+            "independent review. Do not create another report, `record-review` operation, or "
+            "acceptance commit for that verification.\n"
             "- Automatic context compaction alone is not a reason to stop, commit, or hand off. "
             "At an explicit handoff, audit the repository and report unresolved work exactly.\n\n"
             "## Git\n\n"
@@ -588,19 +599,34 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
         return 2
     if args.surface == "work":
         print(
-            "这是该项目的新 Browser ChatGPT Work 主控对话。请从 GitHub 重新读取 AGENTS.md、"
-            "docs/PROJECT_CORE.md、docs/CURRENT_STAGE.md 及其中指向的最新报告，核验远端分支与实际 "
-            "HEAD；本 Prompt 不代表权威状态。先用不超过 8 行区分并报告：研究问题与主方向、核心创新"
-            "假设、关键组件、当前 Gate、最近 verdict、未解决问题、下一项唯一动作。若 Git、PROJECT_CORE "
-            "与 CURRENT_STAGE 冲突，停止并明确列出冲突；不要凭聊天记忆补全。"
+            "这是该项目的新 Browser ChatGPT Work 主控对话。\n\n"
+            "先从 GitHub 重新读取 `AGENTS.md`、`docs/PROJECT_CORE.md`、"
+            "`docs/CURRENT_STAGE.md` 及其指向的最新报告，核验远端分支与实际 HEAD；"
+            "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
+            f"{WORK_CONTRACT_URL}\n\n"
+            "判断当前事务属于 candidate 独立审查、review-state 机械验收、普通状态核验，"
+            "还是阻塞修正。严格按规范只输出 `审查结果`、`设计目标`、`验收目标`、"
+            "`Codex 指令` 四节；最后一节只能有一个 fenced `markdown` 指令块，且其中只能有"
+            "一个最小、可验证的 Codex Goal。不要输出隐藏推理，不要使用冗长分隔线，不要把"
+            "审查落库与下一 candidate 合并。\n\n"
+            "若 candidate 审查已完成但尚未落库，唯一 Goal 必须是 docs-only review-state "
+            "recording；若 review-state commit 已验收，验收本身不得再次落库，可在同一回复中"
+            "把下一项已授权 candidate 作为唯一 Goal。若 Git、PROJECT_CORE 与 CURRENT_STAGE "
+            "冲突，报告 BLOCKED，且只允许给出有界的核对或修正 Goal。"
         )
     else:
         print(
-            "这是该项目的新 Codex 任务。先读取并遵守 AGENTS.md，再读取 docs/PROJECT_CORE.md、"
-            "docs/CURRENT_STAGE.md 及当前 Gate 指向的报告；fetch 后核验实际分支、HEAD、远端跟踪 ref 和"
-            "工作树。先简要报告主方向/创新与本 Goal 的关系、当前 Gate、最近 verdict、未解决问题和下一项"
-            f"唯一动作；预期分支为 {state['branch']}，但必须以 Git 实查为准。任何策略、状态或 Git 冲突都"
-            "必须停止，不得依赖本 Prompt 或旧对话自行推断。"
+            "这是该项目的新 Codex 任务。\n\n"
+            "先读取并遵守 `AGENTS.md`，再读取 `docs/PROJECT_CORE.md`、"
+            "`docs/CURRENT_STAGE.md` 及当前 Gate 指向的报告；fetch 后实查分支、HEAD、远端跟踪 "
+            f"ref、index 和 worktree。记录的预期分支为 `{state['branch']}`，但必须以 Git 实查为准。"
+            "任何策略、状态或 Git 冲突都必须停止，不得依赖本 Prompt 或旧聊天自行补全。\n\n"
+            "开始前把当前工作归类为以下唯一一种事务：review-state recording、remediation、"
+            "next candidate 或 handoff-only。只执行 `CURRENT_STAGE.md` 与用户提供指令共同授权的"
+            "一个原子 Goal；简要说明它与项目主方向、当前 Gate、最近 verdict 和未解决问题的关系。"
+            "合格的 Browser Work 审查不得重复自审；review-state 的机械验收不得生成新的审查报告或"
+            "acceptance commit；不得把审查落库与下一 Gate 合并。完成后报告精确 diff、验证、commit、"
+            "push、远端对齐和仍未闭环事项。"
         )
     return 0
 

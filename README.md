@@ -43,6 +43,16 @@ The bundled lifecycle Hook injects a compact strategy/Gate summary on startup,
 resume, clear, and automatic compaction. It also warns around review-state
 commits and pushes. **Hooks never edit the repository.**
 
+## Browser Work response contract
+
+The generated Work resume prompt links to the public
+[response contract](./skills/maintain-codex-handoff/references/work-response-contract.md).
+Work returns a concise review result, design objective, acceptance objective,
+and one Markdown instruction block containing one Codex Goal. Candidate review
+recording and the next candidate are separate transactions; mechanical
+verification of a review-state commit does not create another acceptance
+commit.
+
 ## Install
 
 Install from the repository:

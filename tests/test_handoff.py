@@ -78,6 +78,8 @@ class HandoffIntegrationTest(unittest.TestCase):
             "prefer the smallest sufficient implementation and experiment matrix",
             "Do not advance a Gate or scientific claim without explicit evidence.",
             "Require one qualified independent review",
+            "Browser Work responses must follow the public Work Response Contract",
+            "Work verification of a review-state commit is mechanical closure",
             "Automatic context compaction alone is not a reason",
             "Do not amend, rebase, force-push, rewrite history",
         ):
@@ -98,8 +100,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("PROJECT_CORE is an unaudited migration placeholder", audit)
         self.assertNotIn("ERROR:", audit)
 
+        prompts = {}
         for surface in ("codex", "work"):
-            prompt = self.run_command(
+            prompts[surface] = self.run_command(
                 sys.executable,
                 str(HANDOFF),
                 "resume-prompt",
@@ -109,7 +112,20 @@ class HandoffIntegrationTest(unittest.TestCase):
                 surface,
             )
             for authority in ("AGENTS.md", "PROJECT_CORE.md", "CURRENT_STAGE.md"):
-                self.assertIn(authority, prompt)
+                self.assertIn(authority, prompts[surface])
+
+        work_prompt = prompts["work"]
+        self.assertIn("work-response-contract.md", work_prompt)
+        for heading in ("审查结果", "设计目标", "验收目标", "Codex 指令"):
+            self.assertIn(heading, work_prompt)
+        self.assertIn("一个 fenced `markdown` 指令块", work_prompt)
+        self.assertIn("验收本身不得再次落库", work_prompt)
+        self.assertIn("不要把审查落库与下一 candidate 合并", work_prompt)
+
+        codex_prompt = prompts["codex"]
+        self.assertIn("review-state recording", codex_prompt)
+        self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
+        self.assertIn("不得把审查落库与下一 Gate 合并", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)

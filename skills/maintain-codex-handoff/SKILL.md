@@ -43,6 +43,9 @@ py -3 scripts/handoff.py resume-prompt --repo <repo> --surface work
 Read [project-core-schema.md](references/project-core-schema.md) before changing
 the strategic core, and [current-stage-schema.md](references/current-stage-schema.md)
 before manually changing volatile state.
+Read [work-response-contract.md](references/work-response-contract.md) before
+generating a Browser Work handoff, evaluating a Work response, or issuing a
+Codex Goal from a completed Work review.
 
 ## Strategic Core
 
@@ -104,6 +107,10 @@ boundaries for speed or smaller code.
 6. Write the review report, run `record-review`, validate with `audit`, and
    create a separate governance-docs-only review-state commit.
 7. Push the review-state commit before ending or handing off the task.
+8. Let browser Work mechanically verify that review-state commit. A successful
+   verification closes the transaction; it creates no second review report,
+   `record-review` operation, or acceptance commit. Only then issue the next
+   bounded Goal.
 
 ## Reviewer Selection
 
@@ -121,6 +128,30 @@ boundaries for speed or smaller code.
 P0 or P1 findings require `REJECT`. Use `ACCEPT_WITH_P2` only when every P2 is
 explicitly non-blocking. Use `BLOCKED` when evidence or environment is
 insufficient.
+
+## Work Response Contract
+
+Require Browser Work to return exactly four visible sections in this order:
+`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`. The last section must
+contain the response's only fenced `markdown` block and exactly one Codex Goal.
+Do not request or expose hidden reasoning; require concise conclusions and
+evidence instead.
+
+Treat `设计目标` as a short explanation of the next authorized transaction, not
+as automatic authorization for a design-only Gate. Treat `验收目标` as the
+future checks Work will perform when Codex returns, not as a second Goal or a
+new review event.
+
+Enforce the closure state machine in
+[work-response-contract.md](references/work-response-contract.md):
+
+- after a candidate review, issue only the review-state recording Goal when
+  recording is pending;
+- after Work verifies the review-state commit, do not record that verification;
+  issue the next candidate Goal if it is authorized;
+- after rejection or a blocked review, issue only remediation or bounded
+  evidence collection;
+- never combine review-state recording with the next Gate in one Goal.
 
 ## Safety
 
@@ -177,6 +208,12 @@ Use repository `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`,
 static Project Instructions, and the generated Work resume prompt. Work should
 own strategic synthesis and candidate-independent review; Codex should own
 bounded implementation and repository verification.
+
+When network access is available, direct Work to the public copy of
+`work-response-contract.md` named by the generated resume prompt. Keep the
+compact fallback rules in `AGENTS.md` and the prompt because external access can
+fail. A project may refine the contract, but it must preserve one response, one
+transaction, one Codex Goal, and no review-of-review commit.
 
 If Work cannot read the repository, attach the latest `PROJECT_CORE.md` and
 `CURRENT_STAGE.md` for that conversation only. Do not keep stale copies in
