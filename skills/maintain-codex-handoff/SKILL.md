@@ -43,7 +43,7 @@ py -3 scripts/handoff.py resume-prompt --repo <repo> --surface work
 Read [project-core-schema.md](references/project-core-schema.md) before changing
 the strategic core, and [current-stage-schema.md](references/current-stage-schema.md)
 before manually changing volatile state.
-Read [work-response-contract.md](references/work-response-contract.md) before
+Read [work-response-contract-v1.md](references/work-response-contract-v1.md) before
 generating a Browser Work handoff, evaluating a Work response, or issuing a
 Codex Goal from a completed Work review.
 
@@ -143,14 +143,15 @@ future checks Work will perform when Codex returns, not as a second Goal or a
 new review event.
 
 Enforce the closure state machine in
-[work-response-contract.md](references/work-response-contract.md):
+[work-response-contract-v1.md](references/work-response-contract-v1.md):
 
 - after a candidate review, issue only the review-state recording Goal when
-  recording is pending;
-- after Work verifies the review-state commit, do not record that verification;
-  issue the next candidate Goal if it is authorized;
-- after rejection or a blocked review, issue only remediation or bounded
-  evidence collection;
+  recording is pending, regardless of verdict; this rule has precedence over
+  remediation;
+- after Work verifies an accepted review-state commit, do not record that
+  verification; issue the next candidate Goal if it is authorized;
+- after Work verifies a rejected or blocked review-state commit, issue only
+  remediation or bounded evidence collection;
 - never combine review-state recording with the next Gate in one Goal.
 
 ## Safety
@@ -210,7 +211,7 @@ own strategic synthesis and candidate-independent review; Codex should own
 bounded implementation and repository verification.
 
 When network access is available, direct Work to the public copy of
-`work-response-contract.md` named by the generated resume prompt. Keep the
+`work-response-contract-v1.md` named by the generated resume prompt. Keep the
 compact fallback rules in `AGENTS.md` and the prompt because external access can
 fail. A project may refine the contract, but it must preserve one response, one
 transaction, one Codex Goal, and no review-of-review commit.

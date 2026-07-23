@@ -46,7 +46,7 @@ commits and pushes. **Hooks never edit the repository.**
 ## Browser Work response contract
 
 The generated Work resume prompt links to the public
-[response contract](./skills/maintain-codex-handoff/references/work-response-contract.md).
+[response contract](./skills/maintain-codex-handoff/references/work-response-contract-v1.md).
 Work returns a concise review result, design objective, acceptance objective,
 and one Markdown instruction block containing one Codex Goal. Candidate review
 recording and the next candidate are separate transactions; mechanical
@@ -155,7 +155,8 @@ skills/maintain-codex-handoff/
 ├── agents/openai.yaml
 ├── references/
 │   ├── current-stage-schema.md
-│   └── project-core-schema.md
+│   ├── project-core-schema.md
+│   └── work-response-contract-v1.md
 └── scripts/
     ├── handoff.py
     └── hook.py

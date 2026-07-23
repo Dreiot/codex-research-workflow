@@ -1,5 +1,11 @@
 # Browser Work Response Contract
 
+Contract version: `v1`.
+
+Once published, this versioned path is immutable. Incompatible changes require
+a new `work-response-contract-vN.md` file and an explicit update to the
+installed skill and generated prompts.
+
 Use this contract for Browser ChatGPT Work responses that review a candidate,
 verify a review-state commit, revalidate repository state, or issue the next
 Codex Goal.
@@ -76,6 +82,8 @@ Do not combine two transactions in one instruction block.
 ### Candidate review completed but not recorded
 
 - Report `CANDIDATE_REVIEW`.
+- This rule has precedence for every completed verdict, including `REJECT` and
+  `BLOCKED`.
 - The only Codex Goal is a governance-docs-only review-state recording.
 - Do not include the next research, design, implementation, or experiment Goal.
 
@@ -84,10 +92,13 @@ Do not combine two transactions in one instruction block.
 - Report `REVIEW_STATE_VERIFICATION` with `VERIFIED`.
 - Verification closes the existing review transaction and creates no new
   review report, `record-review` operation, or acceptance commit.
-- The single Codex Goal may now be the next authorized candidate transaction.
+- For `ACCEPT` or `ACCEPT_WITH_P2`, the single Codex Goal may now be the next
+  authorized candidate transaction.
 
 ### Candidate rejected or evidence blocked
 
+- Apply this branch only after the `REJECT` or `BLOCKED` review-state commit has
+  been recorded, pushed, and verified.
 - The single Codex Goal may only remediate the findings or collect the missing
   evidence.
 - Do not advance the Gate or issue unrelated work.

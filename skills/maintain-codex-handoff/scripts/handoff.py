@@ -20,7 +20,7 @@ VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
 STRATEGIC_STATUSES = {"unaudited", "active", "paused", "redirected", "completed"}
 WORK_CONTRACT_URL = (
     "https://github.com/Dreiot/codex-research-handoff/blob/main/"
-    "skills/maintain-codex-handoff/references/work-response-contract.md"
+    "skills/maintain-codex-handoff/references/work-response-contract-v1.md"
 )
 STATE_REQUIRED_FIELDS = (
     "schema_version",
@@ -466,6 +466,10 @@ def command_initialize(args: argparse.Namespace) -> int:
             "`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`, with one fenced "
             "Markdown block containing one Codex Goal. Never combine review-state recording "
             "with the next candidate.\n"
+            "- Record every completed candidate review before remediation or Gate advancement, "
+            "including `REJECT` and `BLOCKED`. After Work verifies that review-state commit, "
+            "accepted work may advance; rejected or blocked work may only remediate findings "
+            "or collect missing evidence.\n"
             "- Work verification of a review-state commit is mechanical closure, not a new "
             "independent review. Do not create another report, `record-review` operation, or "
             "acceptance commit for that verification.\n"
@@ -609,9 +613,11 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "`Codex 指令` 四节；最后一节只能有一个 fenced `markdown` 指令块，且其中只能有"
             "一个最小、可验证的 Codex Goal。不要输出隐藏推理，不要使用冗长分隔线，不要把"
             "审查落库与下一 candidate 合并。\n\n"
-            "若 candidate 审查已完成但尚未落库，唯一 Goal 必须是 docs-only review-state "
-            "recording；若 review-state commit 已验收，验收本身不得再次落库，可在同一回复中"
-            "把下一项已授权 candidate 作为唯一 Goal。若 Git、PROJECT_CORE 与 CURRENT_STAGE "
+            "若 candidate 审查已完成但尚未落库（包括 REJECT/BLOCKED），唯一 Goal 必须是 "
+            "docs-only review-state recording，此优先级高于 remediation。若 review-state "
+            "commit 已验收，验收本身不得再次落库；ACCEPT/ACCEPT_WITH_P2 可把下一项已授权 "
+            "candidate 作为唯一 Goal，REJECT/BLOCKED 则只能给出 remediation 或补证据 Goal。"
+            "若 Git、PROJECT_CORE 与 CURRENT_STAGE "
             "冲突，报告 BLOCKED，且只允许给出有界的核对或修正 Goal。"
         )
     else:

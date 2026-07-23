@@ -11,6 +11,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HANDOFF = ROOT / "skills" / "maintain-codex-handoff" / "scripts" / "handoff.py"
 HOOK = ROOT / "skills" / "maintain-codex-handoff" / "scripts" / "hook.py"
+WORK_CONTRACT = (
+    ROOT
+    / "skills"
+    / "maintain-codex-handoff"
+    / "references"
+    / "work-response-contract-v1.md"
+)
 
 
 class HandoffIntegrationTest(unittest.TestCase):
@@ -115,11 +122,14 @@ class HandoffIntegrationTest(unittest.TestCase):
                 self.assertIn(authority, prompts[surface])
 
         work_prompt = prompts["work"]
-        self.assertIn("work-response-contract.md", work_prompt)
+        self.assertIn("work-response-contract-v1.md", work_prompt)
         for heading in ("审查结果", "设计目标", "验收目标", "Codex 指令"):
             self.assertIn(heading, work_prompt)
         self.assertIn("一个 fenced `markdown` 指令块", work_prompt)
         self.assertIn("验收本身不得再次落库", work_prompt)
+        self.assertIn("包括 REJECT/BLOCKED", work_prompt)
+        self.assertIn("此优先级高于 remediation", work_prompt)
+        self.assertIn("REJECT/BLOCKED 则只能给出 remediation", work_prompt)
         self.assertIn("不要把审查落库与下一 candidate 合并", work_prompt)
 
         codex_prompt = prompts["codex"]
@@ -134,6 +144,14 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Strategy:", context)
         self.assertIn("Volatile state:", context)
         self.assertEqual(self.run_command("git", "-C", str(self.repo), "status", "--short"), "")
+
+    def test_work_contract_has_unambiguous_closure_precedence(self):
+        contract = WORK_CONTRACT.read_text(encoding="utf-8")
+        self.assertIn("This rule has precedence for every completed verdict", contract)
+        self.assertIn("including `REJECT` and", contract)
+        self.assertIn("Apply this branch only after the `REJECT` or `BLOCKED`", contract)
+        self.assertIn("been recorded, pushed, and verified", contract)
+        self.assertIn("Once published, this versioned path is immutable", contract)
 
     def test_missing_core_is_migration_warning_until_declared_authoritative(self):
         self.initialize_and_commit()
