@@ -43,9 +43,13 @@ py -3 scripts/handoff.py resume-prompt --repo <repo> --surface work
 Read [project-core-schema.md](references/project-core-schema.md) before changing
 the strategic core, and [current-stage-schema.md](references/current-stage-schema.md)
 before manually changing volatile state.
-Read [work-response-contract-v1.md](references/work-response-contract-v1.md) before
+Read [work-response-contract.md](references/work-response-contract.md) before
 generating a Browser Work handoff, evaluating a Work response, or issuing a
 Codex Goal from a completed Work review.
+Do not modify, rename, replace, relax, or expand that contract unless the user
+explicitly authorizes a change to the contract itself. Never infer that
+authorization from ordinary skill use, project governance, review, or prompt
+work.
 
 ## Strategic Core
 
@@ -143,7 +147,7 @@ future checks Work will perform when Codex returns, not as a second Goal or a
 new review event.
 
 Enforce the closure state machine in
-[work-response-contract-v1.md](references/work-response-contract-v1.md):
+[work-response-contract.md](references/work-response-contract.md):
 
 - after a candidate review, issue only the review-state recording Goal when
   recording is pending, regardless of verdict; this rule has precedence over
@@ -153,6 +157,19 @@ Enforce the closure state machine in
 - after Work verifies a rejected or blocked review-state commit, issue only
   remediation or bounded evidence collection;
 - never combine review-state recording with the next Gate in one Goal.
+
+Keep the fenced Codex Goal compact. Invoke this skill, then rely on Codex to
+reload the three authorities, current reports, and actual Git state. Do not
+repeat checked-in protocols, formulas, test matrices, findings, full history,
+all blob hashes, generic safety rules, or exhaustive response templates.
+Include only the unique Goal, expected branch/base, authority pointers, exact
+allowed diff, task-specific delta, material prohibitions, validation commands,
+commit/push, and stop condition. Keep the Goal as short as correctness allows;
+there is no fixed character limit. Framework-scale or cross-module Goals may
+retain necessary task-specific interface, migration, integration, and
+fail-closed detail. Repository repetition is never justification for length;
+prefer moving durable detail into an authorized protocol or report and
+referencing it.
 
 ## Safety
 
@@ -211,9 +228,10 @@ own strategic synthesis and candidate-independent review; Codex should own
 bounded implementation and repository verification.
 
 When network access is available, direct Work to the public copy of
-`work-response-contract-v1.md` named by the generated resume prompt. Keep the
+`work-response-contract.md` named by the generated resume prompt. Keep the
 compact fallback rules in `AGENTS.md` and the prompt because external access can
-fail. A project may refine the contract, but it must preserve one response, one
+fail. Project instructions may add stricter project-specific constraints
+without modifying the public contract, but they must preserve one response, one
 transaction, one Codex Goal, and no review-of-review commit.
 
 If Work cannot read the repository, attach the latest `PROJECT_CORE.md` and

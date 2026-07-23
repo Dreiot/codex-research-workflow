@@ -46,12 +46,15 @@ commits and pushes. **Hooks never edit the repository.**
 ## Browser Work response contract
 
 The generated Work resume prompt links to the public
-[response contract](./skills/maintain-codex-handoff/references/work-response-contract-v1.md).
+[response contract](./skills/maintain-codex-handoff/references/work-response-contract.md).
 Work returns a concise review result, design objective, acceptance objective,
 and one Markdown instruction block containing one Codex Goal. Candidate review
 recording and the next candidate are separate transactions; mechanical
 verification of a review-state commit does not create another acceptance
-commit.
+commit. Codex instruction blocks have no fixed character limit: they stay as
+short as correctness allows and reference checked-in authority instead of
+repeating it. Agents may change the public contract only after explicit user
+authorization.
 
 ## Install
 
@@ -156,7 +159,7 @@ skills/maintain-codex-handoff/
 ├── references/
 │   ├── current-stage-schema.md
 │   ├── project-core-schema.md
-│   └── work-response-contract-v1.md
+│   └── work-response-contract.md
 └── scripts/
     ├── handoff.py
     └── hook.py

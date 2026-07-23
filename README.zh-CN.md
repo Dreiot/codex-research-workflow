@@ -42,10 +42,12 @@ review-state commit 与 push 前后发出警告。**Hook 永远不会修改仓�
 ## Browser Work 输出契约
 
 生成的 Work 恢复 Prompt 会链接公开的
-[输出契约](./skills/maintain-codex-handoff/references/work-response-contract-v1.md)。
+[输出契约](./skills/maintain-codex-handoff/references/work-response-contract.md)。
 Work 的回复固定为审查结果、设计目标、验收目标，以及一个只包含单一 Codex Goal 的
 Markdown 指令块。candidate 审查落库和下一 candidate 必须分开；对 review-state
-commit 的机械验收不会再产生 acceptance commit。
+commit 的机械验收不会再产生 acceptance commit。Codex 指令块没有固定字符上限，应在
+不损害正确性的前提下尽量简短，并引用已落库权威信息而非重复全文。只有用户明确授权时，
+代理才能修改该公共契约。
 
 ## 安装
 

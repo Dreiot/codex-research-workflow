@@ -20,7 +20,7 @@ VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
 STRATEGIC_STATUSES = {"unaudited", "active", "paused", "redirected", "completed"}
 WORK_CONTRACT_URL = (
     "https://github.com/Dreiot/codex-research-handoff/blob/main/"
-    "skills/maintain-codex-handoff/references/work-response-contract-v1.md"
+    "skills/maintain-codex-handoff/references/work-response-contract.md"
 )
 STATE_REQUIRED_FIELDS = (
     "schema_version",
@@ -466,6 +466,15 @@ def command_initialize(args: argparse.Namespace) -> int:
             "`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`, with one fenced "
             "Markdown block containing one Codex Goal. Never combine review-state recording "
             "with the next candidate.\n"
+            "- Keep the Codex Goal as short as correctness allows; there is no fixed character "
+            "limit. Framework-scale or cross-module Goals may retain necessary task-specific "
+            "interface, migration, integration, and fail-closed detail. Invoke the "
+            "installed handoff skill and reference checked-in authorities, protocols, reports, "
+            "formulas, tests, findings, and Git state instead of copying them. Include only the "
+            "unique Goal, expected branch/base, authority pointers, exact allowed diff, "
+            "task-specific delta, material prohibitions, validation, commit/push, and stop "
+            "condition. Repository repetition is never justification for length; move durable "
+            "detail into an authorized protocol or report and reference it when possible.\n"
             "- Record every completed candidate review before remediation or Gate advancement, "
             "including `REJECT` and `BLOCKED`. After Work verifies that review-state commit, "
             "accepted work may advance; rejected or blocked work may only remediate findings "
@@ -612,7 +621,13 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "还是阻塞修正。严格按规范只输出 `审查结果`、`设计目标`、`验收目标`、"
             "`Codex 指令` 四节；最后一节只能有一个 fenced `markdown` 指令块，且其中只能有"
             "一个最小、可验证的 Codex Goal。不要输出隐藏推理，不要使用冗长分隔线，不要把"
-            "审查落库与下一 candidate 合并。\n\n"
+            "审查落库与下一 candidate 合并。Codex 会通过已安装 skill 重新读取三份权威文件、"
+            "当前报告并核验 Git；不要重复协议/公式全文、完整测试矩阵、已落库 findings、完整"
+            "历史、全部 blob、通用安全条款或冗长最终回复模板。指令没有固定字符上限，应在不"
+            "损害正确性的前提下尽量简短；框架级或跨模块 Goal 可保留必要的接口、迁移、集成和 "
+            "fail-closed 细节。只保留唯一 Goal、expected branch/base、权威文件指针、精确允许 "
+            "diff、本轮 delta、关键禁止边界、验证、commit/push 和 stop condition；重复仓库"
+            "内容不能作为超长理由，持久细节应尽量落入授权协议或报告后引用。\n\n"
             "若 candidate 审查已完成但尚未落库（包括 REJECT/BLOCKED），唯一 Goal 必须是 "
             "docs-only review-state recording，此优先级高于 remediation。若 review-state "
             "commit 已验收，验收本身不得再次落库；ACCEPT/ACCEPT_WITH_P2 可把下一项已授权 "

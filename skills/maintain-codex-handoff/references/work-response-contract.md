@@ -1,10 +1,17 @@
 # Browser Work Response Contract
 
-Contract version: `v1`.
+## Change Control
 
-Once published, this versioned path is immutable. Incompatible changes require
-a new `work-response-contract-vN.md` file and an explicit update to the
-installed skill and generated prompts.
+This public contract may be changed, renamed, replaced, relaxed, or expanded
+only after the user explicitly authorizes a change to this contract. Do not
+infer authorization from a request to use the skill, initialize or audit a
+project, improve a project prompt, perform a review, or update project
+governance. Agents must not modify this contract autonomously.
+
+After an explicitly authorized contract change, keep the change bounded,
+synchronize the public repository and installed skill copies, update tests and
+generated prompts, validate the skill, and review the resulting diff before
+delivery.
 
 Use this contract for Browser ChatGPT Work responses that review a candidate,
 verify a review-state commit, revalidate repository state, or issue the next
@@ -62,19 +69,40 @@ verification in another report or commit.
 
 ### Codex 指令
 
-Use one compact Goal with only the task-specific facts Codex needs. Prefer these
-internal headings:
+Start the instruction block by invoking the installed
+`$maintain-codex-handoff` skill. Codex will then reload `AGENTS.md`,
+`docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, the current report, and actual
+Git state. Do not duplicate information that Codex can obtain from those
+authorities and Git.
+
+Use one compact Goal containing only:
 
 - `Goal`
-- `Authority and precheck`
-- `Allowed scope`
-- `Actions`
-- `Verification`
-- `Commit and return`
+- expected branch and base or reviewed candidate SHA;
+- authoritative file and report pointers, with relevant section names;
+- exact allowed diff;
+- task-specific changes or finding IDs not already defined by those sources;
+- material prohibited boundaries;
+- required validation commands;
+- commit, push, return, and stop conditions.
 
-Reference `AGENTS.md`, `docs/PROJECT_CORE.md`, and `docs/CURRENT_STAGE.md`
-instead of repeating stable repository rules. Repeat exact SHAs, allowlists,
-frozen payloads, and stop conditions when they are material to correctness.
+Do not repeat stable repository rules, protocol or formula text, complete test
+matrices, complete findings already stored in a report, full project history,
+all known blob hashes, generic safety rules, or an exhaustive final-response
+template. Reference the checked-in path and relevant section instead. Repeat
+only identities or frozen payloads that cannot be recovered unambiguously from
+the expected base and authority files and are material to correctness.
+
+Keep the instruction block as short as correctness allows; there is no fixed
+character limit. Framework-scale or cross-module Goals may include necessary
+task-specific interface, migration, integration, and fail-closed detail.
+Length is justified only by material content that cannot be recovered
+unambiguously from repository authority, or by an exact user-supplied frozen
+payload such as a not-yet-recorded external review. Repository repetition and
+general complexity are not justification. When a Goal becomes unusually long,
+prefer moving durable detail into an authorized protocol or report and
+referencing it.
+
 Do not combine two transactions in one instruction block.
 
 ## Closure State Machine

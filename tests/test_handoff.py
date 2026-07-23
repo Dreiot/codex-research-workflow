@@ -16,7 +16,7 @@ WORK_CONTRACT = (
     / "skills"
     / "maintain-codex-handoff"
     / "references"
-    / "work-response-contract-v1.md"
+    / "work-response-contract.md"
 )
 
 
@@ -122,7 +122,7 @@ class HandoffIntegrationTest(unittest.TestCase):
                 self.assertIn(authority, prompts[surface])
 
         work_prompt = prompts["work"]
-        self.assertIn("work-response-contract-v1.md", work_prompt)
+        self.assertIn("work-response-contract.md", work_prompt)
         for heading in ("审查结果", "设计目标", "验收目标", "Codex 指令"):
             self.assertIn(heading, work_prompt)
         self.assertIn("一个 fenced `markdown` 指令块", work_prompt)
@@ -130,6 +130,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("包括 REJECT/BLOCKED", work_prompt)
         self.assertIn("此优先级高于 remediation", work_prompt)
         self.assertIn("REJECT/BLOCKED 则只能给出 remediation", work_prompt)
+        self.assertIn("没有固定字符上限", work_prompt)
+        self.assertIn("框架级或跨模块 Goal 可保留必要的接口", work_prompt)
+        self.assertIn("重复仓库内容不能作为超长理由", work_prompt)
+        self.assertIn("不要重复协议/公式全文", work_prompt)
+        self.assertIn("全部 blob", work_prompt)
         self.assertIn("不要把审查落库与下一 candidate 合并", work_prompt)
 
         codex_prompt = prompts["codex"]
@@ -151,7 +156,13 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("including `REJECT` and", contract)
         self.assertIn("Apply this branch only after the `REJECT` or `BLOCKED`", contract)
         self.assertIn("been recorded, pushed, and verified", contract)
-        self.assertIn("Once published, this versioned path is immutable", contract)
+        self.assertIn("only after the user explicitly authorizes a change", contract)
+        self.assertIn("Agents must not modify this contract autonomously", contract)
+        self.assertIn("there is no fixed", contract)
+        self.assertIn("character limit", contract)
+        self.assertIn("Framework-scale or cross-module Goals", contract)
+        self.assertIn("Do not repeat stable repository rules", contract)
+        self.assertNotIn("work-response-contract-v1", contract)
 
     def test_missing_core_is_migration_warning_until_declared_authoritative(self):
         self.initialize_and_commit()
