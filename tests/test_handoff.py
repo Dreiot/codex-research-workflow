@@ -65,6 +65,41 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: initialize handoff")
         return output
 
+    def read_state(self):
+        text = (self.repo / "docs" / "CURRENT_STAGE.md").read_text(encoding="utf-8")
+        payload = text.split("<!-- codex-handoff-state\n", 1)[1].split("\n-->", 1)[0]
+        return json.loads(payload)
+
+    def record_review(self, candidate, candidate_kind, verdict, report_name):
+        report_path = self.repo / "docs" / report_name
+        report_path.write_text(f"# Review\n\nCandidate: `{candidate}`\n", encoding="utf-8")
+        review_path = self.repo / "review-input.json"
+        review_path.write_text(
+            json.dumps(
+                {
+                    "candidate_sha": candidate,
+                    "candidate_kind": candidate_kind,
+                    "verdict": verdict,
+                    "review_report": f"docs/{report_name}",
+                    "open_findings": [] if verdict == "ACCEPT" else ["P2: bounded limitation."],
+                    "current_gate": "review complete",
+                    "next_gate": "next bounded gate",
+                    "next_action": "Verify the review-state commit.",
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.run_command(
+            sys.executable,
+            str(HANDOFF),
+            "record-review",
+            "--repo",
+            str(self.repo),
+            "--input",
+            str(review_path),
+        )
+        review_path.unlink()
+
     def test_initialize_audit_prompts_and_hook_are_consistent(self):
         first = self.run_command(sys.executable, str(HANDOFF), "initialize", "--repo", str(self.repo))
         core_path = self.repo / "docs" / "PROJECT_CORE.md"
@@ -83,8 +118,12 @@ class HandoffIntegrationTest(unittest.TestCase):
             "## Authority",
             "Execute one bounded Goal at a time.",
             "prefer the smallest sufficient implementation and experiment matrix",
+            "shortest credible empirical loop",
+            "Treat exploratory smoke as diagnostic evidence",
             "Do not advance a Gate or scientific claim without explicit evidence.",
-            "Require one qualified independent review",
+            "Require one qualified independent review pinned",
+            "material code, data-processing, experiment",
+            "accepted implementation candidate",
             "Browser Work responses must follow the public Work Response Contract",
             "Work verification of a review-state commit is mechanical closure",
             "Automatic context compaction alone is not a reason",
@@ -136,9 +175,15 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("不要重复协议/公式全文", work_prompt)
         self.assertIn("全部 blob", work_prompt)
         self.assertIn("不要把审查落库与下一 candidate 合并", work_prompt)
+        self.assertIn("non-material", work_prompt)
+        self.assertIn("真实数据 smoke", work_prompt)
+        self.assertIn("主动询问用户", work_prompt)
+        self.assertIn("candidate_kind=implementation", work_prompt)
 
         codex_prompt = prompts["codex"]
         self.assertIn("review-state recording", codex_prompt)
+        self.assertIn("formal evidence run", codex_prompt)
+        self.assertIn("主动询问用户", codex_prompt)
         self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
         self.assertIn("不得把审查落库与下一 Gate 合并", codex_prompt)
 
@@ -163,6 +208,186 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Framework-scale or cross-module Goals", contract)
         self.assertIn("Do not repeat stable repository rules", contract)
         self.assertNotIn("work-response-contract-v1", contract)
+
+    def test_record_review_enforces_candidate_kind_and_accepted_code_semantics(self):
+        self.initialize_and_commit()
+
+        implementation = self.repo / "method.py"
+        implementation.write_text("VALUE = 1\n", encoding="utf-8")
+        self.run_command("git", "-C", str(self.repo), "add", "method.py")
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "feat: add method")
+        implementation_sha = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
+
+        self.record_review(
+            implementation_sha,
+            "implementation",
+            "ACCEPT",
+            "IMPLEMENTATION_REVIEW.md",
+        )
+        implementation_state = self.read_state()
+        self.assertEqual(implementation_state["last_reviewed_candidate"], implementation_sha)
+        self.assertEqual(implementation_state["accepted_code_commit"], implementation_sha)
+        self.run_command(
+            "git",
+            "-C",
+            str(self.repo),
+            "add",
+            "docs/CURRENT_STAGE.md",
+            "docs/IMPLEMENTATION_REVIEW.md",
+        )
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: record implementation review")
+
+        protocol = self.repo / "docs" / "PROTOCOL.md"
+        protocol.write_text("# Protocol\n", encoding="utf-8")
+        self.run_command("git", "-C", str(self.repo), "add", "docs/PROTOCOL.md")
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: add protocol")
+        docs_sha = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
+
+        self.record_review(docs_sha, "docs_only", "ACCEPT_WITH_P2", "PROTOCOL_REVIEW.md")
+        docs_state = self.read_state()
+        self.assertEqual(docs_state["last_reviewed_candidate"], docs_sha)
+        self.assertEqual(docs_state["accepted_code_commit"], implementation_sha)
+        self.run_command(
+            "git",
+            "-C",
+            str(self.repo),
+            "add",
+            "docs/CURRENT_STAGE.md",
+            "docs/PROTOCOL_REVIEW.md",
+        )
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: record protocol review")
+
+        implementation.write_text("VALUE = 2\n", encoding="utf-8")
+        self.run_command("git", "-C", str(self.repo), "add", "method.py")
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "feat: revise method")
+        rejected_sha = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
+
+        self.record_review(rejected_sha, "implementation", "REJECT", "REJECTED_REVIEW.md")
+        rejected_state = self.read_state()
+        self.assertEqual(rejected_state["last_reviewed_candidate"], rejected_sha)
+        self.assertEqual(rejected_state["accepted_code_commit"], implementation_sha)
+
+    def test_record_review_supports_legacy_inputs_and_rejects_kind_conflicts(self):
+        self.initialize_and_commit()
+        implementation = self.repo / "method.py"
+        implementation.write_text("VALUE = 1\n", encoding="utf-8")
+        self.run_command("git", "-C", str(self.repo), "add", "method.py")
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "feat: add method")
+        candidate = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
+        report = self.repo / "docs" / "REVIEW.md"
+        report.write_text("# Review\n", encoding="utf-8")
+
+        review_path = self.repo / "review-input.json"
+        base_review = {
+            "candidate_sha": candidate,
+            "verdict": "ACCEPT",
+            "review_report": "docs/REVIEW.md",
+            "open_findings": [],
+            "next_gate": "next",
+            "next_action": "verify",
+        }
+        review_path.write_text(json.dumps(base_review), encoding="utf-8")
+        self.run_command(
+            sys.executable,
+            str(HANDOFF),
+            "record-review",
+            "--repo",
+            str(self.repo),
+            "--input",
+            str(review_path),
+        )
+        legacy_state = self.read_state()
+        self.assertEqual(legacy_state["accepted_code_commit"], candidate)
+
+        base_review["verdict"] = "BLOCKED"
+        base_review["accepted_code_commit"] = candidate
+        review_path.write_text(json.dumps(base_review), encoding="utf-8")
+        self.run_command(
+            sys.executable,
+            str(HANDOFF),
+            "record-review",
+            "--repo",
+            str(self.repo),
+            "--input",
+            str(review_path),
+        )
+        blocked_state = self.read_state()
+        self.assertEqual(blocked_state["accepted_code_commit"], candidate)
+
+        self.run_command(
+            "git",
+            "-C",
+            str(self.repo),
+            "add",
+            "docs/CURRENT_STAGE.md",
+            "docs/REVIEW.md",
+        )
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: record legacy review")
+        protocol = self.repo / "docs" / "PROTOCOL.md"
+        protocol.write_text("# Protocol\n", encoding="utf-8")
+        self.run_command("git", "-C", str(self.repo), "add", "docs/PROTOCOL.md")
+        self.run_command("git", "-C", str(self.repo), "commit", "-m", "docs: add protocol")
+        docs_candidate = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
+        base_review["candidate_sha"] = docs_candidate
+        base_review["verdict"] = "ACCEPT_WITH_P2"
+        base_review["accepted_code_commit"] = candidate
+        review_path.write_text(json.dumps(base_review), encoding="utf-8")
+        self.run_command(
+            sys.executable,
+            str(HANDOFF),
+            "record-review",
+            "--repo",
+            str(self.repo),
+            "--input",
+            str(review_path),
+        )
+        legacy_docs_state = self.read_state()
+        self.assertEqual(legacy_docs_state["last_reviewed_candidate"], docs_candidate)
+        self.assertEqual(legacy_docs_state["accepted_code_commit"], candidate)
+
+        base_review["candidate_sha"] = docs_candidate
+        base_review["verdict"] = "ACCEPT"
+        base_review["candidate_kind"] = "implementation"
+        base_review["accepted_code_commit"] = "0" * 40
+        review_path.write_text(json.dumps(base_review), encoding="utf-8")
+        conflict = subprocess.run(
+            [
+                sys.executable,
+                str(HANDOFF),
+                "record-review",
+                "--repo",
+                str(self.repo),
+                "--input",
+                str(review_path),
+            ],
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+            env=self.env,
+        )
+        self.assertEqual(conflict.returncode, 2)
+        self.assertIn("conflicts with candidate_kind", conflict.stderr)
+
+        base_review["candidate_kind"] = "invalid"
+        base_review.pop("accepted_code_commit")
+        review_path.write_text(json.dumps(base_review), encoding="utf-8")
+        invalid = subprocess.run(
+            [
+                sys.executable,
+                str(HANDOFF),
+                "record-review",
+                "--repo",
+                str(self.repo),
+                "--input",
+                str(review_path),
+            ],
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+            env=self.env,
+        )
+        self.assertEqual(invalid.returncode, 2)
+        self.assertIn("candidate_kind must be", invalid.stderr)
 
     def test_missing_core_is_migration_warning_until_declared_authoritative(self):
         self.initialize_and_commit()

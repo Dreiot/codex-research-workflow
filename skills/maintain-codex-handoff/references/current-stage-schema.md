@@ -37,6 +37,27 @@ Required rules:
 Human-readable sections follow the comment. Keep them synchronized by using
 `scripts/handoff.py record-review`; hooks parse only the JSON block.
 
+## Review Input Semantics
+
+New `record-review` inputs should declare `candidate_kind` as either:
+
+- `implementation`: code or another material behavioral candidate. An
+  `ACCEPT` or `ACCEPT_WITH_P2` verdict sets `accepted_code_commit` to the
+  candidate SHA.
+- `docs_only`: a protocol, governance, or other docs-only candidate. Acceptance
+  updates `last_reviewed_candidate` but preserves the prior
+  `accepted_code_commit`.
+
+`REJECT` and `BLOCKED` always preserve the prior accepted code. A review-state
+commit is not a reviewed candidate and must not be passed to `record-review`.
+The command fails closed when a supplied `accepted_code_commit` conflicts with
+these semantics.
+
+For backward compatibility, a legacy accepted input without `candidate_kind`
+defaults to `implementation` unless it explicitly preserves the prior
+`accepted_code_commit`, in which case it is treated as `docs_only`. Legacy
+`REJECT` and `BLOCKED` inputs preserve accepted code without needing a kind.
+
 Authority boundary:
 
 - This file is the sole authority for volatile branch/Gate/review/next-action

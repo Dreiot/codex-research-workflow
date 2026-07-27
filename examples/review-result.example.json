@@ -1,5 +1,6 @@
 {
   "candidate_sha": "0123456789abcdef0123456789abcdef01234567",
+  "candidate_kind": "implementation",
   "verdict": "ACCEPT_WITH_P2",
   "review_report": "docs/reviews/G1_INDEPENDENT_REVIEW.md",
   "open_findings": [

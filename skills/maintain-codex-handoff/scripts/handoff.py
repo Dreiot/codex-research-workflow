@@ -17,6 +17,7 @@ STATE_REL = Path("docs/CURRENT_STAGE.md")
 STATE_START = "<!-- codex-handoff-state"
 ENVELOPE_END = "-->"
 VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
+CANDIDATE_KINDS = {"implementation", "docs_only"}
 STRATEGIC_STATUSES = {"unaudited", "active", "paused", "redirected", "completed"}
 WORK_CONTRACT_URL = (
     "https://github.com/Dreiot/codex-research-handoff/blob/main/"
@@ -450,13 +451,31 @@ def command_initialize(args: argparse.Namespace) -> int:
             "answer the current research question and support the target claim. Reuse existing "
             "components and avoid speculative abstractions, duplicate mechanisms, broad "
             "refactors, exhaustive generalization, or unnecessary design-only Gates.\n"
+            "- Prefer the shortest credible empirical loop from minimal implementation through "
+            "bounded real-data smoke to measurable results. Do not invent an extra authorization "
+            "or review Gate when repository authorities already permit a local, reversible run. "
+            "If permission is unclear, ask the user proactively. Always ask before paid, "
+            "irreversible, sensitive-data, external live-service or held-out formal-evaluation "
+            "actions.\n"
+            "- Treat exploratory smoke as diagnostic evidence, not automatic publication "
+            "evidence. Freeze data, configuration, metrics, statistical units, comparators, "
+            "stopping conditions, and provenance before a formal evidence run.\n"
             "- Never trade away data integrity, statistical validity, reproducibility, "
             "fail-closed safeguards, or claim boundaries for speed or smaller code.\n"
             "- Do not advance a Gate or scientific claim without explicit evidence.\n\n"
             "## Review And State\n\n"
             "- Require one qualified independent review pinned to the exact base and candidate "
-            "SHAs. Do not duplicate a qualifying Browser Work review with a Codex reviewer, "
-            "and do not let the reviewer modify the candidate.\n"
+            "SHAs for material code, data-processing, experiment, statistical, protocol, or "
+            "claim-relevant candidates. Do not create review loops for formatting, mechanical "
+            "state synchronization, or other non-material changes that leave behavior, Gate, "
+            "verdict, findings, accepted SHAs, and claims unchanged.\n"
+            "- Do not duplicate a qualifying Browser Work review with a Codex reviewer, split a "
+            "natural end-to-end candidate solely to add reviews, or let the reviewer modify the "
+            "candidate. Non-blocking P2 findings stay in backlog unless they materially affect "
+            "correctness, reproducibility, fair comparison, interpretation, or the target claim.\n"
+            "- If the same P0 or P1 survives two remediation rounds, stop adding implementation "
+            "until the project decides whether the cause is a defect, ambiguous protocol, or an "
+            "expanded evidence or threat boundary.\n"
             "- Update `docs/CURRENT_STAGE.md` only after an authoritative Gate, review, "
             "finding, or next-action change. Update `docs/PROJECT_CORE.md` only after a durable "
             "strategic, innovation, component, evidence, or claim-boundary change.\n"
@@ -482,6 +501,12 @@ def command_initialize(args: argparse.Namespace) -> int:
             "- Work verification of a review-state commit is mechanical closure, not a new "
             "independent review. Do not create another report, `record-review` operation, or "
             "acceptance commit for that verification.\n"
+            "- For an accepted implementation candidate, set both `last_reviewed_candidate` and "
+            "`accepted_code_commit` to the candidate SHA. For an accepted docs-only protocol or "
+            "governance candidate, update only `last_reviewed_candidate`; rejected, blocked, and "
+            "review-state commits never replace the prior accepted code. Every review-state "
+            "recording must pass `candidate_kind=implementation` or `candidate_kind=docs_only` "
+            "explicitly to the handoff tool.\n"
             "- Automatic context compaction alone is not a reason to stop, commit, or hand off. "
             "At an explicit handoff, audit the repository and report unresolved work exactly.\n\n"
             "## Git\n\n"
@@ -556,7 +581,14 @@ def command_record_review(args: argparse.Namespace) -> int:
         print("cannot update invalid CURRENT_STAGE: " + "; ".join(errors), file=sys.stderr)
         return 2
     review = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    required = ("candidate_sha", "verdict", "review_report", "open_findings", "next_gate", "next_action")
+    required = (
+        "candidate_sha",
+        "verdict",
+        "review_report",
+        "open_findings",
+        "next_gate",
+        "next_action",
+    )
     missing = [key for key in required if key not in review]
     if missing:
         print("review input missing: " + ", ".join(missing), file=sys.stderr)
@@ -568,6 +600,35 @@ def command_record_review(args: argparse.Namespace) -> int:
         return 2
     if verdict not in VERDICTS:
         print("invalid verdict", file=sys.stderr)
+        return 2
+    prior_accepted = state["accepted_code_commit"]
+    requested_accepted = review.get("accepted_code_commit")
+    candidate_kind = review.get("candidate_kind")
+    if candidate_kind is not None and (
+        not isinstance(candidate_kind, str) or candidate_kind not in CANDIDATE_KINDS
+    ):
+        print("candidate_kind must be implementation or docs_only", file=sys.stderr)
+        return 2
+    if candidate_kind is None and verdict in {"ACCEPT", "ACCEPT_WITH_P2"}:
+        if "accepted_code_commit" not in review or requested_accepted == candidate:
+            candidate_kind = "implementation"
+        elif requested_accepted == prior_accepted:
+            candidate_kind = "docs_only"
+        else:
+            print(
+                "legacy accepted_code_commit cannot determine candidate_kind",
+                file=sys.stderr,
+            )
+            return 2
+    if verdict in {"ACCEPT", "ACCEPT_WITH_P2"}:
+        expected_accepted = candidate if candidate_kind == "implementation" else prior_accepted
+    else:
+        expected_accepted = prior_accepted
+    if "accepted_code_commit" in review and requested_accepted != expected_accepted:
+        print(
+            "accepted_code_commit conflicts with candidate_kind and verdict semantics",
+            file=sys.stderr,
+        )
         return 2
     state.update(
         {
@@ -581,10 +642,7 @@ def command_record_review(args: argparse.Namespace) -> int:
             "updated_at": now_iso(),
         }
     )
-    if verdict in {"ACCEPT", "ACCEPT_WITH_P2"}:
-        state["accepted_code_commit"] = review.get("accepted_code_commit", candidate)
-    elif "accepted_code_commit" in review:
-        state["accepted_code_commit"] = review["accepted_code_commit"]
+    state["accepted_code_commit"] = expected_accepted
     errors = validate_state(repo, state)
     if errors:
         print("review state invalid: " + "; ".join(errors), file=sys.stderr)
@@ -618,7 +676,8 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
             f"{WORK_CONTRACT_URL}\n\n"
             "判断当前事务属于 candidate 独立审查、review-state 机械验收、普通状态核验，"
-            "还是阻塞修正。严格按规范只输出 `审查结果`、`设计目标`、`验收目标`、"
+            "阻塞修正，还是无需独立审查的 non-material 事务。严格按规范只输出 "
+            "`审查结果`、`设计目标`、`验收目标`、"
             "`Codex 指令` 四节；最后一节只能有一个 fenced `markdown` 指令块，且其中只能有"
             "一个最小、可验证的 Codex Goal。不要输出隐藏推理，不要使用冗长分隔线，不要把"
             "审查落库与下一 candidate 合并。Codex 会通过已安装 skill 重新读取三份权威文件、"
@@ -632,6 +691,14 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "docs-only review-state recording，此优先级高于 remediation。若 review-state "
             "commit 已验收，验收本身不得再次落库；ACCEPT/ACCEPT_WITH_P2 可把下一项已授权 "
             "candidate 作为唯一 Goal，REJECT/BLOCKED 则只能给出 remediation 或补证据 Goal。"
+            "review-state recording 必须明确把被审查 candidate 标记为 "
+            "`candidate_kind=implementation` 或 `candidate_kind=docs_only`，不得按报告标题猜测。"
+            "只对 material implementation、数据处理、实验、统计、协议或 claim 相关 candidate "
+            "创建独立审查；不得为格式、机械同步、普通状态检查或非阻塞 P2 创建 review loop。"
+            "闭环后优先推进最小实现、真实数据 smoke、正式实验或主要指标，而不是新增非必要的 "
+            "design-only Gate。真实数据运行若已被仓库或用户默认规则允许，不得自行追加授权门槛；"
+            "若权限不清，或涉及付费、不可逆、敏感数据、外部 live service 或正式 held-out "
+            "evaluation，应主动询问用户。探索性 smoke 不得自动提升为论文证据。"
             "若 Git、PROJECT_CORE 与 CURRENT_STAGE "
             "冲突，报告 BLOCKED，且只允许给出有界的核对或修正 Goal。"
         )
@@ -642,12 +709,15 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "`docs/CURRENT_STAGE.md` 及当前 Gate 指向的报告；fetch 后实查分支、HEAD、远端跟踪 "
             f"ref、index 和 worktree。记录的预期分支为 `{state['branch']}`，但必须以 Git 实查为准。"
             "任何策略、状态或 Git 冲突都必须停止，不得依赖本 Prompt 或旧聊天自行补全。\n\n"
-            "开始前把当前工作归类为以下唯一一种事务：review-state recording、remediation、"
-            "next candidate 或 handoff-only。只执行 `CURRENT_STAGE.md` 与用户提供指令共同授权的"
+            "开始前把当前工作归类为以下唯一一种事务：non-material、material candidate、"
+            "formal evidence run、review-state recording、remediation 或 handoff-only。"
+            "只执行 `CURRENT_STAGE.md` 与用户提供指令共同授权的"
             "一个原子 Goal；简要说明它与项目主方向、当前 Gate、最近 verdict 和未解决问题的关系。"
             "合格的 Browser Work 审查不得重复自审；review-state 的机械验收不得生成新的审查报告或"
             "acceptance commit；不得把审查落库与下一 Gate 合并。完成后报告精确 diff、验证、commit、"
-            "push、远端对齐和仍未闭环事项。"
+            "push、远端对齐和仍未闭环事项。对已获仓库授权的本地、可恢复真实数据运行，不得自行增加"
+            "审查或授权 Gate；权限不清或涉及付费、不可逆、敏感数据、外部 live service 或正式 "
+            "held-out evaluation 时，应在执行前主动询问用户。"
         )
     return 0
 

@@ -93,33 +93,82 @@ target publication claim requires it. Never trade away data integrity,
 statistical validity, reproducibility, fail-closed safeguards, or claim
 boundaries for speed or smaller code.
 
+Prefer the shortest credible empirical loop:
+
+`minimal implementation -> real-data smoke -> metrics -> diagnosis -> direction decision`.
+
+Do not invent an extra authorization or review Gate when repository authorities
+already permit a local, reversible, bounded real-data run. If permission is
+unclear, ask the user proactively instead of silently blocking or assuming
+permission. Always ask before paid or irreversible actions, sensitive-data
+exposure, external live services or hardware, destructive writes, or consuming
+a held-out evaluation intended for a formal claim.
+
+## Evidence And Transaction Classes
+
+Classify the next transaction before designing a Goal:
+
+- `non-material`: formatting, naming, mechanical state synchronization, or
+  documentation changes that do not alter behavior, evidence, Gate, verdict,
+  findings, accepted SHAs, or claim boundaries. Validate them, but do not create
+  an independent-review loop.
+- `material candidate`: code, data processing, experiment behavior, statistical
+  analysis, protocol semantics, or claim-relevant evidence. Create one bounded
+  candidate and obtain exactly one qualified independent review.
+- `formal evidence run`: a material execution intended to support a publication
+  claim. Freeze the data boundary, configuration, metrics, statistical unit,
+  comparators, stopping conditions, and provenance before execution.
+
+An exploratory real-data smoke is diagnostic evidence, not automatically formal
+paper evidence. Use development data or isolated outputs where practical.
+After adapting a method from smoke results, evaluate the formal claim on
+independent held-out data or a newly frozen evaluation procedure. Do not tune
+repeatedly on the final test set.
+
 ## Gate Workflow
 
 1. Read `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, the current
    Gate specification, and relevant reports.
 2. Verify branch, `HEAD`, remote tracking ref, and worktree status. Stop on a
    conflict between Git, strategy, and stage state.
-3. Implement one bounded Goal and push one candidate commit.
-4. Obtain exactly one qualified independent review pinned to the base and
-   candidate SHAs. Prefer a browser ChatGPT Work review when the user supplies
-   its complete evidence and verdict; otherwise spawn a fresh
-   `research-reviewer` subagent. Do not pass implementation rationale as
-   evidence.
-5. Require the reviewer to inspect the actual diff, tests, and repository
+3. Classify the transaction. Do not advance a Gate or alter review state through
+   a `non-material` change.
+4. Define the smallest decision-complete Goal. When authorities permit it, keep
+   tightly coupled implementation, critical tests, and a bounded exploratory
+   smoke in one candidate instead of creating design-only or micro-review Gates.
+5. For a `non-material` transaction, validate, commit, and push only if
+   authorized, then stop. No independent review or review-state commit is
+   required.
+6. For a material candidate, push one candidate commit and obtain exactly one
+   qualified independent review pinned to the base and candidate SHAs. Prefer a
+   browser ChatGPT Work review when the user supplies its complete evidence and
+   verdict; otherwise spawn a fresh `research-reviewer` subagent. Do not pass
+   implementation rationale as evidence.
+7. Require the reviewer to inspect the actual diff, tests, and repository
    evidence and return `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, or `BLOCKED`, plus
    P0/P1/P2 findings. Record the review source in the detailed report.
-6. Write the review report, run `record-review`, validate with `audit`, and
-   create a separate governance-docs-only review-state commit.
-7. Push the review-state commit before ending or handing off the task.
-8. Let browser Work mechanically verify that review-state commit. A successful
-   verification closes the transaction; it creates no second review report,
-   `record-review` operation, or acceptance commit. Only then issue the next
-   bounded Goal.
+8. Write the review report, run `record-review`, validate with `audit`, and
+   create and push a separate governance-docs-only review-state commit.
+9. Let browser Work mechanically verify that review-state commit. Verification
+   creates no second review report, `record-review` operation, or acceptance
+   commit.
+10. After closure, prefer the next authorized implementation, real-data smoke,
+    formal experiment, or metric-producing Goal. Add a design or protocol Gate
+    only when a material unresolved decision requires it.
+
+Do not split a natural end-to-end candidate solely to create more reviews.
+Non-blocking P2 findings belong in a backlog and do not automatically authorize
+remediation or block empirical work. Promote a P2 only when it materially
+affects correctness, reproducibility, fair comparison, interpretation, or the
+target claim. If the same P0 or P1 remains open after two remediation rounds,
+stop adding implementation and first determine whether the cause is a real
+defect, ambiguous protocol, or reviewer-expanded evidence or threat boundary.
 
 ## Reviewer Selection
 
-- A candidate needs one qualified independent review, not duplicate reviews
-  from both browser Work and a Codex subagent.
+- A material candidate needs one qualified independent review, not duplicate
+  reviews from both browser Work and a Codex subagent. Non-material changes do
+  not acquire a review requirement merely because they are committed.
 - A browser Work review qualifies when it is independent of implementation,
   names exact base/candidate SHAs, inspects the actual GitHub diff and relevant
   evidence, and returns the fixed verdict and severity format.
@@ -132,6 +181,20 @@ boundaries for speed or smaller code.
 P0 or P1 findings require `REJECT`. Use `ACCEPT_WITH_P2` only when every P2 is
 explicitly non-blocking. Use `BLOCKED` when evidence or environment is
 insufficient.
+
+For accepted review state:
+
+- an `implementation` candidate becomes both `last_reviewed_candidate` and
+  `accepted_code_commit`;
+- a `docs_only` protocol or governance candidate becomes
+  `last_reviewed_candidate` but preserves the prior `accepted_code_commit`;
+- a rejected or blocked candidate never replaces the prior accepted code;
+- the review-state commit itself is neither the reviewed candidate nor accepted
+  code.
+
+Pass `candidate_kind` explicitly to `record-review`; do not guess these
+semantics from a report title. A review-state recording Goal must name the
+reviewed candidate as `implementation` or `docs_only`.
 
 ## Work Response Contract
 
@@ -174,6 +237,9 @@ referencing it.
 ## Safety
 
 - Do not let hooks or this skill decide scientific claims.
+- Do not silently loosen a frozen protocol or promote exploratory smoke to
+  formal evidence. A new evidence policy applies prospectively unless a bounded
+  governance change explicitly updates the active protocol.
 - Do not auto-commit or auto-push from bundled scripts.
 - Do not record secrets, raw private data, large logs, or generated artifacts.
 - Do not rewrite historical reports or explored-direction decisions to make the

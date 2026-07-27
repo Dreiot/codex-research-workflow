@@ -99,7 +99,10 @@ python3 ~/.codex/skills/maintain-codex-handoff/scripts/handoff.py audit --repo /
 
 ## 审查规则
 
-一个 candidate 只需要一次合格的独立审查：
+先判断事务是否需要触发审查。格式、机械状态同步以及不改变行为、证据、Gate、
+verdict、findings、accepted SHA 和 claim 的 non-material 修改不需要独立审查。
+代码、数据处理、实验、统计、协议或 claim 相关的 material candidate 只需要一次
+合格的独立审查：
 
 - 浏览器审查必须独立于实现，明确 exact base/candidate SHA，检查真实 diff 与证据，
   并返回 P0/P1/P2 与固定 verdict。
@@ -107,6 +110,8 @@ python3 ~/.codex/skills/maintain-codex-handoff/scripts/handoff.py audit --repo /
   `research-reviewer`。
 - P0/P1 必须 `REJECT`；只有所有 P2 均明确不阻断时才能 `ACCEPT_WITH_P2`；证据不足
   使用 `BLOCKED`。
+- 非阻塞 P2 保留在 backlog；只有实质影响正确性、复现性、公平比较、结果解释或目标
+  claim 时才升级为阻塞项。
 
 Git 历史保持实现与审查状态分离：
 
@@ -114,6 +119,14 @@ Git 历史保持实现与审查状态分离：
 candidate implementation commit
 review-state governance-docs commit
 ```
+
+新的 `record-review` 输入应声明 `candidate_kind`。接受的 `implementation` candidate 成为新的
+`accepted_code_commit`；接受的 `docs_only` candidate 保留此前 accepted code。
+`REJECT`、`BLOCKED` 和 review-state commit 都不会替换 accepted code。
+
+默认优先采用“最小实现 → 有界真实数据 smoke → 可测指标”的最短可信实证闭环。
+探索性 smoke 只是诊断证据，不能自动升级为论文证据；正式运行必须冻结数据边界、
+配置、指标、统计单位、comparators、停止条件和 provenance。
 
 ## 自动压缩不等于交接
 

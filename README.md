@@ -111,8 +111,12 @@ provided a qualified independent review.
 
 ## Review policy
 
-One candidate needs one qualified independent review, not two ceremonial
-reviews.
+Classify work before creating a review event. Formatting, mechanical state
+synchronization, and other non-material changes do not need an independent
+review when they leave behavior, evidence, Gate, verdict, findings, accepted
+SHAs, and claims unchanged. A material code, data, experiment, statistical,
+protocol, or claim-relevant candidate needs one qualified independent review,
+not two ceremonial reviews.
 
 - A browser review qualifies when it is independent of implementation, names
   the exact base and candidate SHAs, inspects the actual diff and evidence, and
@@ -122,6 +126,9 @@ reviews.
   explicitly requested.
 - P0 or P1 requires `REJECT`. `ACCEPT_WITH_P2` is valid only when every P2 is
   explicitly non-blocking. Missing evidence produces `BLOCKED`.
+- Non-blocking P2 findings remain backlog unless they materially affect
+  correctness, reproducibility, fair comparison, interpretation, or the target
+  claim.
 
 The detailed review report and `CURRENT_STAGE.md` are committed separately from
 the implementation candidate, preserving an auditable history:
@@ -130,6 +137,17 @@ the implementation candidate, preserving an auditable history:
 candidate implementation commit
 review-state governance-docs commit
 ```
+
+New `record-review` inputs should declare `candidate_kind`. Accepted `implementation` candidates
+become the new `accepted_code_commit`; accepted `docs_only` candidates preserve
+the prior accepted code. Rejected, blocked, and review-state commits never
+replace accepted code.
+
+Prefer the shortest credible empirical loop from a minimal implementation to a
+bounded real-data smoke and measurable metrics. Exploratory smoke is diagnostic
+evidence, not automatic publication evidence. Formal runs must freeze the data
+boundary, configuration, metrics, statistical unit, comparators, stopping
+conditions, and provenance.
 
 ## Compaction is not handoff
 
