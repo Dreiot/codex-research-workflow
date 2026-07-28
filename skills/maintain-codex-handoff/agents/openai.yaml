@@ -1,4 +1,4 @@
 interface:
   display_name: "Maintain Codex Handoff"
-  short_description: "Maintain project strategy and gate handoffs"
-  default_prompt: "Use $maintain-codex-handoff to audit or update the canonical project strategy and current gate handoff."
+  short_description: "Keep research handoffs execution-first"
+  default_prompt: "Use $maintain-codex-handoff to preserve canonical research state without adding review gates to exploratory implementation or real-data work."

@@ -27,7 +27,7 @@ The separation prevents a common failure mode: a stale handoff summary quietly
 becoming a second source of truth.
 
 <p align="center">
-  <img src="./assets/readme/workflow.svg" width="100%" alt="Candidate implementation, independent review, review-state recording, and resume or compaction verification workflow.">
+  <img src="./assets/readme/workflow.svg" width="100%" alt="Continuous empirical iteration with formal review only when promoting work into a research baseline or paper evidence.">
 </p>
 
 ## What the Skill does
@@ -40,21 +40,22 @@ becoming a second source of truth.
 | `resume-prompt` | Produces a compact Codex or browser-review entry prompt that reloads repository truth | No |
 
 The bundled lifecycle Hook injects a compact strategy/Gate summary on startup,
-resume, clear, and automatic compaction. It also warns around review-state
-commits and pushes. **Hooks never edit the repository.**
+resume, clear, and automatic compaction. Optional reviewer hooks constrain an
+explicit `research-reviewer` to read-only review. Routine shell commands and
+task completion do not run automatic handoff audits. **Hooks never edit the
+repository.**
 
 ## Browser Work response contract
 
 The generated Work resume prompt links to the public
 [response contract](./skills/maintain-codex-handoff/references/work-response-contract.md).
 Work returns a concise review result, design objective, acceptance objective,
-and one Markdown instruction block containing one Codex Goal. Candidate review
-recording and the next candidate are separate transactions; mechanical
-verification of a review-state commit does not create another acceptance
-commit. Codex instruction blocks have no fixed character limit: they stay as
-short as correctness allows and reference checked-in authority instead of
-repeating it. Agents may change the public contract only after explicit user
-authorization.
+and at most one Markdown instruction block containing one Codex Goal. The
+contract is an output format, not a mandatory review state machine.
+Exploratory implementation and real-data work do not require review-state
+commits. A clean mechanical verification may be followed by the next Goal in
+the same response. Agents may change the public contract only after explicit
+user authorization.
 
 ## Install
 
@@ -109,14 +110,22 @@ a read-only fallback reviewer. Install it as
 `~/.codex/agents/research-reviewer.toml` when browser ChatGPT has not already
 provided a qualified independent review.
 
-## Review policy
+## Execution and review policy
 
-Classify work before creating a review event. Formatting, mechanical state
-synchronization, and other non-material changes do not need an independent
-review when they leave behavior, evidence, Gate, verdict, findings, accepted
-SHAs, and claims unchanged. A material code, data, experiment, statistical,
-protocol, or claim-relevant candidate needs one qualified independent review,
-not two ceremonial reviews.
+The default workflow is continuous empirical iteration:
+
+```text
+minimal implementation -> real-data run -> metrics -> diagnosis
+-> direction adjustment -> paper evidence
+```
+
+Ordinary implementation, tests, debugging, data processing, local smoke,
+exploratory experiments, parameter adjustment, and metric generation do not
+need independent review or review-state recording.
+
+Use one qualified independent review only for an explicit formal promotion:
+accepting a major implementation baseline, freezing a publication evaluation,
+adopting a key result, changing the core method, or raising a paper claim.
 
 - A browser review qualifies when it is independent of implementation, names
   the exact base and candidate SHAs, inspects the actual diff and evidence, and
@@ -124,11 +133,10 @@ not two ceremonial reviews.
 - The `research-reviewer` subagent is a fallback when no qualified browser
   review exists, evidence is incomplete or conflicting, or a second opinion is
   explicitly requested.
-- P0 or P1 requires `REJECT`. `ACCEPT_WITH_P2` is valid only when every P2 is
-  explicitly non-blocking. Missing evidence produces `BLOCKED`.
-- Non-blocking P2 findings remain backlog unless they materially affect
-  correctness, reproducibility, fair comparison, interpretation, or the target
-  claim.
+- A rejected or blocked formal promotion is recorded before remediation so the
+  decision and candidate identity are preserved.
+- Mechanical verification creates no second review. When it passes, Work may
+  immediately issue the next Goal.
 
 The detailed review report and `CURRENT_STAGE.md` are committed separately from
 the implementation candidate, preserving an auditable history:
@@ -143,11 +151,11 @@ become the new `accepted_code_commit`; accepted `docs_only` candidates preserve
 the prior accepted code. Rejected, blocked, and review-state commits never
 replace accepted code.
 
-Prefer the shortest credible empirical loop from a minimal implementation to a
-bounded real-data smoke and measurable metrics. Exploratory smoke is diagnostic
-evidence, not automatic publication evidence. Formal runs must freeze the data
-boundary, configuration, metrics, statistical unit, comparators, stopping
-conditions, and provenance.
+Exploratory smoke is diagnostic evidence, not automatic publication evidence.
+Formal runs freeze the data boundary, configuration, metrics, statistical
+unit, comparators, stopping conditions, and provenance. The Skill does not add
+duplicate execution authorization after that scope is already frozen and
+authorized.
 
 ## Compaction is not handoff
 

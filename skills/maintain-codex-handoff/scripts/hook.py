@@ -93,7 +93,8 @@ def main() -> int:
         else:
             context_parts.append("Volatile Gate state is unavailable; do not begin substantial work.")
         context_parts.append(
-            "Re-read the files, fetch and verify the remote, and stop on any Git/strategy/stage mismatch before editing."
+            "Use the shortest empirical loop by default. Ordinary exploratory commits do not require review-state "
+            "recording. Resolve material Git/strategy/stage conflicts before relying on them."
         )
         emit(system_message=" | ".join(messages), context=" ".join(context_parts), event=event)
         return 0
@@ -115,10 +116,10 @@ def main() -> int:
     if event == "SubagentStop":
         emit(
             system_message=(
-                "Research reviewer finished. The parent must write the detailed review report, update "
-                "docs/CURRENT_STAGE.md with maintain-codex-handoff, audit it, and create a separate "
-                "governance-docs-only review-state commit before handoff. Update docs/PROJECT_CORE.md only "
-                "when the evidence changes a strategic hypothesis, component, direction, or claim boundary."
+                "Research reviewer finished. If this was an explicitly requested formal promotion review, "
+                "write its report, update docs/CURRENT_STAGE.md with maintain-codex-handoff, audit it, and "
+                "create one governance-docs-only review-state commit. Exploratory work does not gain a "
+                "review-state requirement merely because a reviewer was consulted."
             ),
             event=event,
         )

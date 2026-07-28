@@ -24,7 +24,7 @@ Research Handoff** 将操作规则、科研战略和当前 Gate 分别写入仓�
 这种拆分可以防止旧交接总结悄然变成第二个真相来源。
 
 <p align="center">
-  <img src="./assets/readme/workflow.svg" width="100%" alt="候选实现、独立审查、review-state 落库以及恢复或自动压缩后的核验流程。">
+  <img src="./assets/readme/workflow.svg" width="100%" alt="默认连续实证迭代，仅在正式提升为科研基线或论文证据时进行独立审查。">
 </p>
 
 ## Skill 能做什么
@@ -36,17 +36,17 @@ Research Handoff** 将操作规则、科研战略和当前 Gate 分别写入仓�
 | `record-review` | 将精确 candidate SHA、固定 verdict、findings、报告路径和下一 Gate 写入 `CURRENT_STAGE.md` | 是 |
 | `resume-prompt` | 生成 Codex 或浏览器审查对话的短恢复 Prompt | 否 |
 
-生命周期 Hook 会在启动、恢复、清空和自动压缩时注入精简的战略/Gate 摘要，并在
-review-state commit 与 push 前后发出警告。**Hook 永远不会修改仓库。**
+生命周期 Hook 会在启动、恢复、清空和自动压缩时注入精简的战略/Gate 摘要；可选的
+reviewer Hook 只约束显式启动的 `research-reviewer`。普通 shell 命令和任务结束不再
+自动运行 handoff audit。**Hook 永远不会修改仓库。**
 
 ## Browser Work 输出契约
 
 生成的 Work 恢复 Prompt 会链接公开的
 [输出契约](./skills/maintain-codex-handoff/references/work-response-contract.md)。
-Work 的回复固定为审查结果、设计目标、验收目标，以及一个只包含单一 Codex Goal 的
-Markdown 指令块。candidate 审查落库和下一 candidate 必须分开；对 review-state
-commit 的机械验收不会再产生 acceptance commit。Codex 指令块没有固定字符上限，应在
-不损害正确性的前提下尽量简短，并引用已落库权威信息而非重复全文。只有用户明确授权时，
+Work 的回复采用审查结果、设计目标、验收目标，以及至多一个包含单一 Codex Goal 的
+Markdown 指令块。该契约只是输出格式，不是强制审查状态机。探索性实现和真实数据工作
+不需要 review-state；机械验收通过后可在同一回复直接签发下一 Goal。只有用户明确授权时，
 代理才能修改该公共契约。
 
 ## 安装
@@ -97,21 +97,24 @@ python3 ~/.codex/skills/maintain-codex-handoff/scripts/handoff.py audit --repo /
 `~/.codex/agents/research-reviewer.toml`。当浏览器 ChatGPT 已经完成合格的独立审查时，
 不应再重复启动它。
 
-## 审查规则
+## 执行与审查规则
 
-先判断事务是否需要触发审查。格式、机械状态同步以及不改变行为、证据、Gate、
-verdict、findings、accepted SHA 和 claim 的 non-material 修改不需要独立审查。
-代码、数据处理、实验、统计、协议或 claim 相关的 material candidate 只需要一次
-合格的独立审查：
+默认采用连续实证流程：
+
+```text
+最小实现 → 真实数据运行 → 性能指标 → 问题定位 → 方向调整 → 论文证据
+```
+
+普通实现、测试、调试、数据处理、本地 smoke、探索实验、调参和指标生成不需要独立审查
+或 review-state。只有明确准备接受主要实现基线、冻结正式论文实验、采纳关键结果、改变
+核心方法或提升论文 claim 时，才进行一次合格的独立审查：
 
 - 浏览器审查必须独立于实现，明确 exact base/candidate SHA，检查真实 diff 与证据，
   并返回 P0/P1/P2 与固定 verdict。
 - 只有在缺少合格浏览器审查、证据不完整或冲突、或用户要求第二意见时，才使用
   `research-reviewer`。
-- P0/P1 必须 `REJECT`；只有所有 P2 均明确不阻断时才能 `ACCEPT_WITH_P2`；证据不足
-  使用 `BLOCKED`。
-- 非阻塞 P2 保留在 backlog；只有实质影响正确性、复现性、公平比较、结果解释或目标
-  claim 时才升级为阻塞项。
+- 正式提升被拒绝或阻塞时，先记录结论再修正，以保留决策和 candidate 身份。
+- 机械验收不产生第二次审查；通过后 Work 可以立即签发下一 Goal。
 
 Git 历史保持实现与审查状态分离：
 
@@ -124,9 +127,9 @@ review-state governance-docs commit
 `accepted_code_commit`；接受的 `docs_only` candidate 保留此前 accepted code。
 `REJECT`、`BLOCKED` 和 review-state commit 都不会替换 accepted code。
 
-默认优先采用“最小实现 → 有界真实数据 smoke → 可测指标”的最短可信实证闭环。
-探索性 smoke 只是诊断证据，不能自动升级为论文证据；正式运行必须冻结数据边界、
-配置、指标、统计单位、comparators、停止条件和 provenance。
+探索性 smoke 只是诊断证据，不能自动升级为论文证据；正式运行冻结数据边界、配置、
+指标、统计单位、comparators、停止条件和 provenance。范围已经冻结并获得授权后，
+Skill 不再增加重复的逐次执行许可。
 
 ## 自动压缩不等于交接
 

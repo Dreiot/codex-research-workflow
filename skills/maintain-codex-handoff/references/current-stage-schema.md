@@ -11,15 +11,15 @@ envelope:
   "schema_version": 1,
   "project": "example",
   "branch": "main",
-  "research_phase": "implementation_review_loop",
-  "current_gate": "G1 independent review",
+  "research_phase": "exploratory_iteration",
+  "current_gate": "First decision-complete empirical result",
   "last_reviewed_candidate": null,
   "accepted_code_commit": null,
-  "review_verdict": "BLOCKED",
+  "review_verdict": "NO_REVIEW",
   "review_report": null,
-  "open_findings": ["Candidate has not been independently reviewed."],
-  "next_gate": "G1.1 independent review",
-  "next_action": "Review the exact candidate SHA before further work.",
+  "open_findings": [],
+  "next_gate": "Direction decision from measured results",
+  "next_action": "Implement and run the smallest experiment that answers the current research question.",
   "updated_at": "2026-01-01T00:00:00+00:00"
 }
 -->
@@ -28,44 +28,46 @@ envelope:
 Required rules:
 
 - SHA fields are full 40-character lowercase Git SHAs or `null`.
-- `review_verdict` is one of `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, `BLOCKED`.
+- `review_verdict` is `NO_REVIEW` when no formal promotion review applies, or
+  one of `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, `BLOCKED` after such a review.
 - `open_findings` is a JSON array of concise strings.
 - `review_report` is a repository-relative path or `null`.
 - `updated_at` is an ISO 8601 timestamp with a timezone.
 - The file never records the SHA of the commit that contains itself.
 
-Human-readable sections follow the comment. Keep them synchronized by using
-`scripts/handoff.py record-review`; hooks parse only the JSON block.
+Ordinary exploratory commits do not require an update to this file and do not
+imply pending review. Update it only after a material milestone, formal
+promotion review, material blocker, or next-action change.
 
-## Review Input Semantics
+Human-readable sections follow the comment. Keep them synchronized with the
+JSON block. Use `scripts/handoff.py record-review` only for an explicit formal
+promotion review.
 
-New `record-review` inputs should declare `candidate_kind` as either:
+## Formal Review Input
 
-- `implementation`: code or another material behavioral candidate. An
-  `ACCEPT` or `ACCEPT_WITH_P2` verdict sets `accepted_code_commit` to the
-  candidate SHA.
-- `docs_only`: a protocol, governance, or other docs-only candidate. Acceptance
-  updates `last_reviewed_candidate` but preserves the prior
-  `accepted_code_commit`.
+New `record-review` inputs declare `candidate_kind` as either:
 
-`REJECT` and `BLOCKED` always preserve the prior accepted code. A review-state
-commit is not a reviewed candidate and must not be passed to `record-review`.
-The command fails closed when a supplied `accepted_code_commit` conflicts with
-these semantics.
+- `implementation`: a formally promoted implementation baseline. `ACCEPT` or
+  `ACCEPT_WITH_P2` sets `accepted_code_commit` to the candidate SHA.
+- `docs_only`: a formally promoted protocol or governance baseline. Acceptance
+  updates `last_reviewed_candidate` and preserves the prior accepted code.
 
-For backward compatibility, a legacy accepted input without `candidate_kind`
-defaults to `implementation` unless it explicitly preserves the prior
-`accepted_code_commit`, in which case it is treated as `docs_only`. Legacy
-`REJECT` and `BLOCKED` inputs preserve accepted code without needing a kind.
+`ACCEPT` requires no open findings. `ACCEPT_WITH_P2` requires one or more
+P2-only findings. Any P0 or P1 requires `REJECT`. `BLOCKED` means required
+evidence or environment is unavailable.
 
-Authority boundary:
+`REJECT` and `BLOCKED` preserve prior accepted code. A review-state commit is
+not a reviewed candidate and must not be passed to `record-review`. The command
+fails closed when findings, verdict, candidate kind, or accepted code conflict.
 
-- This file is the sole authority for volatile branch/Gate/review/next-action
-  state.
-- Durable research direction, innovation hypotheses, component architecture,
-  explored-direction decisions, and claim position belong in
-  `docs/PROJECT_CORE.md`.
-- Do not copy volatile state into `PROJECT_CORE.md`, and do not expand this file
-  into a second project-history or strategy document.
-- A resumed task reads `AGENTS.md`, `docs/PROJECT_CORE.md`, and this file, then
-  verifies all Git facts directly.
+Legacy accepted inputs without `candidate_kind` remain supported when their
+accepted-code semantics are unambiguous.
+
+## Authority Boundary
+
+- This file is the sole authority for volatile branch, milestone, formal review,
+  material blocker, and next-action state.
+- Durable strategy, innovations, component architecture, explored directions,
+  and claim position belong in `docs/PROJECT_CORE.md`.
+- Do not turn this file into a per-commit log or a second project history.
+- A resumed task reads the three authorities and verifies necessary Git facts.

@@ -1,26 +1,24 @@
 ---
 name: maintain-codex-handoff
-description: Create, audit, update, and resume canonical research-project handoffs based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use after implementation or review gates, before cross-task handoff, when a Codex task is resumed or compacted, when project strategy or innovation history must be preserved, when stale CODEX_HANDOFF.md or LATEST_STATE.md files exist, or when generating a browser ChatGPT Work resume prompt.
+description: Create, audit, update, and resume canonical research-project handoffs based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use at explicit handoffs, formal evidence or promotion reviews, durable strategy changes, state conflicts, or when stale CODEX_HANDOFF.md or LATEST_STATE.md files exist. Do not turn ordinary implementation, debugging, real-data smoke, or exploratory experiments into review gates.
 ---
 
 # Maintain Codex Handoff
 
-Use three authorities with non-overlapping responsibilities:
+Use three repository authorities:
 
-- `AGENTS.md`: stable operating rules, permissions, validation, Git, review, and
-  claim boundaries.
-- `docs/PROJECT_CORE.md`: durable research strategy, target contribution,
-  innovation hypotheses, component map, explored-direction decision ledger,
-  evidence position, and scientific boundaries.
-- `docs/CURRENT_STAGE.md`: volatile branch, current Gate, exact review state,
-  open findings, and next single action.
+- `AGENTS.md`: stable operating, permission, validation, Git, and claim rules.
+- `docs/PROJECT_CORE.md`: durable research direction, innovations, components,
+  explored directions, evidence position, and scientific boundaries.
+- `docs/CURRENT_STAGE.md`: current branch, milestone, formal review state,
+  material blockers, and next action.
 
-Treat Git and checked-in project evidence as the source of truth. A conversation
-summary is only an entry pointer, never an authority.
+Git and checked-in evidence are authoritative. Conversation summaries are only
+entry pointers.
 
-## Modes
+## Commands
 
-Use the bundled script with the smallest mode that fits:
+Use the smallest applicable command:
 
 ```powershell
 py -3 scripts/handoff.py audit --repo <repo>
@@ -30,278 +28,190 @@ py -3 scripts/handoff.py resume-prompt --repo <repo> --surface codex
 py -3 scripts/handoff.py resume-prompt --repo <repo> --surface work
 ```
 
-- `audit`: validate all canonical files, both JSON schemas, Git ancestry, report
-  pointers, authority alignment, and legacy handoff files. It never writes.
-- `initialize`: create missing canonical files with conservative placeholders.
-  Never overwrite an existing canonical file.
-- `record-review`: update only `CURRENT_STAGE.md` from a structured review
-  result. Write the detailed review report first; this command invents neither
-  evidence nor scientific conclusions.
-- `resume-prompt`: print a compact prompt that forces the next Codex or browser
-  Work conversation to reload strategy and volatile state from the repository.
+- `audit` validates canonical files, Git identity, report pointers, and legacy
+  handoff files. It never writes.
+- `initialize` creates missing authorities without overwriting existing files.
+- `record-review` records an explicitly requested formal promotion review. It
+  does not decide whether a candidate deserves promotion.
+- `resume-prompt` produces a compact entry prompt that reloads repository truth.
 
-Read [project-core-schema.md](references/project-core-schema.md) before changing
-the strategic core, and [current-stage-schema.md](references/current-stage-schema.md)
-before manually changing volatile state.
-Read [work-response-contract.md](references/work-response-contract.md) before
-generating a Browser Work handoff, evaluating a Work response, or issuing a
-Codex Goal from a completed Work review.
-Do not modify, rename, replace, relax, or expand that contract unless the user
-explicitly authorizes a change to the contract itself. Never infer that
-authorization from ordinary skill use, project governance, review, or prompt
+Read the schema references before manually editing `PROJECT_CORE.md` or
+`CURRENT_STAGE.md`. Read
+[work-response-contract.md](references/work-response-contract.md) before
+generating or evaluating a Browser Work response. Do not modify that contract
+without explicit user authorization.
+
+## Research Priority
+
+Optimize for the shortest credible path to publishable experimental evidence:
+
+`minimal implementation -> real-data run -> metrics -> diagnosis -> direction adjustment -> paper evidence`
+
+Default to execution, not governance. When current repository and user
+boundaries permit it, Codex may continuously implement, test, run local
+recoverable real-data smoke or exploratory experiments, diagnose results, and
+adjust the method without creating design-only Gates, independent reviews, or
+review-state commits between iterations.
+
+Use the simplest correct and testable implementation. Prefer existing
+components, small diffs, early end-to-end runs, and measurable results. Do not
+expand into speculative abstractions, broad refactors, exhaustive
+generalization, defensive infrastructure, cryptographic evidence chains, or
+adjacent improvements unless they directly block the current research
+decision.
+
+Stop when the Goal's acceptance criteria pass or the produced metrics are
+sufficient to decide the next direction. Record unrelated issues without
+investigating or fixing them.
+
+Never trade away data integrity, statistical validity, fair comparison,
+reproducibility, material failure handling, or honest claim boundaries.
+
+## Permission Boundary
+
+Local, recoverable, no-cost work using project-authorized data is allowed by
+default, including real-data smoke and exploratory experiments. Do not ask for
+per-run permission when repository authorities already permit that class of
 work.
 
-## Strategic Core
+Ask before:
 
-`PROJECT_CORE.md` preserves knowledge that should survive many Goals and
-conversations:
+- paid services or material resource charges;
+- sensitive-data exposure or credential use not already authorized;
+- external live services or hardware with side effects;
+- destructive or irreversible actions.
 
-- research question, intended paper contribution, and primary direction;
-- innovation hypotheses, each marked as proposed, supported, rejected, or
-  superseded rather than silently promoted to a contribution;
-- core mathematical/software components, their roles, interfaces, dependencies,
-  implementation locations, maturity, and evidence;
-- explored directions, including negative results, decision reason, reusable
-  residue, and the report or experiment that supports the decision;
-- current evidence tier and the strongest claim presently supportable;
-- data, provenance, mathematical, experimental, and publication boundaries;
-- open strategic questions, decision criteria, dependency roadmap, and canonical
-  source index.
+For a formal publication evaluation, require a frozen data boundary,
+configuration, metrics, statistical unit, comparators, stopping conditions,
+and provenance. If those are already authorized and frozen, do not request
+duplicate execution permission.
 
-Update it only after a strategic decision, architecture change, material
-evidence change, or explicit project-core audit. Preserve prior decisions in the
-ledger; do not rewrite history. If a strategic change alters the active Gate,
-synchronize `CURRENT_STAGE.md` in the same governance change.
+## Two Execution Lanes
 
-Never put branch, current HEAD, current Gate, latest verdict, or next action in
-`PROJECT_CORE.md`. Those belong only in `CURRENT_STAGE.md`. Detailed proofs,
-reviews, and experiment results stay in their own reports; the core links to
-them instead of copying them.
+### Exploratory iteration
 
-## Research Delivery Economy
+This is the default. It includes ordinary implementation, tests, debugging,
+data processing, local smoke, exploratory experiments, parameter adjustment,
+and metric generation.
 
-Optimize method development for the shortest credible path from a research
-question to reproducible evidence and a defensible paper claim. Work should
-define the smallest decision-complete Goal and experiment matrix sufficient to
-test the current hypothesis; Codex should implement the simplest bounded
-solution that is correct, testable, reproducible, and robust at material
-failure boundaries. Prefer existing components, small diffs, early end-to-end
-experiments, and measurable results over speculative abstractions, duplicate
-mechanisms, broad refactors, exhaustive generalization, or unnecessary
-design-only Gates. Expand scope only when evidence, independent review, or the
-target publication claim requires it. Never trade away data integrity,
-statistical validity, reproducibility, fail-closed safeguards, or claim
-boundaries for speed or smaller code.
+- Keep naturally coupled implementation, critical tests, and bounded runs
+  together.
+- Multiple commits and iterations are allowed.
+- No independent review or review-state commit is required.
+- Do not update `CURRENT_STAGE.md` for every commit or local result.
+- Non-blocking findings are ordinary backlog items and do not block execution.
 
-Prefer the shortest credible empirical loop:
+### Formal promotion
 
-`minimal implementation -> real-data smoke -> metrics -> diagnosis -> direction decision`.
+Use this lane only when the user, Goal, or `CURRENT_STAGE.md` explicitly intends
+to:
 
-Do not invent an extra authorization or review Gate when repository authorities
-already permit a local, reversible, bounded real-data run. If permission is
-unclear, ask the user proactively instead of silently blocking or assuming
-permission. Always ask before paid or irreversible actions, sensitive-data
-exposure, external live services or hardware, destructive writes, or consuming
-a held-out evaluation intended for a formal claim.
+- accept a major implementation as the formal project baseline;
+- freeze a publication evaluation;
+- adopt a key result or statistical conclusion;
+- change the core method; or
+- raise the paper claim boundary.
 
-## Evidence And Transaction Classes
+Create one natural candidate, pin its base and candidate SHAs, and obtain
+exactly one qualified independent review. Browser Work is preferred when it
+has inspected the actual GitHub diff and evidence. Use `research-reviewer` only
+when no qualifying Work review exists, evidence conflicts, or the user asks
+for a second opinion.
 
-Classify the next transaction before designing a Goal:
+Record a completed formal promotion review once:
 
-- `non-material`: formatting, naming, mechanical state synchronization, or
-  documentation changes that do not alter behavior, evidence, Gate, verdict,
-  findings, accepted SHAs, or claim boundaries. Validate them, but do not create
-  an independent-review loop.
-- `material candidate`: code, data processing, experiment behavior, statistical
-  analysis, protocol semantics, or claim-relevant evidence. Create one bounded
-  candidate and obtain exactly one qualified independent review.
-- `formal evidence run`: a material execution intended to support a publication
-  claim. Freeze the data boundary, configuration, metrics, statistical unit,
-  comparators, stopping conditions, and provenance before execution.
+1. write the detailed report;
+2. run `record-review`;
+3. run `audit`;
+4. create and push one governance-docs-only review-state commit.
 
-An exploratory real-data smoke is diagnostic evidence, not automatically formal
-paper evidence. Use development data or isolated outputs where practical.
-After adapting a method from smoke results, evaluate the formal claim on
-independent held-out data or a newly frozen evaluation procedure. Do not tune
+Mechanical verification of that commit creates no new review or commit. If
+verification passes, Browser Work may issue the next Goal in the same response.
+A rejected or blocked formal promotion remains recorded before remediation so
+the decision and candidate identity are not lost.
+
+## Evidence And Claims
+
+Exploratory smoke is diagnostic evidence, not automatic paper evidence. After
+using exploratory results to adjust a method, evaluate the formal claim on an
+independent held-out set or a newly frozen evaluation procedure. Do not tune
 repeatedly on the final test set.
 
-## Gate Workflow
+Formal evidence should preserve predefined metrics, all valid runs, failures,
+variation, uncertainty, resource cost, and material negative results. It may
+emphasize supported strengths, but it must not hide evidence that would change
+the conclusion.
 
-1. Read `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, the current
-   Gate specification, and relevant reports.
-2. Verify branch, `HEAD`, remote tracking ref, and worktree status. Stop on a
-   conflict between Git, strategy, and stage state.
-3. Classify the transaction. Do not advance a Gate or alter review state through
-   a `non-material` change.
-4. Define the smallest decision-complete Goal. When authorities permit it, keep
-   tightly coupled implementation, critical tests, and a bounded exploratory
-   smoke in one candidate instead of creating design-only or micro-review Gates.
-5. For a `non-material` transaction, validate, commit, and push only if
-   authorized, then stop. No independent review or review-state commit is
-   required.
-6. For a material candidate, push one candidate commit and obtain exactly one
-   qualified independent review pinned to the base and candidate SHAs. Prefer a
-   browser ChatGPT Work review when the user supplies its complete evidence and
-   verdict; otherwise spawn a fresh `research-reviewer` subagent. Do not pass
-   implementation rationale as evidence.
-7. Require the reviewer to inspect the actual diff, tests, and repository
-   evidence and return `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, or `BLOCKED`, plus
-   P0/P1/P2 findings. Record the review source in the detailed report.
-8. Write the review report, run `record-review`, validate with `audit`, and
-   create and push a separate governance-docs-only review-state commit.
-9. Let browser Work mechanically verify that review-state commit. Verification
-   creates no second review report, `record-review` operation, or acceptance
-   commit.
-10. After closure, prefer the next authorized implementation, real-data smoke,
-    formal experiment, or metric-producing Goal. Add a design or protocol Gate
-    only when a material unresolved decision requires it.
+Engineering hashes, schemas, counters, manifests, and logs support
+reproducibility only when materially needed. They are not scientific evidence
+by themselves and must not become an unrelated research Gate.
 
-Do not split a natural end-to-end candidate solely to create more reviews.
-Non-blocking P2 findings belong in a backlog and do not automatically authorize
-remediation or block empirical work. Promote a P2 only when it materially
-affects correctness, reproducibility, fair comparison, interpretation, or the
-target claim. If the same P0 or P1 remains open after two remediation rounds,
-stop adding implementation and first determine whether the cause is a real
-defect, ambiguous protocol, or reviewer-expanded evidence or threat boundary.
+## Canonical State
 
-## Reviewer Selection
+Update `PROJECT_CORE.md` only after a durable change to strategy, innovation
+status, component identity, explored-direction decision, evidence level, or
+claim boundary. Preserve rejected and negative directions rather than
+rewriting history.
 
-- A material candidate needs one qualified independent review, not duplicate
-  reviews from both browser Work and a Codex subagent. Non-material changes do
-  not acquire a review requirement merely because they are committed.
-- A browser Work review qualifies when it is independent of implementation,
-  names exact base/candidate SHAs, inspects the actual GitHub diff and relevant
-  evidence, and returns the fixed verdict and severity format.
-- Use `research-reviewer` only when no qualifying Work review exists, the Work
-  evidence is incomplete or unverifiable, conclusions conflict, or the user
-  explicitly requests a second opinion.
-- When recording an external Work review, preserve its evidence and normalized
-  verdict in a repository report; never infer acceptance from a chat summary.
+Update `CURRENT_STAGE.md` only after a material milestone, formal review,
+material blocker, or next-action change. Ordinary exploratory commits do not
+imply that review closure is pending.
 
-P0 or P1 findings require `REJECT`. Use `ACCEPT_WITH_P2` only when every P2 is
-explicitly non-blocking. Use `BLOCKED` when evidence or environment is
-insufficient.
+Keep branch, HEAD, current milestone, verdict, and next action out of
+`PROJECT_CORE.md`. Detailed proofs and results belong in reports referenced by
+the canonical files.
 
-For accepted review state:
+For an accepted formal review:
 
-- an `implementation` candidate becomes both `last_reviewed_candidate` and
+- `candidate_kind=implementation` updates both `last_reviewed_candidate` and
   `accepted_code_commit`;
-- a `docs_only` protocol or governance candidate becomes
-  `last_reviewed_candidate` but preserves the prior `accepted_code_commit`;
-- a rejected or blocked candidate never replaces the prior accepted code;
-- the review-state commit itself is neither the reviewed candidate nor accepted
-  code.
+- `candidate_kind=docs_only` updates only `last_reviewed_candidate`;
+- rejected, blocked, and review-state commits never replace accepted code.
 
-Pass `candidate_kind` explicitly to `record-review`; do not guess these
-semantics from a report title. A review-state recording Goal must name the
-reviewed candidate as `implementation` or `docs_only`.
+## Browser Work Contract
 
-## Work Response Contract
+Browser Work uses four concise visible sections: `审查结果`, `设计目标`,
+`验收目标`, and `Codex 指令`. The last section contains at most one fenced
+`markdown` block with one Codex Goal.
 
-Require Browser Work to return exactly four visible sections in this order:
-`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`. The last section must
-contain the response's only fenced `markdown` block and exactly one Codex Goal.
-Do not request or expose hidden reasoning; require concise conclusions and
-evidence instead.
+This is an output format, not a mandatory review state machine. A state check
+may contain no Goal. A clean review-state verification may be followed by the
+next Goal in the same response. Exploratory work does not acquire a review
+requirement merely because it produced a commit.
 
-Treat `设计目标` as a short explanation of the next authorized transaction, not
-as automatic authorization for a design-only Gate. Treat `验收目标` as the
-future checks Work will perform when Codex returns, not as a second Goal or a
-new review event.
+Keep Goals as short as correctness allows. Invoke this skill and reference
+checked-in authorities instead of copying protocols, formulas, test matrices,
+findings, hashes, history, or generic safety rules. Include only the unique
+Goal, necessary Git identity, authority pointers, allowed scope, task-specific
+delta, validation, delivery, and stop condition.
 
-Enforce the closure state machine in
-[work-response-contract.md](references/work-response-contract.md):
+## Hooks
 
-- after a candidate review, issue only the review-state recording Goal when
-  recording is pending, regardless of verdict; this rule has precedence over
-  remediation;
-- after Work verifies an accepted review-state commit, do not record that
-  verification; issue the next candidate Goal if it is authorized;
-- after Work verifies a rejected or blocked review-state commit, issue only
-  remediation or bounded evidence collection;
-- never combine review-state recording with the next Gate in one Goal.
+Hooks may inject compact canonical context and warn about malformed authorities
+or an explicitly staged formal review that is not synchronized with
+`CURRENT_STAGE.md`. They must not infer that every commit needs review, decide
+scientific claims, edit files, or block exploratory execution.
 
-Keep the fenced Codex Goal compact. Invoke this skill, then rely on Codex to
-reload the three authorities, current reports, and actual Git state. Do not
-repeat checked-in protocols, formulas, test matrices, findings, full history,
-all blob hashes, generic safety rules, or exhaustive response templates.
-Include only the unique Goal, expected branch/base, authority pointers, exact
-allowed diff, task-specific delta, material prohibitions, validation commands,
-commit/push, and stop condition. Keep the Goal as short as correctness allows;
-there is no fixed character limit. Framework-scale or cross-module Goals may
-retain necessary task-specific interface, migration, integration, and
-fail-closed detail. Repository repetition is never justification for length;
-prefer moving durable detail into an authorized protocol or report and
-referencing it.
+## Handoff
 
-## Safety
+Automatic context compaction is normal and does not require a handoff. Use an
+explicit handoff only when opening a new Codex or Browser Work conversation,
+when critical constraints were demonstrably lost, or at a useful milestone.
 
-- Do not let hooks or this skill decide scientific claims.
-- Do not silently loosen a frozen protocol or promote exploratory smoke to
-  formal evidence. A new evidence policy applies prospectively unless a bounded
-  governance change explicitly updates the active protocol.
-- Do not auto-commit or auto-push from bundled scripts.
-- Do not record secrets, raw private data, large logs, or generated artifacts.
-- Do not rewrite historical reports or explored-direction decisions to make the
-  project look cleaner.
-- Do not keep a second dynamic handoff file. Mark old `CODEX_HANDOFF.md` and
-  `LATEST_STATE.md` as legacy or remove them when they are untracked and stale.
-- Hooks may warn and inject compact context, but they must not edit repository
-  files.
+Before handoff:
 
-## Compaction and Explicit Handoff
+1. finish only the current safely verifiable operation;
+2. read the three authorities and inspect actual Git state;
+3. distinguish pushed facts from chat-only conclusions, uncommitted work, and
+   unrun validation;
+4. run `audit`;
+5. generate the relevant `resume-prompt`.
 
-Automatic context compaction is normal continuity inside the same Codex task;
-it is not a reason to stop, commit, or open a new task. On `compact`, the
-`SessionStart` Hook reloads the canonical strategy and Gate summary. Persist
-state when an evidence-backed event occurs, not when a context meter becomes
-large:
+Do not commit an unfinished candidate merely to make a handoff look clean.
+Do not create `CODEX_HANDOFF.md`, `LATEST_STATE.md`, or another dynamic source
+of truth.
 
-- update `PROJECT_CORE.md` after a durable strategy, component identity,
-  explored-direction status, evidence level, or claim boundary changes;
-- update `CURRENT_STAGE.md` after an authorized Gate, review, finding, or next
-  action changes;
-- keep detailed evidence in its report at the time it becomes authoritative.
-
-Use an explicit handoff only when opening a new Codex task or browser Work
-conversation, when compaction has demonstrably lost a critical constraint or
-created a conflict, or at a natural Gate boundary where a clean context is
-useful. Before that handoff:
-
-1. Finish only the current atomic operation that can be completed and verified
-   safely. Handoff pressure is not authorization to accept a candidate, weaken a
-   Gate, edit outside the whitelist, or commit incomplete work.
-2. Re-read the three authorities and verify actual branch, `HEAD`, remote ref,
-   index, worktree, and the reports needed by the current Gate.
-3. Separate facts already committed and pushed from chat-only conclusions,
-   uncommitted changes, unrun validation, and unauthorized future work.
-4. Run `audit`. If the repository is intentionally dirty or closure is blocked,
-   report the exact state without disguising it as a completed handoff.
-5. Generate the appropriate `resume-prompt`; the next conversation must reload
-   repository authorities and verify Git rather than inherit a long narrative.
-
-For browser Work, distinguish an independent review completed in chat from a
-review-state commit already recorded in GitHub. If recording is still pending,
-issue a bounded docs-only Codex Goal and do not advance the research Gate. Never
-store a stale `CURRENT_STAGE.md` copy as a permanent Project File.
-
-## Browser Work
-
-Browser ChatGPT Work does not load local Codex hooks, skills, or local memory.
-Use repository `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`,
-static Project Instructions, and the generated Work resume prompt. Work should
-own strategic synthesis and candidate-independent review; Codex should own
-bounded implementation and repository verification.
-
-When network access is available, direct Work to the public copy of
-`work-response-contract.md` named by the generated resume prompt. Keep the
-compact fallback rules in `AGENTS.md` and the prompt because external access can
-fail. Project instructions may add stricter project-specific constraints
-without modifying the public contract, but they must preserve one response, one
-transaction, one Codex Goal, and no review-of-review commit.
-
-If Work cannot read the repository, attach the latest `PROJECT_CORE.md` and
-`CURRENT_STAGE.md` for that conversation only. Do not keep stale copies in
-Project Files. When intentionally opening a new conversation, hand off with the
-generated short prompt; the next conversation must reload the three authorities
-rather than trusting pasted narrative.
+Browser Work cannot load local hooks, skills, or memory. It must use repository
+authorities, Project Instructions, the public Work contract, and a generated
+resume prompt. If it cannot read GitHub, attach current authorities for that
+conversation only; do not preserve stale copies as Project Files.

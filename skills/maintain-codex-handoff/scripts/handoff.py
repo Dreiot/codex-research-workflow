@@ -16,7 +16,8 @@ CORE_START = "<!-- codex-project-core"
 STATE_REL = Path("docs/CURRENT_STAGE.md")
 STATE_START = "<!-- codex-handoff-state"
 ENVELOPE_END = "-->"
-VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
+REVIEW_VERDICTS = {"ACCEPT", "ACCEPT_WITH_P2", "REJECT", "BLOCKED"}
+STATE_VERDICTS = REVIEW_VERDICTS | {"NO_REVIEW"}
 CANDIDATE_KINDS = {"implementation", "docs_only"}
 STRATEGIC_STATUSES = {"unaudited", "active", "paused", "redirected", "completed"}
 WORK_CONTRACT_URL = (
@@ -65,6 +66,16 @@ CORE_REQUIRED_HEADINGS = (
     "## Update Rules",
 )
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+NON_BLOCKING_LANGUAGE_RE = re.compile(
+    r"\b(?:non[- ]blocking|not\s+blocking|does\s+not\s+block)\b",
+    flags=re.IGNORECASE,
+)
+BLOCKING_LANGUAGE_RE = re.compile(
+    r"\b(?:blocking|blocker|blocks|blocked|"
+    r"must\s+(?:be\s+)?(?:fixed|closed|resolved)\s+(?:before|prior\s+to)|"
+    r"prevents?\s+(?:acceptance|promotion))\b|阻塞",
+    flags=re.IGNORECASE,
+)
 
 
 def git(repo: Path, *args: str, check: bool = True) -> str:
@@ -146,6 +157,64 @@ def read_state(repo: Path) -> Tuple[Optional[Dict[str, Any]], List[str]]:
     return state, errors + validate_state(repo, state)
 
 
+def validate_review_semantics(
+    verdict: Any, findings: Any, *, require_explicit_labels: bool = False
+) -> List[str]:
+    if verdict == "NO_REVIEW":
+        return []
+    if verdict not in REVIEW_VERDICTS or not isinstance(findings, list):
+        return []
+
+    errors: List[str] = []
+    severities: List[Optional[str]] = []
+    for finding in findings:
+        match = (
+            re.match(r"^\s*(P[012])\b", finding, flags=re.IGNORECASE)
+            if isinstance(finding, str)
+            else None
+        )
+        severities.append(match.group(1).upper() if match else None)
+
+    if verdict == "ACCEPT" and findings:
+        errors.append("ACCEPT requires no open findings")
+    if verdict == "ACCEPT_WITH_P2":
+        invalid_severity = (
+            any(item != "P2" for item in severities)
+            if require_explicit_labels
+            else any(item in {"P0", "P1"} for item in severities)
+        )
+        if not findings or invalid_severity:
+            errors.append("ACCEPT_WITH_P2 requires one or more P2-only findings")
+        elif any(
+            BLOCKING_LANGUAGE_RE.search(NON_BLOCKING_LANGUAGE_RE.sub("", item))
+            for item in findings
+        ):
+            errors.append("P2 findings are non-blocking and must not use blocking language")
+    if verdict != "REJECT" and any(item in {"P0", "P1"} for item in severities):
+        errors.append("P0 or P1 findings require REJECT")
+    if verdict == "REJECT" and (
+        not findings
+        or (
+            require_explicit_labels
+            and not any(item in {"P0", "P1"} for item in severities)
+        )
+    ):
+        errors.append("REJECT requires at least one P0 or P1 finding")
+    if verdict == "BLOCKED" and (
+        not findings
+        or (
+            require_explicit_labels
+            and not all(
+                isinstance(item, str)
+                and re.match(r"^\s*BLOCKED\s*:", item, flags=re.IGNORECASE)
+                for item in findings
+            )
+        )
+    ):
+        errors.append("BLOCKED requires one or more BLOCKED: evidence or environment findings")
+    return errors
+
+
 def validate_state(repo: Path, state: Dict[str, Any]) -> List[str]:
     errors: List[str] = []
     missing = [key for key in STATE_REQUIRED_FIELDS if key not in state]
@@ -156,12 +225,16 @@ def validate_state(repo: Path, state: Dict[str, Any]) -> List[str]:
         errors.append("unexpected fields: " + ", ".join(extra))
     if state.get("schema_version") != 1:
         errors.append("schema_version must be 1")
-    if state.get("review_verdict") not in VERDICTS:
+    if state.get("review_verdict") not in STATE_VERDICTS:
         errors.append("invalid review_verdict")
     if not isinstance(state.get("open_findings"), list) or not all(
         isinstance(item, str) and item.strip() for item in state.get("open_findings", [])
     ):
         errors.append("open_findings must be an array of non-empty strings")
+    else:
+        errors.extend(
+            validate_review_semantics(state.get("review_verdict"), state.get("open_findings"))
+        )
     for key in ("project", "branch", "research_phase", "current_gate", "next_gate", "next_action"):
         if not isinstance(state.get(key), str) or not state.get(key, "").strip():
             errors.append(f"{key} must be a non-empty string")
@@ -385,18 +458,14 @@ def audit(repo: Path) -> Dict[str, Any]:
 
     state_commit = git(repo, "log", "-1", "--format=%H", "--", STATE_REL.as_posix(), check=False)
     core_commit = git(repo, "log", "-1", "--format=%H", "--", CORE_REL.as_posix(), check=False)
-    pending = bool(state_commit and state_commit != head)
-    if pending:
-        warnings.append(
-            f"HEAD {head[:12]} is newer than state commit {state_commit[:12]}; review closure may be pending"
-        )
+    head_newer_than_state = bool(state_commit and state_commit != head)
     return {
         "repo": str(repo),
         "branch": branch,
         "head": head,
         "state_commit": state_commit or None,
         "core_commit": core_commit or None,
-        "pending_after_state": pending,
+        "head_newer_than_state": head_newer_than_state,
         "worktree_clean": not bool(status),
         "errors": errors,
         "warnings": warnings,
@@ -440,51 +509,40 @@ def command_initialize(args: argparse.Namespace) -> int:
             "action. Treat Git and checked-in evidence as authoritative.\n"
             "- Do not create a second dynamic state file. Keep branch, HEAD, Gate, verdict, "
             "and next action out of `PROJECT_CORE.md`.\n\n"
-            "## Execution\n\n"
-            "- Before editing, verify the branch, HEAD, index, worktree, and any remote or "
-            "tracking ref required by the current Goal. Stop and report any conflict between "
-            "Git, project strategy, and current state.\n"
-            "- Execute one bounded Goal at a time. Keep every change within its authorized "
-            "file and evidence scope; do not infer authorization for a later Gate.\n"
-            "- During method development, prefer the smallest sufficient implementation and "
-            "experiment matrix that is correct, testable, reproducible, and robust enough to "
-            "answer the current research question and support the target claim. Reuse existing "
-            "components and avoid speculative abstractions, duplicate mechanisms, broad "
-            "refactors, exhaustive generalization, or unnecessary design-only Gates.\n"
-            "- Prefer the shortest credible empirical loop from minimal implementation through "
-            "bounded real-data smoke to measurable results. Do not invent an extra authorization "
-            "or review Gate when repository authorities already permit a local, reversible run. "
-            "If permission is unclear, ask the user proactively. Always ask before paid, "
-            "irreversible, sensitive-data, external live-service or held-out formal-evaluation "
-            "actions.\n"
-            "- Treat exploratory smoke as diagnostic evidence, not automatic publication "
-            "evidence. Freeze data, configuration, metrics, statistical units, comparators, "
-            "stopping conditions, and provenance before a formal evidence run.\n"
-            "- Never trade away data integrity, statistical validity, reproducibility, "
-            "fail-closed safeguards, or claim boundaries for speed or smaller code.\n"
-            "- Do not advance a Gate or scientific claim without explicit evidence.\n\n"
-            "## Review And State\n\n"
-            "- Require one qualified independent review pinned to the exact base and candidate "
-            "SHAs for material code, data-processing, experiment, statistical, protocol, or "
-            "claim-relevant candidates. Do not create review loops for formatting, mechanical "
-            "state synchronization, or other non-material changes that leave behavior, Gate, "
-            "verdict, findings, accepted SHAs, and claims unchanged.\n"
-            "- Do not duplicate a qualifying Browser Work review with a Codex reviewer, split a "
-            "natural end-to-end candidate solely to add reviews, or let the reviewer modify the "
-            "candidate. Non-blocking P2 findings stay in backlog unless they materially affect "
-            "correctness, reproducibility, fair comparison, interpretation, or the target claim.\n"
-            "- If the same P0 or P1 survives two remediation rounds, stop adding implementation "
-            "until the project decides whether the cause is a defect, ambiguous protocol, or an "
-            "expanded evidence or threat boundary.\n"
-            "- Update `docs/CURRENT_STAGE.md` only after an authoritative Gate, review, "
-            "finding, or next-action change. Update `docs/PROJECT_CORE.md` only after a durable "
-            "strategic, innovation, component, evidence, or claim-boundary change.\n"
-            "- Do not treat chat summaries, local tests, or candidate-local validation as "
-            "independent acceptance.\n"
-            "- Browser Work responses must follow the public Work Response Contract: exactly "
-            "`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`, with one fenced "
-            "Markdown block containing one Codex Goal. Never combine review-state recording "
-            "with the next candidate.\n"
+             "## Execution\n\n"
+             "- Verify the Git identity needed by the current Goal. Resolve material conflicts "
+             "between Git, project strategy, and current state before relying on them.\n"
+             "- Default to the shortest empirical loop: minimal implementation, real-data run, "
+             "metrics, diagnosis, direction adjustment, and paper evidence. Keep naturally "
+             "coupled implementation, critical tests, and bounded exploratory runs together.\n"
+             "- Local, recoverable, no-cost work using project-authorized data is allowed by "
+             "default. Ask before paid, sensitive, external side-effecting, destructive, or "
+             "irreversible actions; do not request duplicate permission for an already authorized "
+             "and frozen run.\n"
+             "- Use the simplest correct, testable implementation. Do not add speculative "
+             "abstractions, broad refactors, defensive infrastructure, exhaustive validation, "
+             "or design-only Gates unless they directly block the current research decision.\n"
+             "- Stop when acceptance criteria pass or metrics are sufficient to choose the next "
+             "direction. Record unrelated issues without investigating them.\n"
+             "- Preserve data integrity, statistical validity, fair comparison, reproducibility, "
+             "material failure handling, negative results, and honest claim boundaries.\n\n"
+             "## Review And State\n\n"
+             "- Exploratory implementation, tests, smoke, debugging, parameter adjustment, and "
+             "metric generation do not require independent review or review-state commits.\n"
+             "- Require one qualified independent review only for an explicit formal promotion: "
+             "accepting a major implementation baseline, freezing a publication evaluation, "
+             "adopting a key result, changing the core method, or raising a paper claim.\n"
+             "- Do not duplicate a qualifying Browser Work review with a Codex reviewer. Record "
+             "a rejected or blocked formal promotion before remediation; mechanical verification "
+             "creates no new review and may be followed immediately by the next Goal.\n"
+             "- Update `docs/CURRENT_STAGE.md` only after a material milestone, formal review, "
+             "material blocker, or next-action change. Ordinary commits do not imply pending "
+             "review closure. Update `docs/PROJECT_CORE.md` only after a durable strategic, "
+             "innovation, component, evidence, or claim-boundary change.\n"
+             "- Browser Work responses must follow the public Work Response Contract: exactly "
+             "`审查结果`, `设计目标`, `验收目标`, and `Codex 指令`, with one fenced "
+             "Markdown block containing at most one Codex Goal. A clean review-state verification "
+             "may be followed by the next Goal in the same response.\n"
             "- Keep the Codex Goal as short as correctness allows; there is no fixed character "
             "limit. Framework-scale or cross-module Goals may retain necessary task-specific "
             "interface, migration, integration, and fail-closed detail. Invoke the "
@@ -494,13 +552,9 @@ def command_initialize(args: argparse.Namespace) -> int:
             "task-specific delta, material prohibitions, validation, commit/push, and stop "
             "condition. Repository repetition is never justification for length; move durable "
             "detail into an authorized protocol or report and reference it when possible.\n"
-            "- Record every completed candidate review before remediation or Gate advancement, "
-            "including `REJECT` and `BLOCKED`. After Work verifies that review-state commit, "
-            "accepted work may advance; rejected or blocked work may only remediate findings "
-            "or collect missing evidence.\n"
-            "- Work verification of a review-state commit is mechanical closure, not a new "
-            "independent review. Do not create another report, `record-review` operation, or "
-            "acceptance commit for that verification.\n"
+             "- Work verification of a formal review-state commit is mechanical closure, not a "
+             "new independent review. Do not create another report, `record-review` operation, "
+             "or acceptance commit for that verification.\n"
             "- For an accepted implementation candidate, set both `last_reviewed_candidate` and "
             "`accepted_code_commit` to the candidate SHA. For an accepted docs-only protocol or "
             "governance candidate, update only `last_reviewed_candidate`; rejected, blocked, and "
@@ -554,15 +608,15 @@ def command_initialize(args: argparse.Namespace) -> int:
             "schema_version": 1,
             "project": repo.name,
             "branch": branch,
-            "research_phase": "handoff_migration",
-            "current_gate": "Establish canonical project state",
+            "research_phase": "exploratory_iteration",
+            "current_gate": "Begin the shortest empirical loop",
             "last_reviewed_candidate": None,
             "accepted_code_commit": None,
-            "review_verdict": "BLOCKED",
+            "review_verdict": "NO_REVIEW",
             "review_report": None,
-            "open_findings": ["Project-specific current state has not yet been audited."],
-            "next_gate": "Project state audit",
-            "next_action": "Audit governing documents and Git history before implementation.",
+            "open_findings": [],
+            "next_gate": "First decision-complete empirical result",
+            "next_action": "Audit PROJECT_CORE.md, then run the smallest experiment that answers the current research question.",
             "updated_at": now_iso(),
         }
         state_path.parent.mkdir(parents=True, exist_ok=True)
@@ -598,8 +652,20 @@ def command_record_review(args: argparse.Namespace) -> int:
     if not isinstance(candidate, str) or not SHA_RE.fullmatch(candidate):
         print("candidate_sha must be a full lowercase SHA", file=sys.stderr)
         return 2
-    if verdict not in VERDICTS:
+    if verdict not in REVIEW_VERDICTS:
         print("invalid verdict", file=sys.stderr)
+        return 2
+    findings = review["open_findings"]
+    if not isinstance(findings, list) or any(
+        not isinstance(item, str) or not item.strip() for item in findings
+    ):
+        print("open_findings must be an array of non-empty strings", file=sys.stderr)
+        return 2
+    semantic_errors = validate_review_semantics(
+        verdict, findings, require_explicit_labels=True
+    )
+    if semantic_errors:
+        print("; ".join(semantic_errors), file=sys.stderr)
         return 2
     prior_accepted = state["accepted_code_commit"]
     requested_accepted = review.get("accepted_code_commit")
@@ -636,7 +702,7 @@ def command_record_review(args: argparse.Namespace) -> int:
             "last_reviewed_candidate": candidate,
             "review_verdict": verdict,
             "review_report": review["review_report"],
-            "open_findings": review["open_findings"],
+            "open_findings": findings,
             "next_gate": review["next_gate"],
             "next_action": review["next_action"],
             "updated_at": now_iso(),
@@ -675,32 +741,14 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "`docs/CURRENT_STAGE.md` 及其指向的最新报告，核验远端分支与实际 HEAD；"
             "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
             f"{WORK_CONTRACT_URL}\n\n"
-            "判断当前事务属于 candidate 独立审查、review-state 机械验收、普通状态核验，"
-            "阻塞修正，还是无需独立审查的 non-material 事务。严格按规范只输出 "
-            "`审查结果`、`设计目标`、`验收目标`、"
-            "`Codex 指令` 四节；最后一节只能有一个 fenced `markdown` 指令块，且其中只能有"
-            "一个最小、可验证的 Codex Goal。不要输出隐藏推理，不要使用冗长分隔线，不要把"
-            "审查落库与下一 candidate 合并。Codex 会通过已安装 skill 重新读取三份权威文件、"
-            "当前报告并核验 Git；不要重复协议/公式全文、完整测试矩阵、已落库 findings、完整"
-            "历史、全部 blob、通用安全条款或冗长最终回复模板。指令没有固定字符上限，应在不"
-            "损害正确性的前提下尽量简短；框架级或跨模块 Goal 可保留必要的接口、迁移、集成和 "
-            "fail-closed 细节。只保留唯一 Goal、expected branch/base、权威文件指针、精确允许 "
-            "diff、本轮 delta、关键禁止边界、验证、commit/push 和 stop condition；重复仓库"
-            "内容不能作为超长理由，持久细节应尽量落入授权协议或报告后引用。\n\n"
-            "若 candidate 审查已完成但尚未落库（包括 REJECT/BLOCKED），唯一 Goal 必须是 "
-            "docs-only review-state recording，此优先级高于 remediation。若 review-state "
-            "commit 已验收，验收本身不得再次落库；ACCEPT/ACCEPT_WITH_P2 可把下一项已授权 "
-            "candidate 作为唯一 Goal，REJECT/BLOCKED 则只能给出 remediation 或补证据 Goal。"
-            "review-state recording 必须明确把被审查 candidate 标记为 "
-            "`candidate_kind=implementation` 或 `candidate_kind=docs_only`，不得按报告标题猜测。"
-            "只对 material implementation、数据处理、实验、统计、协议或 claim 相关 candidate "
-            "创建独立审查；不得为格式、机械同步、普通状态检查或非阻塞 P2 创建 review loop。"
-            "闭环后优先推进最小实现、真实数据 smoke、正式实验或主要指标，而不是新增非必要的 "
-            "design-only Gate。真实数据运行若已被仓库或用户默认规则允许，不得自行追加授权门槛；"
-            "若权限不清，或涉及付费、不可逆、敏感数据、外部 live service 或正式 held-out "
-            "evaluation，应主动询问用户。探索性 smoke 不得自动提升为论文证据。"
-            "若 Git、PROJECT_CORE 与 CURRENT_STAGE "
-            "冲突，报告 BLOCKED，且只允许给出有界的核对或修正 Goal。"
+            "默认推进：最小实现 → 真实数据运行 → 指标 → 诊断 → 方向调整。探索性实现、测试、"
+            "smoke、调试和调参不需要独立审查或 review-state。只有明确准备接受主要实现、冻结"
+            "正式论文评估、采纳关键结果、改变核心方法或提升论文 claim 时，才进行一次 formal "
+            "promotion 审查并记录结论；机械验收通过后可立即签发下一 Goal。\n\n"
+            "按公开 Contract 简洁输出，最多给出一个 Codex Goal。Goal 引用仓库权威内容，不复制"
+            "完整协议、历史、hash 或通用规则。达到验收目标即停止，相邻问题只记录。已授权的本地、"
+            "可恢复、无付费真实数据工作无需逐次询问；只有付费、敏感数据、外部副作用、破坏性或"
+            "不可逆操作需要先询问。若权威状态存在实质冲突，只给出最小核对或修正 Goal。"
         )
     else:
         print(
@@ -709,15 +757,13 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "`docs/CURRENT_STAGE.md` 及当前 Gate 指向的报告；fetch 后实查分支、HEAD、远端跟踪 "
             f"ref、index 和 worktree。记录的预期分支为 `{state['branch']}`，但必须以 Git 实查为准。"
             "任何策略、状态或 Git 冲突都必须停止，不得依赖本 Prompt 或旧聊天自行补全。\n\n"
-            "开始前把当前工作归类为以下唯一一种事务：non-material、material candidate、"
-            "formal evidence run、review-state recording、remediation 或 handoff-only。"
-            "只执行 `CURRENT_STAGE.md` 与用户提供指令共同授权的"
-            "一个原子 Goal；简要说明它与项目主方向、当前 Gate、最近 verdict 和未解决问题的关系。"
-            "合格的 Browser Work 审查不得重复自审；review-state 的机械验收不得生成新的审查报告或"
-            "acceptance commit；不得把审查落库与下一 Gate 合并。完成后报告精确 diff、验证、commit、"
-            "push、远端对齐和仍未闭环事项。对已获仓库授权的本地、可恢复真实数据运行，不得自行增加"
-            "审查或授权 Gate；权限不清或涉及付费、不可逆、敏感数据、外部 live service 或正式 "
-            "held-out evaluation 时，应在执行前主动询问用户。"
+            "默认执行探索流程：最小实现、测试、真实数据运行、指标、诊断和方向调整。只有 Goal、"
+            "用户或 CURRENT_STAGE 明确要求正式提升主要实现、冻结正式论文评估、关键结果、核心方法或论文 "
+            "claim 时，才启动一次独立审查和 review-state。普通探索提交不需要审查或状态落库。"
+            "合格的 Browser Work 审查不得重复自审；机械验收不得生成新的审查报告。完成后报告实际 "
+            "diff、验证、实验指标、commit/push 和未闭环事项。达到验收目标即停止，不调查相邻问题。"
+            "对已获授权的本地、可恢复、无付费真实数据工作不得增加 Gate；仅在涉及付费、敏感数据、"
+            "外部副作用、破坏性或不可逆操作时主动询问用户。"
         )
     return 0
 
