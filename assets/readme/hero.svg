@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
-  <title id="title">Codex Research Handoff</title>
-  <desc id="desc">A technical editorial map showing Git truth feeding stable rules, durable project strategy, and volatile Gate state.</desc>
+  <title id="title">Codex Research Workflow</title>
+  <desc id="desc">A repository-native research workflow connecting Git truth, stable rules, durable project strategy, and current execution state.</desc>
 
   <rect x="1" y="1" width="1198" height="418" rx="8" fill="#f7f5ef" stroke="#17191b" stroke-width="2"/>
   <rect x="1" y="1" width="1198" height="10" rx="6" fill="#17191b"/>
@@ -8,10 +8,10 @@
   <g id="title-block" transform="translate(54 48)">
     <text x="0" y="0" fill="#2f7d62" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700">AUDITABLE RESEARCH AGENT WORKFLOWS</text>
     <text x="0" y="76" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="58" font-weight="750">CODEX RESEARCH</text>
-    <text x="0" y="138" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="58" font-weight="750">HANDOFF</text>
+    <text x="0" y="138" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="58" font-weight="750">WORKFLOW</text>
     <line x1="0" y1="170" x2="570" y2="170" stroke="#17191b" stroke-width="2"/>
-    <text x="0" y="208" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">Research state that survives tasks, reviews,</text>
-    <text x="0" y="237" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">and automatic context compaction.</text>
+    <text x="0" y="208" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">Research execution with durable strategy,</text>
+    <text x="0" y="237" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">claim-aware evidence, and resumable state.</text>
 
     <g transform="translate(0 280)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
       <text x="0" y="0" fill="#697075">POLICY</text>

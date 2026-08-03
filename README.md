@@ -3,14 +3,18 @@
 </p>
 
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Handoff separates stable rules, durable research strategy, and volatile gate state into three auditable authorities.">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Workflow connects continuous research execution with stable rules, durable strategy, and resumable project state.">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/workflow-tags.svg" width="100%" alt="Exploration first, canonical state, claim-aware evidence, and Codex plus Browser Work.">
 </p>
 
 Long-running research agents drift when operating rules, scientific direction,
 and the current implementation Gate live only in conversation history. **Codex
-Research Handoff** turns those layers into explicit repository authorities,
-validates them against Git, and reloads them after resume or automatic context
-compaction.
+Research Workflow** combines an exploration-first execution loop with explicit
+repository authorities, validates durable state against Git, and reloads the
+right context after resume or automatic context compaction.
 
 It is a Codex Skill for research software, paper pipelines, evidence-gated
 experiments, and any repository where a plausible summary is not enough.

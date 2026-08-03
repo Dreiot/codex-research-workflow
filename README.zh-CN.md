@@ -3,12 +3,16 @@
 </p>
 
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Handoff 将稳定规则、长期科研战略和动态 Gate 拆分为三份可审计权威文件。">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Workflow 将连续科研执行与稳定规则、长期战略和可恢复项目状态结合。">
+</p>
+
+<p align="center">
+  <img src="./assets/readme/workflow-tags.svg" width="100%" alt="探索优先、权威状态、claim 感知，以及 Codex 与 Browser Work 协作。">
 </p>
 
 长期科研任务容易在多轮对话、自动压缩和跨任务切换后发生状态漂移。**Codex
-Research Handoff** 将操作规则、科研战略和当前 Gate 分别写入仓库中的三份权威文件，
-使用确定性脚本核验 schema 与 Git，并在任务恢复或自动压缩后重新注入摘要。
+Research Workflow** 将探索优先的科研执行循环与三份仓库权威文件结合，使用确定性脚本
+核验 schema 与 Git，并在任务恢复或自动压缩后重新注入正确的战略和阶段上下文。
 
 它适用于科研软件、论文实验流水线、证据 Gate，以及任何不能只依赖“看起来合理的聊天总结”
 的项目。
