@@ -244,10 +244,13 @@ def verify_state(path: Path, expected: Dict[str, Any]) -> None:
 
 
 def delete_failure_inside(plan: Dict[str, Any], source: Path) -> bool:
-    source_text = str(source).replace("\\", "/").casefold()
+    def normalized(value: Any) -> str:
+        return str(value).replace("\\\\", "\\").replace("\\", "/").casefold()
+
+    source_text = normalized(source)
     return any(
         failure.get("phase") == "delete"
-        and source_text in str(failure.get("error", "")).replace("\\", "/").casefold()
+        and source_text in normalized(failure.get("error", ""))
         for failure in plan["execution"]["failures"]
     )
 

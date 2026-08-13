@@ -253,7 +253,8 @@ class CommandTest(unittest.TestCase):
             {
                 "phase": "delete",
                 "at": "2026-01-01T00:00:00+00:00",
-                "error": f"simulated partial deletion at {junk / 'stdout.log'}",
+                "error": "simulated partial deletion at "
+                + str(junk / "stdout.log").replace("\\", "\\\\"),
             }
         )
         plan_path.write_text(json.dumps(plan), encoding="utf-8")
