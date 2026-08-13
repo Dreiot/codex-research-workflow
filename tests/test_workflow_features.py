@@ -210,7 +210,13 @@ class CommandTest(unittest.TestCase):
         (repo / "AGENTS.md").write_text("# Rules\n\n- Experiment root: `experiments`\n", encoding="utf-8")
         (repo / "docs").mkdir()
         (repo / "docs" / "PROJECT_CORE.md").write_text("# Core\n", encoding="utf-8")
-        (repo / ".gitignore").write_text("experiments/runs/\nexperiments/.tmp/\nexperiments/quarantine/\n", encoding="utf-8")
+        (repo / ".gitignore").write_text(
+            "experiments/runs/\n"
+            "experiments/runs/old/r001\n"
+            "experiments/.tmp/\n"
+            "experiments/quarantine/\n",
+            encoding="utf-8",
+        )
         self.git(repo, "add", "AGENTS.md", "docs/PROJECT_CORE.md", ".gitignore")
         self.git(repo, "commit", "-m", "governance")
         junk = repo / "experiments" / "runs" / "old" / "r001"

@@ -19,4 +19,7 @@ counts, byte sizes, modification metadata, tracked/ignored status, and tracked
 references. It does not load large run contents into model context or read raw
 datasets to infer a classification.
 
+Tracked `.gitignore` declarations are ignore metadata, not artifact references;
+all other live tracked references remain deletion blockers.
+
 `delete_reproducible` requires retained reproducibility inputs. `delete_technical_failure` requires evidence that the output cannot support a scientific conclusion; a scientifically meaningful negative result belongs in `keep_negative_evidence`.

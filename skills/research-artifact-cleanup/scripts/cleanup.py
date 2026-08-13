@@ -119,7 +119,11 @@ def experiment_root(repo: Path) -> Path:
 
 def references(repo: Path, rel: Path) -> List[str]:
     result = run(["git", "-C", str(repo), "grep", "-l", "-F", rel.as_posix(), "--", ":(exclude)" + rel.as_posix()])
-    return sorted(line for line in result.stdout.splitlines() if line.strip())
+    return sorted(
+        line
+        for line in result.stdout.splitlines()
+        if line.strip() and Path(line).name != ".gitignore"
+    )
 
 
 def tracked(repo: Path, rel: Path) -> List[str]:
