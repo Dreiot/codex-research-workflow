@@ -6,6 +6,10 @@ authority, Git-tracked reference changes, and the final commit/push. Cleanup
 owns metadata inventory, classification inputs, state-bound plans, physical
 moves/deletions, and execution verification.
 
+The selected project root must be the exact Git root. Inventory the whole
+project root, including ignored artifacts, and reject nested or split-root
+layouts before planning cleanup.
+
 Trigger a read-only plan after a committed `PROJECT_CORE.md` change that:
 
 - replaces or terminates the primary direction;

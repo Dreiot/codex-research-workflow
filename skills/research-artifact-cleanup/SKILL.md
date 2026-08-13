@@ -1,6 +1,6 @@
 ---
 name: research-artifact-cleanup
-description: Plan and apply user-approved cleanup of obsolete research runs, technical failures, duplicate reproducible outputs, and retired-direction artifacts. Use after a committed PROJECT_CORE direction retirement or for an explicit repository cleanup request. Integrates with Codex Research Workflow, preserves formal and negative evidence, and never deletes from an unapproved inventory.
+description: Plan and apply user-approved cleanup across the exact single-root research project, including ignored obsolete runs, technical failures, duplicate reproducible outputs, and retired-direction artifacts. Use after a committed PROJECT_CORE direction retirement or for an explicit project cleanup request. Integrates with Codex Research Workflow, preserves formal and negative evidence, and never deletes from an unapproved inventory.
 ---
 
 # Research Artifact Cleanup
@@ -10,6 +10,8 @@ Clean historical research artifacts without weakening the evidence available to 
 ## Required Boundary
 
 - Use together with `$codex-research-workflow` for governed repositories.
+- Require the Codex-opened project root to equal the exact Git root. `--repo`
+  names this one root; never clean a parent workspace or an outside sibling.
 - This Skill cleans existing artifacts. It does not create experiments, choose a research direction, compact authority documents, or judge scientific sufficiency.
 - Treat `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, Git, current reports, and approved evidence packets as authority.
 - Never inspect raw/external datasets merely to classify storage.
@@ -17,8 +19,8 @@ Clean historical research artifacts without weakening the evidence available to 
 
 ## Workflow
 
-1. Audit the repository with Codex Research Workflow and require a clean, exact Git root.
-2. Read [classification-policy.md](references/classification-policy.md), inventory metadata and Git references, then prepare a decisions JSON.
+1. Audit the project with Codex Research Workflow and require one clean, exact project/Git root.
+2. Read [classification-policy.md](references/classification-policy.md), inventory the entire project root plus Git references, then prepare a decisions JSON.
 3. Run `cleanup.py plan`. Present its plan identity, totals, experiment-level table, and numbered approval scope. Stop for user approval.
 4. After explicit approval, run `apply --phase relocate` first when migration is required. Update and validate references before deletion.
 5. Run `apply --phase delete` with the same `plan_id`. Unknown, active, formal-evidence, and negative-evidence items remain non-deletable.

@@ -50,6 +50,9 @@ Then audit an existing governed project:
 py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.py" audit --repo C:\path\to\project
 ```
 
+The Codex-opened project root and exact Git root must be the same directory.
+Nested or split-root project layouts stop for an explicit root migration.
+
 For an older governed project, preview migration before changing anything:
 
 ```powershell
@@ -70,7 +73,7 @@ Git and checked-in evidence remain authoritative. Chat summaries are pointers, n
 
 ## Experiments without repository sprawl
 
-The default root is `experiments/`; `AGENTS.md` may declare another repository-relative root. Nothing is created until an artifact is actually needed.
+The default root is `experiments/`; `AGENTS.md` may declare another project-relative root. Nothing is created until an artifact is actually needed. Cleanup inventory still begins at the whole project root, including ignored local artifacts.
 
 ```text
 experiments/

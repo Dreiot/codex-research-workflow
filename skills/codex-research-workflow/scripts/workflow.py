@@ -162,6 +162,14 @@ def exact_repo(path: Path) -> Optional[Path]:
     return repo if repo == resolved else None
 
 
+def immediate_nested_repositories(path: Path) -> List[Path]:
+    roots: List[Path] = []
+    for child in path.iterdir():
+        if child.is_dir() and (child / ".git").exists():
+            roots.append(child.resolve())
+    return sorted(roots)
+
+
 def validate_id(value: str, label: str) -> str:
     if not EXPERIMENT_ID_RE.fullmatch(value):
         raise ValueError(f"{label} must use lowercase ASCII letters, digits, and hyphens")
@@ -762,15 +770,16 @@ def audit(repo: Path) -> Dict[str, Any]:
 
 
 def command_audit(args: argparse.Namespace) -> int:
-    repo = find_repo(Path(args.repo).resolve())
-    if not repo:
-        print("not a Git repository", file=sys.stderr)
+    try:
+        repo = require_exact_git_repo(args.repo)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 2
     result = audit(repo)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
-        print(f"repo: {result['repo']}")
+        print(f"project_root: {result['repo']}")
         print(f"branch: {result['branch']}")
         print(f"HEAD: {result['head']}")
         print(f"worktree_clean: {result['worktree_clean']}")
@@ -782,9 +791,10 @@ def command_audit(args: argparse.Namespace) -> int:
 
 
 def command_initialize(args: argparse.Namespace) -> int:
-    repo = find_repo(Path(args.repo).resolve())
-    if not repo:
-        print("not a Git repository", file=sys.stderr)
+    try:
+        repo = require_exact_git_repo(args.repo, require_history=False)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 2
     created = initialize_authorities(repo)
     for rel in ("AGENTS.md", CORE_REL.as_posix(), STATE_REL.as_posix()):
@@ -984,11 +994,23 @@ def command_migrate(args: argparse.Namespace) -> int:
     return 0
 
 
-def require_exact_git_repo(value: str) -> Path:
+def require_exact_git_repo(value: str, require_history: bool = True) -> Path:
     repo = Path(value).resolve()
-    if exact_repo(repo) != repo or not current_head(repo):
-        raise ValueError("command requires the exact root of an existing Git repository")
-    return repo
+    if exact_repo(repo) == repo:
+        if require_history and not current_head(repo):
+            raise ValueError("command requires an existing commit at the exact project/Git root")
+        return repo
+    nested = immediate_nested_repositories(repo) if repo.is_dir() else []
+    if nested:
+        joined = ", ".join(str(path) for path in nested)
+        raise ValueError(
+            "project root contains a nested Git repository; relocate Git to the project root: "
+            + joined
+        )
+    discovered = find_repo(repo) if repo.is_dir() else None
+    if discovered:
+        raise ValueError(f"--repo must name the exact project/Git root, not a subdirectory: {discovered}")
+    raise ValueError("command requires one project root that is also the exact Git root")
 
 
 def require_ignored(repo: Path, rel: Path) -> None:

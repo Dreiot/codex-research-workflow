@@ -1,5 +1,9 @@
 # Initialization and Migration
 
+The Codex-opened project root, authority root, and exact Git root are one
+directory. `--repo` always names that directory. A nested Git repository is an
+invalid project layout, not a supported multi-root mode.
+
 ## New projects
 
 Run `workflow.py init --repo <repo>` without `--apply` first. The plan must
@@ -33,3 +37,7 @@ Migration does not compact authorities, relocate experiments, or delete
 artifacts. Those are independent user-authorized transactions. Existing remote
 or multi-branch layouts are inspected but never renamed, merged, deleted, or
 rewritten automatically.
+
+If the selected project root contains a nested Git repository, stop before
+`migrate`. Prepare a separate user-approved root-relocation transaction, preserve
+Git history and protected artifacts, and rerun `audit` at the unified root.

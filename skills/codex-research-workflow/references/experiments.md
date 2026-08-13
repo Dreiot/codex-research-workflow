@@ -1,6 +1,6 @@
 # Experiment Layout and Run Manifest
 
-Resolve the single experiment root from `AGENTS.md`; otherwise use
+Resolve the single experiment root inside the exact project/Git root from `AGENTS.md`; otherwise use
 `experiments/`. Do not pre-create unused directories.
 
 ```text

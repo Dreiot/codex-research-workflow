@@ -1,9 +1,13 @@
 ---
 name: codex-research-workflow
-description: Initialize, migrate, audit, execute, review, and resume governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every Browser Work-issued Codex Goal in a governed project, and for project setup, durable direction changes, decision-complete evidence, natural implementation-candidate review, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
+description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every Browser Work-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, natural implementation-candidate review, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
 ---
 
 # Codex Research Workflow
+
+Treat the Codex-opened project root and exact Git root as the same directory.
+`--repo` always names that project root. Do not support a parent workspace with a
+nested project repository; stop and require a user-approved root migration.
 
 Treat Git and checked-in evidence as authoritative. Use:
 
@@ -20,7 +24,8 @@ declare them redundant.
 ## Restore State
 
 At a new Goal, resume, or explicit handoff, read the three authorities and the
-currently controlling report, then verify the repository root, branch, HEAD,
+currently controlling report, then verify that the project root is the exact
+Git root, followed by branch, HEAD,
 remote tracking ref, index, worktree, and relevant protected paths. Do not load
 chronological ledgers or old reports unless current authorities point to them,
 state conflicts, or historical tracing requires them.
@@ -51,7 +56,7 @@ next decision. Do not investigate adjacent issues merely for completeness.
 
 ## Manage Experiments
 
-Use one repository experiment root, default `experiments/`; a project may
+Use one experiment root inside the project root, default `experiments/`; a project may
 override it only in `AGENTS.md`. Create it and its subdirectories only when
 needed. New persistent artifacts must not create ad hoc top-level output roots.
 
@@ -118,7 +123,9 @@ changes core components enough to obsolete prior experiments, generate a
 read-only cleanup plan in the same Goal and stop for user review. Text-only
 edits, evidence additions, and claim narrowing do not trigger cleanup.
 
-Cleanup execution is not a formal research Gate. Use a Cleanup Plan Review,
+Cleanup inventory starts at the entire project root, including ignored local
+artifacts; Git tracking is evidence metadata, not the scan boundary. Cleanup
+execution is not a formal research Gate. Use a Cleanup Plan Review,
 explicit user approval, and a Cleanup Execution Verification. Read
 [cleanup-integration.md](references/cleanup-integration.md) when triggered.
 

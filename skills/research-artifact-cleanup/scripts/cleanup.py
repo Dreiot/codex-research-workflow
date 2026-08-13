@@ -63,7 +63,7 @@ def resolve_repo(value: str) -> Path:
     repo = Path(value).resolve()
     result = run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"])
     if result.returncode != 0 or Path(result.stdout.strip()).resolve() != repo:
-        raise ValueError("cleanup requires the exact Git repository root")
+        raise ValueError("cleanup requires one project root that is also the exact Git root")
     if git(repo, "status", "--porcelain=v1", "--untracked-files=all"):
         raise ValueError("cleanup planning requires a clean worktree")
     return repo
@@ -307,7 +307,7 @@ def command_apply(args: argparse.Namespace) -> int:
         repo = Path(args.repo).resolve()
         result = run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"])
         if result.returncode != 0 or Path(result.stdout.strip()).resolve() != repo:
-            raise ValueError("cleanup requires the exact Git repository root")
+            raise ValueError("cleanup requires one project root that is also the exact Git root")
         if plan_path.is_absolute():
             resolved_plan = plan_path.resolve()
             resolved_plan.relative_to(repo)

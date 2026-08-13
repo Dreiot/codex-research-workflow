@@ -50,6 +50,8 @@ npx skills add Dreiot/codex-research-workflow
 py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.py" audit --repo C:\项目路径
 ```
 
+Codex 打开的项目根与精确 Git 根必须是同一目录。嵌套或双根结构会停止，等待显式根目录迁移。
+
 旧治理项目先只查看迁移计划：
 
 ```powershell
@@ -70,7 +72,7 @@ Git 与已提交证据保持权威。聊天摘要只是入口，不是状态。�
 
 ## 实验产物不再污染仓库根目录
 
-默认实验根目录为 `experiments/`；也可在 `AGENTS.md` 中声明其他仓库相对路径。没有真实产物需求时不会预建任何目录。
+默认实验根目录为 `experiments/`；也可在 `AGENTS.md` 中声明其他项目相对路径。没有真实产物需求时不会预建任何目录。清理盘点仍从完整项目根开始，包括 ignored 本地产物。
 
 ```text
 experiments/

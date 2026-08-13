@@ -143,6 +143,65 @@ class CommandTest(unittest.TestCase):
         )
         self.assertEqual(validated["status"], "valid")
 
+    def test_commands_reject_nested_or_inexact_project_roots(self):
+        project = self.base / "project-root"
+        repo = project / "nested-repo"
+        child = repo / "src"
+        child.mkdir(parents=True)
+        self.run_cmd("git", "init", "-b", "main", str(repo))
+        self.configure(repo)
+        (repo / "README.md").write_text("nested\n", encoding="utf-8")
+        self.git(repo, "add", "README.md")
+        self.git(repo, "commit", "-m", "initial")
+
+        nested = self.run_cmd(
+            sys.executable,
+            str(WORKFLOW),
+            "audit",
+            "--repo",
+            str(project),
+            expected=2,
+        )
+        self.assertIn("project root contains a nested Git repository", nested.stderr)
+
+        inexact = self.run_cmd(
+            sys.executable,
+            str(WORKFLOW),
+            "audit",
+            "--repo",
+            str(child),
+            expected=2,
+        )
+        self.assertIn("exact project/Git root", inexact.stderr)
+
+        decisions = self.base / "nested-decisions.json"
+        decisions.write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "path": "nested-repo/README.md",
+                            "classification": "unknown",
+                            "action": "keep",
+                            "reason": "must remain outside cleanup until roots are unified",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        cleanup = self.run_cmd(
+            sys.executable,
+            str(CLEANUP),
+            "plan",
+            "--repo",
+            str(project),
+            "--decisions",
+            str(decisions),
+            expected=2,
+        )
+        self.assertIn("one project root", cleanup.stderr)
+
     def test_cleanup_requires_plan_id_and_preserves_unknown(self):
         repo = self.base / "cleanup-project"
         repo.mkdir()

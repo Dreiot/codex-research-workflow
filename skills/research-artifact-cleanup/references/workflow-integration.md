@@ -1,5 +1,8 @@
 # Workflow Integration
 
+Both Skills operate on one project root that is also the exact Git root.
+Reject nested repositories and never extend cleanup to paths outside that root.
+
 Cleanup is triggered only after a committed `PROJECT_CORE.md` change that replaces or terminates the primary direction, rejects or supersedes a durable direction, or makes old runs obsolete through a core-component change. Wording, citation, evidence-level, and claim-narrowing edits do not automatically trigger cleanup.
 
 The same Codex Goal may commit the direction decision and produce a read-only cleanup plan, but it must stop before relocation or deletion. The Browser Work response should summarize:

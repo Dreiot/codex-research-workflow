@@ -13,6 +13,10 @@ Every item uses exactly one classification:
 
 Classification uses repository evidence and explicit user decisions. File age, size, ignored status, folder naming, or apparent duplication is never sufficient by itself. Preserve enough reports, metrics, manifests, negative results, and code/config identity for Browser Work to review the result and choose the next direction.
 
-The inventory script records paths, counts, byte sizes, modification metadata, tracked/ignored status, and tracked references. It does not load large run contents into model context or read raw datasets to infer a classification.
+Inventory starts at the exact project/Git root and includes ignored local
+artifacts, not only tracked files or the experiment directory. It records paths,
+counts, byte sizes, modification metadata, tracked/ignored status, and tracked
+references. It does not load large run contents into model context or read raw
+datasets to infer a classification.
 
 `delete_reproducible` requires retained reproducibility inputs. `delete_technical_failure` requires evidence that the output cannot support a scientific conclusion; a scientifically meaningful negative result belongs in `keep_negative_evidence`.
