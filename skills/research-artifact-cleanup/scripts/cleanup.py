@@ -26,7 +26,7 @@ DELETE_CLASSES = {"delete_reproducible", "delete_technical_failure"}
 KEEP_CLASSES = CLASSES - DELETE_CLASSES
 CORE_REL = Path("docs/PROJECT_CORE.md")
 PLAN_SCHEMA = "research-artifact-cleanup-plan/v1"
-RECORD_SCHEMA = "research-artifact-cleanup-record/v1"
+RECORD_SCHEMA = "research-artifact-cleanup-record/v2"
 
 
 def run(command: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess[str]:
@@ -316,16 +316,45 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
     if plan.get("important"):
         root = experiment_root(repo)
         record_rel = root / "registry" / "cleanup" / f"{plan['plan_id']}.json"
+        inventory = [
+            {key: item[key] for key in ("path", "classification", "action", "target", "reason")}
+            for item in plan["items"]
+        ]
+        totals: Dict[str, Dict[str, int]] = {}
+        groups: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
+        for item in plan["items"]:
+            classification = item["classification"]
+            bucket = totals.setdefault(classification, {"items": 0, "files": 0, "bytes": 0})
+            bucket["items"] += 1
+            bucket["files"] += item["state"]["files"]
+            bucket["bytes"] += item["state"]["bytes"]
+            key = (classification, item["action"], item["reason"])
+            group = groups.setdefault(
+                key,
+                {
+                    "classification": classification,
+                    "action": item["action"],
+                    "reason": item["reason"],
+                    "files": 0,
+                    "bytes": 0,
+                    "paths": [],
+                },
+            )
+            group["files"] += item["state"]["files"]
+            group["bytes"] += item["state"]["bytes"]
+            path_entry = {"path": item["path"]}
+            if item["target"] is not None:
+                path_entry["target"] = item["target"]
+            group["paths"].append(path_entry)
         record = {
             "schema": RECORD_SCHEMA,
             "cleanup_id": plan["plan_id"],
             "verified_at": now_iso(),
             "base_head": plan["head"],
             "project_core_commit": plan["project_core_commit"],
-            "items": [
-                {key: item[key] for key in ("path", "classification", "action", "target", "reason")}
-                for item in plan["items"]
-            ],
+            "inventory_sha256": canonical_hash({"items": inventory}),
+            "totals": totals,
+            "groups": list(groups.values()),
         }
         save(inside(repo, record_rel), record)
 

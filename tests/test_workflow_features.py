@@ -289,7 +289,13 @@ class CommandTest(unittest.TestCase):
                 phase,
             )
         self.assertFalse(junk.exists())
-        self.assertTrue((repo / "experiments" / "registry" / "cleanup" / f"{planned['plan_id']}.json").is_file())
+        record_path = repo / "experiments" / "registry" / "cleanup" / f"{planned['plan_id']}.json"
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        self.assertEqual(record["schema"], "research-artifact-cleanup-record/v2")
+        self.assertEqual(record["totals"]["delete_technical_failure"]["items"], 1)
+        self.assertEqual(len(record["groups"]), 1)
+        self.assertEqual(record["groups"][0]["paths"], [{"path": "experiments/runs/old/r001"}])
+        self.assertNotIn("items", record)
         self.assertFalse((repo / planned["plan"]).exists())
 
 
