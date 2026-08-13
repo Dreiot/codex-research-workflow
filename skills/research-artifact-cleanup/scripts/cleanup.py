@@ -340,9 +340,9 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
                 },
             )
             group["items"] += 1
-            path_entry = {"path": item["path"]}
+            path_entry: Any = item["path"]
             if item["target"] is not None:
-                path_entry["target"] = item["target"]
+                path_entry = {"path": item["path"], "target": item["target"]}
             group["paths"].append(path_entry)
         record = {
             "schema": RECORD_SCHEMA,

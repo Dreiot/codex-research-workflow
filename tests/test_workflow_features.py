@@ -295,7 +295,7 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(record["totals"]["delete_technical_failure"]["items"], 1)
         self.assertEqual(len(record["groups"]), 1)
         self.assertEqual(record["groups"][0]["items"], 1)
-        self.assertEqual(record["groups"][0]["paths"], [{"path": "experiments/runs/old/r001"}])
+        self.assertEqual(record["groups"][0]["paths"], ["experiments/runs/old/r001"])
         self.assertNotIn("items", record)
         self.assertFalse((repo / planned["plan"]).exists())
 
