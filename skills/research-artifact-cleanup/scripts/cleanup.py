@@ -335,13 +335,11 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
                     "classification": classification,
                     "action": item["action"],
                     "reason": item["reason"],
-                    "files": 0,
-                    "bytes": 0,
+                    "items": 0,
                     "paths": [],
                 },
             )
-            group["files"] += item["state"]["files"]
-            group["bytes"] += item["state"]["bytes"]
+            group["items"] += 1
             path_entry = {"path": item["path"]}
             if item["target"] is not None:
                 path_entry["target"] = item["target"]
