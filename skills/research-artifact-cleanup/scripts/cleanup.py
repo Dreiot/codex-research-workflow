@@ -5,7 +5,9 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import shutil
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -241,6 +243,22 @@ def verify_state(path: Path, expected: Dict[str, Any]) -> None:
         raise ValueError(f"artifact changed since planning: {path}")
 
 
+def delete_failure_inside(plan: Dict[str, Any], source: Path) -> bool:
+    source_text = str(source).replace("\\", "/").casefold()
+    return any(
+        failure.get("phase") == "delete"
+        and source_text in str(failure.get("error", "")).replace("\\", "/").casefold()
+        for failure in plan["execution"]["failures"]
+    )
+
+
+def clear_readonly_and_retry(function: Any, path: str, exc_info: Tuple[Any, Any, Any]) -> None:
+    if not isinstance(exc_info[1], PermissionError):
+        raise exc_info[1]
+    os.chmod(path, stat.S_IWRITE)
+    function(path)
+
+
 def apply_relocate(repo: Path, plan: Dict[str, Any]) -> None:
     done = set(plan["execution"]["relocate"])
     for item in plan["items"]:
@@ -265,13 +283,17 @@ def apply_delete(repo: Path, plan: Dict[str, Any]) -> None:
         if item["classification"] not in DELETE_CLASSES:
             raise ValueError(f"non-deletable classification: {item['classification']}")
         source = inside(repo, Path(item["path"]))
-        verify_state(source, item["state"])
+        try:
+            verify_state(source, item["state"])
+        except ValueError:
+            if not delete_failure_inside(plan, source):
+                raise
         live_refs = references(repo, Path(item["path"]))
         if live_refs:
             raise ValueError(f"tracked references remain for {item['path']}: {', '.join(live_refs)}")
         if source.is_dir():
-            shutil.rmtree(source)
-        else:
+            shutil.rmtree(source, onerror=clear_readonly_and_retry)
+        elif source.exists():
             source.unlink()
         plan["execution"]["delete"].append(item["path"])
 

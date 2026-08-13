@@ -1,5 +1,6 @@
 import json
 import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -222,6 +223,9 @@ class CommandTest(unittest.TestCase):
         junk = repo / "experiments" / "runs" / "old" / "r001"
         junk.mkdir(parents=True)
         (junk / "stdout.log").write_text("technical failure\n", encoding="utf-8")
+        readonly = junk / "readonly.log"
+        readonly.write_text("generated Git object\n", encoding="utf-8")
+        os.chmod(readonly, stat.S_IREAD)
 
         decisions = self.base / "decisions.json"
         decisions.write_text(
@@ -243,6 +247,17 @@ class CommandTest(unittest.TestCase):
         planned = json.loads(
             self.run_cmd(sys.executable, str(CLEANUP), "plan", "--repo", str(repo), "--decisions", str(decisions)).stdout
         )
+        plan_path = repo / planned["plan"]
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        plan["execution"]["failures"].append(
+            {
+                "phase": "delete",
+                "at": "2026-01-01T00:00:00+00:00",
+                "error": f"simulated partial deletion at {junk / 'stdout.log'}",
+            }
+        )
+        plan_path.write_text(json.dumps(plan), encoding="utf-8")
+        (junk / "stdout.log").unlink()
         self.run_cmd(
             sys.executable,
             str(CLEANUP),
