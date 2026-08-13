@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">One research system in sixty seconds</title>
+  <desc id="desc">Git and three canonical files govern a fast empirical loop, tracked evidence candidates, formal promotion, and separately approved artifact cleanup.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#2457D6"/></marker>
+    <marker id="arrow-ink" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#14161A"/></marker>
+  </defs>
+  <rect x="1" y="1" width="1198" height="418" rx="18" fill="#14161A" stroke="#14161A" stroke-width="2"/>
+  <text x="42" y="49" fill="#F3EFE6" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="720">One research system in 60 seconds</text>
+  <text x="1158" y="47" text-anchor="end" fill="#A8ABB2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">AUTHORITY → EXECUTION → EVIDENCE → DECISION</text>
+  <path d="M42 70H1158" stroke="#41444A"/>
+
+  <g transform="translate(42 100)">
+    <rect width="228" height="250" rx="9" fill="#F3EFE6"/>
+    <text x="22" y="33" fill="#2457D6" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">01 / AUTHORITY</text>
+    <text x="22" y="66" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Reload truth</text>
+    <path d="M22 83H206" stroke="#BDB7AC"/>
+    <g fill="#34373D" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+      <text x="22" y="116">AGENTS.md</text>
+      <text x="22" y="148">PROJECT_CORE.md</text>
+      <text x="22" y="180">CURRENT_STAGE.md</text>
+      <text x="22" y="222">branch / HEAD / diff</text>
+    </g>
+    <circle cx="194" cy="218" r="6" fill="#D75945"/>
+  </g>
+
+  <path d="M282 225H318" stroke="#2457D6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <g transform="translate(330 100)">
+    <rect width="228" height="250" rx="9" fill="#F3EFE6"/>
+    <text x="22" y="33" fill="#2457D6" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">02 / EXECUTION</text>
+    <text x="22" y="66" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Run the minimum</text>
+    <path d="M22 83H206" stroke="#BDB7AC"/>
+    <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">
+      <text x="22" y="118" fill="#34373D">implement</text>
+      <text x="22" y="151" fill="#34373D">real-data smoke</text>
+      <text x="22" y="184" fill="#34373D">metrics + diagnosis</text>
+    </g>
+    <path d="M22 215H178" stroke="#2457D6" stroke-width="3"/>
+    <path d="M168 207L180 215L168 223" fill="none" stroke="#2457D6" stroke-width="3"/>
+    <text x="22" y="242" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">NO CEREMONY FOR EXPLORATION</text>
+  </g>
+
+  <path d="M570 225H606" stroke="#2457D6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <g transform="translate(618 100)">
+    <rect width="228" height="250" rx="9" fill="#F3EFE6"/>
+    <text x="22" y="33" fill="#2457D6" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">03 / EVIDENCE</text>
+    <text x="22" y="66" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Make it reviewable</text>
+    <path d="M22 83H206" stroke="#BDB7AC"/>
+    <rect x="22" y="105" width="184" height="42" rx="4" fill="#FFFFFF" stroke="#14161A"/>
+    <text x="36" y="131" fill="#14161A" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">manifest.json</text>
+    <rect x="22" y="159" width="184" height="42" rx="4" fill="#FFFFFF" stroke="#14161A"/>
+    <text x="36" y="185" fill="#14161A" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">analysis_report.md</text>
+    <text x="22" y="232" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">GIT-ACCESSIBLE CANDIDATE</text>
+  </g>
+
+  <path d="M858 225H894" stroke="#2457D6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <g transform="translate(906 100)">
+    <rect width="252" height="250" rx="9" fill="#F3EFE6"/>
+    <text x="22" y="33" fill="#D75945" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">04 / DECISION</text>
+    <text x="22" y="66" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="21" font-weight="700">Promote or redirect</text>
+    <path d="M22 83H230" stroke="#BDB7AC"/>
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">
+      <rect x="22" y="105" width="208" height="36" rx="18" fill="#14161A"/>
+      <text x="38" y="128" fill="#F3EFE6">FORMAL REVIEW · WHEN READY</text>
+      <rect x="22" y="155" width="208" height="36" rx="18" fill="#FFFFFF" stroke="#D75945" stroke-width="2"/>
+      <text x="40" y="178" fill="#D75945">CLEANUP · USER APPROVAL</text>
+    </g>
+    <text x="22" y="230" fill="#676B73" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="14">Update direction only from evidence.</text>
+  </g>
+
+  <path d="M1032 366C1032 396 444 396 444 366" fill="none" stroke="#D75945" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow-ink)"/>
+  <text x="738" y="399" text-anchor="middle" fill="#A8ABB2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">NEXT QUESTION RETURNS TO EXECUTION</text>
+</svg>

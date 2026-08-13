@@ -1,63 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title desc">
   <title id="title">Codex Research Workflow</title>
-  <desc id="desc">A repository-native research workflow connecting Git truth, stable rules, durable project strategy, and current execution state.</desc>
+  <desc id="desc">An evidence-led research operating system connecting three canonical project files to fast experiments, reviewable evidence, and approved cleanup.</desc>
+  <defs>
+    <pattern id="paper-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#D8D1C4" stroke-width="1" opacity=".42"/>
+    </pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#2457D6"/>
+    </marker>
+  </defs>
 
-  <rect x="1" y="1" width="1198" height="418" rx="8" fill="#f7f5ef" stroke="#17191b" stroke-width="2"/>
-  <rect x="1" y="1" width="1198" height="10" rx="6" fill="#17191b"/>
+  <rect x="1" y="1" width="1198" height="458" rx="22" fill="#F3EFE6" stroke="#14161A" stroke-width="2"/>
+  <rect x="1" y="1" width="1198" height="458" rx="22" fill="url(#paper-grid)"/>
+  <path d="M0 74H1200" stroke="#14161A" stroke-width="2"/>
+  <path d="M760 74V460" stroke="#14161A" stroke-width="2"/>
 
-  <g id="title-block" transform="translate(54 48)">
-    <text x="0" y="0" fill="#2f7d62" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700">AUDITABLE RESEARCH AGENT WORKFLOWS</text>
-    <text x="0" y="76" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="58" font-weight="750">CODEX RESEARCH</text>
-    <text x="0" y="138" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="58" font-weight="750">WORKFLOW</text>
-    <line x1="0" y1="170" x2="570" y2="170" stroke="#17191b" stroke-width="2"/>
-    <text x="0" y="208" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">Research execution with durable strategy,</text>
-    <text x="0" y="237" fill="#393d40" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20">claim-aware evidence, and resumable state.</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+    <text x="38" y="45" fill="#2457D6" font-weight="700">RESEARCH OPERATING SYSTEM / v1</text>
+    <text x="1162" y="45" text-anchor="end" fill="#676B73">GIT-VERIFIED · RESUMABLE · CLAIM-AWARE</text>
+  </g>
 
-    <g transform="translate(0 280)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
-      <text x="0" y="0" fill="#697075">POLICY</text>
-      <text x="76" y="0" fill="#17191b" font-weight="700">AGENTS.md</text>
-      <text x="210" y="0" fill="#697075">STRATEGY</text>
-      <text x="302" y="0" fill="#17191b" font-weight="700">PROJECT_CORE.md</text>
-      <text x="0" y="34" fill="#697075">STATE</text>
-      <text x="76" y="34" fill="#17191b" font-weight="700">CURRENT_STAGE.md</text>
-      <circle cx="238" cy="29" r="5" fill="#2f7d62"/>
-      <text x="253" y="34" fill="#2f7d62" font-weight="700">GIT-VERIFIED</text>
+  <g transform="translate(46 112)">
+    <text x="0" y="0" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="700">TWO CODEX SKILLS · ONE RESEARCH CONTRACT</text>
+    <text x="0" y="70" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="60" font-weight="760">CODEX RESEARCH</text>
+    <text x="0" y="132" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="60" font-weight="760">WORKFLOW</text>
+    <rect x="0" y="158" width="92" height="7" fill="#D75945"/>
+    <text x="0" y="211" fill="#34373D" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="21">Run the smallest credible experiment.</text>
+    <text x="0" y="243" fill="#34373D" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, sans-serif" font-size="21">Keep every durable decision recoverable.</text>
+
+    <g transform="translate(0 284)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+      <rect width="322" height="42" rx="4" fill="#14161A"/>
+      <text x="18" y="27" fill="#F3EFE6">$codex-research-workflow</text>
+      <rect x="336" width="322" height="42" rx="4" fill="#F3EFE6" stroke="#14161A" stroke-width="2"/>
+      <text x="354" y="27" fill="#14161A">$research-artifact-cleanup</text>
     </g>
   </g>
 
-  <g id="authority-map" transform="translate(704 38)">
-    <rect x="0" y="0" width="442" height="344" rx="7" fill="#17191b"/>
-    <text x="26" y="35" fill="#f7f5ef" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" font-weight="700">SOURCE OF TRUTH / GIT</text>
-    <text x="416" y="35" text-anchor="end" fill="#9ca3a7" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">VERIFY HEAD</text>
-    <line x1="26" y1="52" x2="416" y2="52" stroke="#4b5054"/>
-    <line x1="48" y1="72" x2="48" y2="266" stroke="#6f767a" stroke-width="2"/>
+  <g transform="translate(796 100)">
+    <text x="0" y="0" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">CANONICAL PROJECT AUTHORITY</text>
+    <path d="M18 42V252" stroke="#2457D6" stroke-width="3"/>
 
-    <g transform="translate(28 72)">
-      <circle cx="20" cy="28" r="8" fill="#2f7d62"/>
-      <rect x="48" y="0" width="340" height="58" rx="5" fill="#f7f5ef"/>
-      <rect x="48" y="0" width="6" height="58" rx="3" fill="#2f7d62"/>
-      <text x="70" y="23" fill="#697075" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">01 / STABLE RULES</text>
-      <text x="70" y="44" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">AGENTS.md</text>
+    <g transform="translate(0 28)">
+      <circle cx="18" cy="32" r="8" fill="#2457D6"/>
+      <rect x="42" y="0" width="312" height="66" rx="6" fill="#FFFFFF" stroke="#14161A" stroke-width="1.5"/>
+      <text x="60" y="24" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">A/01 · STABLE RULES</text>
+      <text x="60" y="49" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">AGENTS.md</text>
     </g>
 
-    <g transform="translate(28 146)">
-      <circle cx="20" cy="28" r="8" fill="#c78b2d"/>
-      <rect x="48" y="0" width="340" height="58" rx="5" fill="#f7f5ef"/>
-      <rect x="48" y="0" width="6" height="58" rx="3" fill="#c78b2d"/>
-      <text x="70" y="23" fill="#697075" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">02 / DURABLE STRATEGY</text>
-      <text x="70" y="44" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">PROJECT_CORE.md</text>
+    <g transform="translate(0 116)">
+      <circle cx="18" cy="32" r="8" fill="#2457D6"/>
+      <rect x="42" y="0" width="312" height="66" rx="6" fill="#FFFFFF" stroke="#14161A" stroke-width="1.5"/>
+      <text x="60" y="24" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">A/02 · DURABLE DIRECTION</text>
+      <text x="60" y="49" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">PROJECT_CORE.md</text>
     </g>
 
-    <g transform="translate(28 220)">
-      <circle cx="20" cy="28" r="8" fill="#b94d4d"/>
-      <rect x="48" y="0" width="340" height="58" rx="5" fill="#f7f5ef"/>
-      <rect x="48" y="0" width="6" height="58" rx="3" fill="#b94d4d"/>
-      <text x="70" y="23" fill="#697075" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">03 / VOLATILE GATE STATE</text>
-      <text x="70" y="44" fill="#17191b" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">CURRENT_STAGE.md</text>
+    <g transform="translate(0 204)">
+      <circle cx="18" cy="32" r="8" fill="#D75945"/>
+      <rect x="42" y="0" width="312" height="66" rx="6" fill="#FFFFFF" stroke="#14161A" stroke-width="1.5"/>
+      <text x="60" y="24" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">A/03 · CURRENT GATE</text>
+      <text x="60" y="49" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">CURRENT_STAGE.md</text>
     </g>
 
-    <line x1="26" y1="302" x2="416" y2="302" stroke="#4b5054"/>
-    <text x="26" y="328" fill="#9ca3a7" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">HOOK</text>
-    <text x="82" y="328" fill="#f7f5ef" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12">STARTUP  RESUME  COMPACT  STOP</text>
+    <path d="M174 280V301" stroke="#2457D6" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="42" y="310" width="312" height="40" rx="20" fill="#14161A"/>
+    <circle cx="67" cy="330" r="6" fill="#D75945"/>
+    <text x="84" y="335" fill="#F3EFE6" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">VERIFY BRANCH · HEAD · DIFF</text>
   </g>
 </svg>

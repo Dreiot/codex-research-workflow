@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">From exploratory output to a Work decision</title>
+  <desc id="desc">Exploration can continue from a Codex response, while direction, method, baseline, metric, or claim changes require a tracked evidence candidate.</desc>
+  <rect x="1" y="1" width="1198" height="298" rx="18" fill="#FFFFFF" stroke="#14161A" stroke-width="2"/>
+  <g transform="translate(40 34)">
+    <text x="0" y="0" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" font-weight="700">EVIDENCE BOUNDARY</text>
+    <text x="0" y="43" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="720">Keep exploration light. Make durable decisions inspectable.</text>
+  </g>
+  <path d="M600 92V268" stroke="#14161A" stroke-width="2" stroke-dasharray="5 6"/>
+  <g transform="translate(40 112)">
+    <rect width="520" height="142" rx="8" fill="#F3EFE6"/>
+    <text x="22" y="29" fill="#2457D6" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">REVERSIBLE EXPLORATION</text>
+    <text x="22" y="63" fill="#14161A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">Codex output can guide the next small run</text>
+    <text x="22" y="94" fill="#676B73" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15">smoke · debugging · parameter adjustment · diagnosis</text>
+    <text x="22" y="121" fill="#676B73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">NO AUTOMATIC REVIEW-STATE</text>
+  </g>
+  <g transform="translate(640 112)">
+    <rect width="520" height="142" rx="8" fill="#14161A"/>
+    <text x="22" y="29" fill="#D75945" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="700">DURABLE WORK DECISION</text>
+    <text x="22" y="63" fill="#F3EFE6" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="20" font-weight="700">Track a decision-complete candidate</text>
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+      <text x="22" y="96" fill="#FFFFFF">manifest.json</text>
+      <text x="169" y="96" fill="#FFFFFF">analysis_report.md</text>
+      <text x="354" y="96" fill="#A8ABB2">metrics.json*</text>
+    </g>
+    <text x="22" y="122" fill="#A8ABB2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11">* ONLY WHEN NUMERICAL METRICS EXIST</text>
+  </g>
+</svg>
