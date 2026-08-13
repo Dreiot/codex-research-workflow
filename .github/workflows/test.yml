@@ -23,7 +23,8 @@ jobs:
       - name: Compile scripts
         run: >-
           python -m py_compile
-          skills/maintain-codex-handoff/scripts/handoff.py
-          skills/maintain-codex-handoff/scripts/hook.py
+          skills/codex-research-workflow/scripts/workflow.py
+          skills/codex-research-workflow/scripts/hook.py
+          skills/research-artifact-cleanup/scripts/cleanup.py
       - name: Run integration tests
         run: python -m unittest discover -s tests -v

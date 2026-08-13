@@ -1,4 +1,0 @@
-interface:
-  display_name: "Maintain Codex Handoff"
-  short_description: "Keep research handoffs execution-first"
-  default_prompt: "Use $maintain-codex-handoff to preserve canonical research state without adding review gates to exploratory implementation or real-data work."

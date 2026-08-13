@@ -40,7 +40,7 @@ imply pending review. Update it only after a material milestone, formal
 promotion review, material blocker, or next-action change.
 
 Human-readable sections follow the comment. Keep them synchronized with the
-JSON block. Use `scripts/handoff.py record-review` only for an explicit formal
+JSON block. Use `scripts/workflow.py record-review` only for an explicit formal
 promotion review.
 
 ## Formal Review Input
@@ -70,4 +70,8 @@ accepted-code semantics are unambiguous.
 - Durable strategy, innovations, component architecture, explored directions,
   and claim position belong in `docs/PROJECT_CORE.md`.
 - Do not turn this file into a per-commit log or a second project history.
+- Keep only current effective state. Move historical narrative to referenced
+  reports and Git rather than appending successive Gate sections.
+- Do not enforce a byte, line, or token budget. Historical accumulation is a
+  warning; conflicting current Gate, verdict, or next action is an error.
 - A resumed task reads the three authorities and verifies necessary Git facts.

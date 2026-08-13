@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Research Workflow"
+  short_description: "Run research with canonical, resumable state"
+  default_prompt: "Use $codex-research-workflow to continue this governed research project from repository authority."

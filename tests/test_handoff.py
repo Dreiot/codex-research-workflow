@@ -9,9 +9,17 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HANDOFF = ROOT / "skills" / "maintain-codex-handoff" / "scripts" / "handoff.py"
-HOOK = ROOT / "skills" / "maintain-codex-handoff" / "scripts" / "hook.py"
+WORKFLOW = ROOT / "skills" / "codex-research-workflow" / "scripts" / "workflow.py"
+HANDOFF = WORKFLOW  # Compatibility name used by the historical regression tests.
+HOOK = ROOT / "skills" / "codex-research-workflow" / "scripts" / "hook.py"
 WORK_CONTRACT = (
+    ROOT
+    / "skills"
+    / "codex-research-workflow"
+    / "references"
+    / "work-response-contract.md"
+)
+LEGACY_WORK_CONTRACT = (
     ROOT
     / "skills"
     / "maintain-codex-handoff"
@@ -52,7 +60,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         return result.stdout.strip()
 
     def initialize_and_commit(self):
-        output = self.run_command(sys.executable, str(HANDOFF), "initialize", "--repo", str(self.repo))
+        output = self.run_command(sys.executable, str(WORKFLOW), "initialize", "--repo", str(self.repo))
         self.run_command(
             "git",
             "-C",
@@ -192,12 +200,14 @@ class HandoffIntegrationTest(unittest.TestCase):
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
         parsed = json.loads(hook_output)
         context = parsed["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("Strategy:", context)
-        self.assertIn("Volatile state:", context)
+        self.assertIn("Use $codex-research-workflow", context)
+        self.assertIn("direction=", context)
+        self.assertIn("gate=", context)
         self.assertEqual(self.run_command("git", "-C", str(self.repo), "status", "--short"), "")
 
     def test_work_contract_is_format_not_mandatory_review_state_machine(self):
         contract = WORK_CONTRACT.read_text(encoding="utf-8")
+        self.assertEqual(contract, LEGACY_WORK_CONTRACT.read_text(encoding="utf-8"))
         self.assertIn("Only the user may authorize changing", contract)
         self.assertIn("Agents must not modify it autonomously", contract)
         self.assertIn("It is not a mandatory review", contract)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Artifact Cleanup"
+  short_description: "Safely review and clean research artifacts"
+  default_prompt: "Use $codex-research-workflow with $research-artifact-cleanup to inventory research artifacts, produce a reviewable cleanup plan, and apply only an approved plan."

@@ -6,10 +6,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
-            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "command": "python3 ~/.codex/skills/codex-research-workflow/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\codex-research-workflow\\scripts\\hook.py\"",
             "timeout": 15,
-            "statusMessage": "Loading canonical project handoff"
+            "statusMessage": "Loading canonical research state"
           }
         ]
       }
@@ -20,8 +20,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
-            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "command": "python3 ~/.codex/skills/codex-research-workflow/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\codex-research-workflow\\scripts\\hook.py\"",
             "timeout": 15,
             "statusMessage": "Loading independent review rules"
           }
@@ -34,10 +34,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.codex/skills/maintain-codex-handoff/scripts/hook.py",
-            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\maintain-codex-handoff\\scripts\\hook.py\"",
+            "command": "python3 ~/.codex/skills/codex-research-workflow/scripts/hook.py",
+            "commandWindows": "py -3 \"%USERPROFILE%\\.codex\\skills\\codex-research-workflow\\scripts\\hook.py\"",
             "timeout": 15,
-            "statusMessage": "Checking review handoff"
+            "statusMessage": "Checking research review state"
           }
         ]
       }

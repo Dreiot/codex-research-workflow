@@ -1,215 +1,102 @@
-<p align="right">
-  <strong>English</strong> · <a href="./README.zh-CN.md">简体中文</a>
-</p>
+<p align="right"><strong>English</strong> · <a href="./README.zh-CN.md">简体中文</a></p>
 
-<p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Workflow connects continuous research execution with stable rules, durable strategy, and resumable project state.">
-</p>
+<p align="center"><img src="./assets/readme/hero.svg" width="100%" alt="Codex Research Workflow"></p>
 
-<p align="center">
-  <img src="./assets/readme/workflow-tags.svg" width="100%" alt="Exploration first, canonical state, claim-aware evidence, and Codex plus Browser Work.">
-</p>
+# Codex Research Workflow
 
-Long-running research agents drift when operating rules, scientific direction,
-and the current implementation Gate live only in conversation history. **Codex
-Research Workflow** combines an exploration-first execution loop with explicit
-repository authorities, validates durable state against Git, and reloads the
-right context after resume or automatic context compaction.
+Two compact, progressive-disclosure Codex Skills for governed research repositories:
 
-It is a Codex Skill for research software, paper pipelines, evidence-gated
-experiments, and any repository where a plausible summary is not enough.
+- `$codex-research-workflow` keeps execution, Git identity, research strategy, current state, experiments, evidence, reviews, and handoffs coherent.
+- `$research-artifact-cleanup` inventories and removes obsolete artifacts only through an explicit, user-approved, state-bound plan.
 
-## The three-authority contract
+The workflow is empirical by default: minimal implementation → real-data run → metrics → diagnosis → direction adjustment → paper evidence. Ordinary smoke tests and exploratory runs do not become formal review Gates.
 
-| Authority | Time scale | Owns | Must not own |
-| --- | --- | --- | --- |
-| `AGENTS.md` | Stable | Operating rules, permissions, validation, Git, review, and claim boundaries | Current Gate or transient progress |
-| `docs/PROJECT_CORE.md` | Durable | Research question, target contribution, innovation hypotheses, component map, explored directions, evidence level, and claim ceiling | Branch, HEAD, current verdict, or next action |
-| `docs/CURRENT_STAGE.md` | Volatile | Branch, current Gate, reviewed candidate, verdict, open findings, and one next action | Long-form strategy or project history |
+## Canonical authority
 
-The separation prevents a common failure mode: a stale handoff summary quietly
-becoming a second source of truth.
+| File | Role |
+|---|---|
+| `AGENTS.md` | Stable repository rules and experiment-root policy |
+| `docs/PROJECT_CORE.md` | Compact durable strategy and one synthesized record per past direction |
+| `docs/CURRENT_STAGE.md` | Current Gate, accepted identity, findings, and next action only |
 
-<p align="center">
-  <img src="./assets/readme/workflow.svg" width="100%" alt="Continuous empirical iteration with formal review only when promoting work into a research baseline or paper evidence.">
-</p>
+The internal markers `codex-project-core` and `codex-handoff-state` remain compatible with existing governed projects. Chat summaries never replace repository authority.
 
-## What the Skill does
+## Workflow commands
 
-| Command | Result | Writes files? |
-| --- | --- | --- |
-| `audit` | Validates both JSON envelopes, required sections, report pointers, Git ancestry, project identity, and legacy handoff files | No |
-| `initialize` | Creates missing canonical files with conservative, explicitly unaudited placeholders | Yes, missing files only |
-| `record-review` | Records an exact candidate SHA, fixed verdict, findings, report path, and next Gate in `CURRENT_STAGE.md` | Yes |
-| `resume-prompt` | Produces a compact Codex or browser-review entry prompt that reloads repository truth | No |
+```text
+workflow.py init                 # plan by default; --apply requires the exact plan ID
+workflow.py migrate              # add the new structure without moving old artifacts
+workflow.py audit
+workflow.py prepare-experiment   # create an ignored run manifest only when needed
+workflow.py prepare-evidence     # create a tracked evidence candidate only when needed
+workflow.py validate-evidence
+workflow.py record-review
+workflow.py resume-prompt
+```
 
-The bundled lifecycle Hook injects a compact strategy/Gate summary on startup,
-resume, clear, and automatic compaction. Optional reviewer hooks constrain an
-explicit `research-reviewer` to read-only review. Routine shell commands and
-task completion do not run automatic handoff audits. **Hooks never edit the
-repository.**
+`initialize` remains an undocumented compatibility alias for legacy automation.
 
-## Browser Work response contract
+New-project `init` checks the exact directory, nested Git state, upload candidates, sensitive/oversized files, origin history, GitHub owner/name/visibility, and an empty remote. It uses `main`, never creates branch variants, and refuses overwrite or force-push.
 
-The generated Work resume prompt links to the public
-[response contract](./skills/maintain-codex-handoff/references/work-response-contract.md).
-Work returns a concise review result, design objective, acceptance objective,
-and at most one Markdown instruction block containing one Codex Goal. The
-contract is an output format, not a mandatory review state machine.
-Exploratory implementation and real-data work do not require review-state
-commits. A clean mechanical verification may be followed by the next Goal in
-the same response. Agents may change the public contract only after explicit
-user authorization.
+Existing-project `migrate` is also plan/apply. It adds only missing authority/policy files and generated-artifact ignore rules; it does not migrate artifacts, compact documents, or change scientific content.
+
+## Experiment artifacts
+
+The default root is `experiments/`; `AGENTS.md` may declare another repository-relative root. Directories are created on demand.
+
+```text
+experiments/
+├── scripts/       tracked experiment entrypoints
+├── configs/       tracked configurations
+├── registry/      tracked compact registries and important cleanup records
+├── evidence/      tracked decision candidates for Work review
+├── runs/          ignored generated run outputs
+├── .tmp/          ignored disposable files and cleanup plans
+└── quarantine/    ignored artifacts awaiting a decision
+```
+
+Core method code stays in `src/` or the repository's existing code area. Raw and external datasets stay outside the experiment root.
+
+Exploratory output in a Codex response is sufficient for another reversible exploration. Before Work adopts a result, changes the method/direction/baseline/data split/metric/claim from it, or promotes it to formal evidence, create `experiments/evidence/<experiment-id>/<candidate-id>/` with `manifest.json`, `analysis_report.md`, and `metrics.json` only when numerical metrics exist.
+
+## Cleanup transaction
+
+Cleanup uses exactly six classifications: `keep_formal_evidence`, `keep_negative_evidence`, `keep_active`, `delete_reproducible`, `delete_technical_failure`, and `unknown`. Unknown items are never deleted.
+
+After a committed `PROJECT_CORE.md` change that actually retires, rejects, supersedes, or makes a primary direction obsolete, the Workflow may invoke Cleanup to produce a read-only plan. The Goal then stops. Relocation or deletion requires the user to approve the numbered scope and exact `plan_id`.
+
+The detailed JSON plan is ignored. Important verified cleanups create `experiments/registry/cleanup/<cleanup-id>.json`. Current-run files explicitly marked temporary may be removed by the Workflow after a successful run without a historical cleanup transaction.
+
+## Browser Work contract
+
+Every actionable Work Goal explicitly invokes `$codex-research-workflow`; cleanup Goals invoke both Skills. The public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) preserves the existing four-section response format and review boundaries. The contract is an output protocol, not a mandatory state machine.
 
 ## Install
 
-Install from the repository:
-
 ```bash
-npx skills add Dreiot/codex-research-handoff
+npx skills add Dreiot/codex-research-workflow
 ```
 
-Or use Codex's built-in installer explicitly:
+Install both paths:
 
 ```text
-Install the Skill from https://github.com/Dreiot/codex-research-handoff,
-path skills/maintain-codex-handoff.
+skills/codex-research-workflow
+skills/research-artifact-cleanup
 ```
 
-The installed Skill keeps the invocation name:
-
-```text
-$maintain-codex-handoff
-```
-
-## First use
-
-On macOS or Linux:
-
-```bash
-python3 ~/.codex/skills/maintain-codex-handoff/scripts/handoff.py initialize --repo /path/to/repository
-python3 ~/.codex/skills/maintain-codex-handoff/scripts/handoff.py audit --repo /path/to/repository
-```
-
-On Windows PowerShell:
+Example on Windows:
 
 ```powershell
-py -3 "$env:USERPROFILE\.codex\skills\maintain-codex-handoff\scripts\handoff.py" initialize --repo C:\path\to\repository
-py -3 "$env:USERPROFILE\.codex\skills\maintain-codex-handoff\scripts\handoff.py" audit --repo C:\path\to\repository
+py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.py" audit --repo C:\path\to\repository
 ```
 
-`initialize` does not infer scientific truth. It creates an `unaudited`
-`PROJECT_CORE.md`; a qualified project owner or reviewer must replace the
-placeholders with evidence-backed strategy.
+The optional fail-open lifecycle Hook injects only a compact authority/Gate pointer. Explicit `audit` remains fail-closed. Reviewer hooks retain the formal-review boundary.
 
-## Add lifecycle Hooks
-
-Use [examples/hooks.template.json](./examples/hooks.template.json) as a merge
-template for `~/.codex/hooks.json`. Do not overwrite unrelated existing Hooks.
-The Windows command uses `%USERPROFILE%`; replace it with an absolute path if
-your Hook runner does not expand environment variables.
-
-The optional [research-reviewer.toml](./examples/research-reviewer.toml) defines
-a read-only fallback reviewer. Install it as
-`~/.codex/agents/research-reviewer.toml` when browser ChatGPT has not already
-provided a qualified independent review.
-
-## Execution and review policy
-
-The default workflow is continuous empirical iteration:
-
-```text
-minimal implementation -> real-data run -> metrics -> diagnosis
--> direction adjustment -> paper evidence
-```
-
-Ordinary implementation, tests, debugging, data processing, local smoke,
-exploratory experiments, parameter adjustment, and metric generation do not
-need independent review or review-state recording.
-
-Use one qualified independent review only for an explicit formal promotion:
-accepting a major implementation baseline, freezing a publication evaluation,
-adopting a key result, changing the core method, or raising a paper claim.
-
-- A browser review qualifies when it is independent of implementation, names
-  the exact base and candidate SHAs, inspects the actual diff and evidence, and
-  returns P0/P1/P2 findings plus one fixed verdict.
-- The `research-reviewer` subagent is a fallback when no qualified browser
-  review exists, evidence is incomplete or conflicting, or a second opinion is
-  explicitly requested.
-- A rejected or blocked formal promotion is recorded before remediation so the
-  decision and candidate identity are preserved.
-- Mechanical verification creates no second review. When it passes, Work may
-  immediately issue the next Goal.
-
-The detailed review report and `CURRENT_STAGE.md` are committed separately from
-the implementation candidate, preserving an auditable history:
-
-```text
-candidate implementation commit
-review-state governance-docs commit
-```
-
-New `record-review` inputs should declare `candidate_kind`. Accepted `implementation` candidates
-become the new `accepted_code_commit`; accepted `docs_only` candidates preserve
-the prior accepted code. Rejected, blocked, and review-state commits never
-replace accepted code.
-
-Exploratory smoke is diagnostic evidence, not automatic publication evidence.
-Formal runs freeze the data boundary, configuration, metrics, statistical
-unit, comparators, stopping conditions, and provenance. The Skill does not add
-duplicate execution authorization after that scope is already frozen and
-authorized.
-
-## Compaction is not handoff
-
-Automatic context compaction is normal continuity inside one Codex task. It is
-not a trigger to stop, force a checkpoint commit, or open a new task. Persist
-state when evidence changes an authority; use an explicit handoff only when
-opening a new task or browser conversation, after demonstrated context loss, or
-at a natural Gate boundary.
-
-## Safety boundaries
-
-- The Skill does not decide scientific claims.
-- Hooks warn and inject context; they are not a security sandbox.
-- Scripts never auto-commit or auto-push.
-- Browser ChatGPT does not load local Hooks, Skills, or memory automatically.
-- Private data, large logs, generated artifacts, and secrets do not belong in
-  canonical handoff files.
-- `CODEX_HANDOFF.md` and `LATEST_STATE.md` are treated as legacy dynamic-state
-  files because they can create competing authorities.
-
-## Repository layout
-
-```text
-skills/maintain-codex-handoff/
-├── SKILL.md
-├── agents/openai.yaml
-├── references/
-│   ├── current-stage-schema.md
-│   ├── project-core-schema.md
-│   └── work-response-contract.md
-└── scripts/
-    ├── handoff.py
-    └── hook.py
-
-examples/
-├── hooks.template.json
-└── research-reviewer.toml
-```
-
-## Validate the package
+## Validate
 
 ```bash
+python -m py_compile skills/codex-research-workflow/scripts/workflow.py skills/codex-research-workflow/scripts/hook.py skills/research-artifact-cleanup/scripts/cleanup.py
 python -m unittest discover -s tests -v
-python -m py_compile skills/maintain-codex-handoff/scripts/handoff.py skills/maintain-codex-handoff/scripts/hook.py
 ```
 
-The test suite creates temporary Git repositories and checks initialization,
-idempotence, schema auditing, prompt generation, migration behavior, and
-read-only Hook execution.
-
-## License
-
-[MIT](./LICENSE)
+Licensed under Apache-2.0.

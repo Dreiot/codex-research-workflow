@@ -65,7 +65,12 @@ Update policy:
 - Browser ChatGPT Work normally synthesizes strategic updates from checked-in
   evidence; Codex may prepare the docs-only change when explicitly instructed.
 - Preserve rejected and superseded directions. Never erase negative results.
+- Keep one synthesized decision record per core direction, including important
+  prior objective-function or mechanism directions. Update that record instead
+  of appending run-by-run or review-by-review narratives.
 - Link to detailed reports rather than copying large evidence blocks.
+- Do not enforce a byte, line, or token budget. Optimize semantic precision and
+  remove duplication without deleting decision-relevant history.
 - If strategy changes the active Gate or next action, update
   `docs/CURRENT_STAGE.md` in the same governance change.
 - A migration placeholder uses `strategic_status: unaudited` and is not evidence
