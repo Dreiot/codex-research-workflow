@@ -8,7 +8,8 @@ Cleanup is triggered only after a committed `PROJECT_CORE.md` change that replac
 The same Codex Goal may commit the direction decision and produce a read-only cleanup plan, but it must stop before relocation or deletion. The Browser Work response should summarize:
 
 1. plan ID, Git HEAD, and `PROJECT_CORE.md` base commit;
-2. counts and bytes by the six classifications;
+2. counts and bytes by the seven classifications, including the recorded user
+   decision for any `delete_user_retired` group;
 3. one row per experiment or candidate group, including references and proposed action;
 4. numbered approval scopes, clearly separating relocation from deletion;
 5. materials retained for subsequent Work review.

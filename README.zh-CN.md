@@ -99,11 +99,13 @@ experiments/
   <img src="./assets/readme/cleanup-gate.svg" width="100%" alt="清理盘点生成状态绑定计划，并在迁移或删除前暂停等待用户审批">
 </p>
 
-清理严格使用六类分类：
+清理严格使用七类分类：
 
 | 默认保留 | 仅有证据且审批后可删除 |
 |---|---|
-| `keep_formal_evidence` · `keep_negative_evidence` · `keep_active` · `unknown` | `delete_reproducible` · `delete_technical_failure` |
+| `keep_formal_evidence` · `keep_negative_evidence` · `keep_active` · `unknown` | `delete_reproducible` · `delete_technical_failure` · `delete_user_retired` |
+
+`delete_user_retired` 用于记录用户明确退役的精确范围及替代保留的精简证据。它仍须审批状态绑定的 plan ID，且不能覆盖正式证据、负面证据、活动依赖或未决项保护。
 
 只有已提交的 `PROJECT_CORE.md` 调整确实终止、拒绝、替代主要方向，或使它因核心组件变化而过时时，才触发只读清理计划。措辞、引用、证据等级或 claim 收窄不会触发清理。详细计划保持 Git 忽略；重要清理核验通过后生成 `experiments/registry/cleanup/<cleanup-id>.json`。
 

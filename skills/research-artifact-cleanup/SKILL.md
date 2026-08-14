@@ -16,12 +16,15 @@ Clean historical research artifacts without weakening the evidence available to 
 - Treat `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, Git, current reports, and approved evidence packets as authority.
 - Never inspect raw/external datasets merely to classify storage.
 - Never apply deletion from prose approval alone. Apply only an unchanged machine plan whose `plan_id` the user approved.
+- Use `delete_user_retired` only for an exact user-retired artifact scope after
+  recording the user's statement and the retained evidence boundary; it never
+  overrides formal, negative, active, or unresolved evidence protection.
 
 ## Workflow
 
 1. Audit the project with Codex Research Workflow and require one clean, exact project/Git root.
 2. Read [classification-policy.md](references/classification-policy.md), inventory the entire project root plus Git references, then prepare a decisions JSON.
-3. Run `cleanup.py plan`. Present its plan identity, totals, experiment-level table, and numbered approval scope. Stop for user approval.
+3. Run `cleanup.py plan`. Present its plan identity, totals, experiment-level table, any user-retirement basis and lost replay capability, and numbered approval scope. Stop for user approval.
 4. After explicit approval, run `apply --phase relocate` first when migration is required. Update and validate references before deletion.
 5. Run `apply --phase delete` with the same `plan_id`. Unknown, active, formal-evidence, and negative-evidence items remain non-deletable.
 6. Run `apply --phase verify`. Important cleanups create a compact tracked record; the ignored detailed plan is removed only after verification succeeds.

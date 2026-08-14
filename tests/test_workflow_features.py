@@ -291,13 +291,75 @@ class CommandTest(unittest.TestCase):
         self.assertFalse(junk.exists())
         record_path = repo / "experiments" / "registry" / "cleanup" / f"{planned['plan_id']}.json"
         record = json.loads(record_path.read_text(encoding="utf-8"))
-        self.assertEqual(record["schema"], "research-artifact-cleanup-record/v2")
+        self.assertEqual(record["schema"], "research-artifact-cleanup-record/v3")
         self.assertEqual(record["totals"]["delete_technical_failure"]["items"], 1)
         self.assertEqual(len(record["groups"]), 1)
         self.assertEqual(record["groups"][0]["items"], 1)
         self.assertEqual(record["groups"][0]["paths"], ["experiments/runs/old/r001"])
         self.assertNotIn("items", record)
         self.assertFalse((repo / planned["plan"]).exists())
+
+    def test_cleanup_user_retired_requires_and_records_user_decision(self):
+        repo = self.base / "cleanup-user-retired"
+        repo.mkdir()
+        self.run_cmd("git", "init", "-b", "main", str(repo))
+        self.configure(repo)
+        (repo / "AGENTS.md").write_text("# Rules\n\n- Experiment root: `experiments`\n", encoding="utf-8")
+        (repo / "docs").mkdir()
+        (repo / "docs" / "PROJECT_CORE.md").write_text("# Core\n", encoding="utf-8")
+        (repo / ".gitignore").write_text("experiments/runs/\nexperiments/.tmp/\n", encoding="utf-8")
+        self.git(repo, "add", "AGENTS.md", "docs/PROJECT_CORE.md", ".gitignore")
+        self.git(repo, "commit", "-m", "governance")
+        retired = repo / "experiments" / "runs" / "legacy-grid"
+        retired.mkdir(parents=True)
+        (retired / "result.json").write_text("{}\n", encoding="utf-8")
+
+        decisions = self.base / "user-retired.json"
+        item = {
+            "path": "experiments/runs/legacy-grid",
+            "classification": "delete_user_retired",
+            "action": "delete",
+            "reason": "compact golden evidence remains and exact stochastic replay is intentionally retired",
+        }
+        decisions.write_text(json.dumps({"important": True, "items": [item]}), encoding="utf-8")
+        missing = self.run_cmd(
+            sys.executable,
+            str(CLEANUP),
+            "plan",
+            "--repo",
+            str(repo),
+            "--decisions",
+            str(decisions),
+            expected=2,
+        )
+        self.assertIn("requires user_decision", missing.stderr)
+
+        item["user_decision"] = "Retain only golden, Results, and logs."
+        decisions.write_text(json.dumps({"important": True, "items": [item]}), encoding="utf-8")
+        planned = json.loads(
+            self.run_cmd(sys.executable, str(CLEANUP), "plan", "--repo", str(repo), "--decisions", str(decisions)).stdout
+        )
+        self.assertEqual(json.loads((repo / planned["plan"]).read_text(encoding="utf-8"))["schema"], "research-artifact-cleanup-plan/v2")
+        for phase in ("relocate", "delete", "verify"):
+            self.run_cmd(
+                sys.executable,
+                str(CLEANUP),
+                "apply",
+                "--repo",
+                str(repo),
+                "--plan",
+                planned["plan"],
+                "--plan-id",
+                planned["plan_id"],
+                "--phase",
+                phase,
+            )
+        record = json.loads(
+            (repo / "experiments" / "registry" / "cleanup" / f"{planned['plan_id']}.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(record["schema"], "research-artifact-cleanup-record/v3")
+        self.assertEqual(record["totals"]["delete_user_retired"]["items"], 1)
+        self.assertEqual(record["groups"][0]["user_decision"], "Retain only golden, Results, and logs.")
 
 
 if __name__ == "__main__":

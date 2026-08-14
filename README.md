@@ -100,11 +100,16 @@ Create `experiments/evidence/<experiment-id>/<candidate-id>/` before Browser Wor
   <img src="./assets/readme/cleanup-gate.svg" width="100%" alt="Cleanup inventory becomes a state-bound plan that pauses for approval before relocation or deletion">
 </p>
 
-Cleanup uses exactly six classifications:
+Cleanup uses exactly seven classifications:
 
 | Preserved | Deletable only with evidence and approval |
 |---|---|
-| `keep_formal_evidence` · `keep_negative_evidence` · `keep_active` · `unknown` | `delete_reproducible` · `delete_technical_failure` |
+| `keep_formal_evidence` · `keep_negative_evidence` · `keep_active` · `unknown` | `delete_reproducible` · `delete_technical_failure` · `delete_user_retired` |
+
+`delete_user_retired` records an exact user retirement decision and the compact
+evidence retained in its place. It still requires approval of the generated,
+state-bound plan ID and cannot override formal, negative, active, or unresolved
+evidence protection.
 
 A committed `PROJECT_CORE.md` change triggers a read-only cleanup plan only when it actually retires, rejects, supersedes, or makes a primary direction obsolete. Wording, citation, evidence-level, and claim-narrowing edits do not trigger cleanup. The detailed plan remains ignored; important verified transactions create `experiments/registry/cleanup/<cleanup-id>.json`.
 

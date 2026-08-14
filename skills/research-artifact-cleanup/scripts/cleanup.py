@@ -20,13 +20,14 @@ CLASSES = {
     "keep_active",
     "delete_reproducible",
     "delete_technical_failure",
+    "delete_user_retired",
     "unknown",
 }
-DELETE_CLASSES = {"delete_reproducible", "delete_technical_failure"}
+DELETE_CLASSES = {"delete_reproducible", "delete_technical_failure", "delete_user_retired"}
 KEEP_CLASSES = CLASSES - DELETE_CLASSES
 CORE_REL = Path("docs/PROJECT_CORE.md")
-PLAN_SCHEMA = "research-artifact-cleanup-plan/v1"
-RECORD_SCHEMA = "research-artifact-cleanup-record/v2"
+PLAN_SCHEMA = "research-artifact-cleanup-plan/v2"
+RECORD_SCHEMA = "research-artifact-cleanup-record/v3"
 
 
 def run(command: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess[str]:
@@ -119,13 +120,78 @@ def experiment_root(repo: Path) -> Path:
     return Path("experiments")
 
 
+def path_token_is_reference(
+    text: str, rel: Path, repo: Path, *, allow_bare_assignment: bool = False
+) -> bool:
+    """Return true only for a repo-root-relative path-like occurrence."""
+    def previous_nonspace(position: int) -> str:
+        position -= 1
+        while position >= 0 and text[position] in " \t\r":
+            position -= 1
+        if position >= 0 and text[position] == "\n":
+            return ""
+        return text[position] if position >= 0 else ""
+
+    forward = rel.as_posix()
+    tokens = {forward, forward.replace("/", "\\")}
+    single_component = len(rel.parts) == 1
+    same_as_repo_name = len(rel.parts) == 1 and rel.name.casefold() == repo.name.casefold()
+    for token in tokens:
+        start = 0
+        while True:
+            index = text.find(token, start)
+            if index < 0:
+                break
+            end = index + len(token)
+            before = text[index - 1] if index else ""
+            after = text[end] if end < len(text) else ""
+            explicit_prefix = text[max(0, index - 2) : index] in {"./", ".\\"}
+            before_is_segment = bool(before) and (before.isalnum() or before in "._-/\\") and not explicit_prefix
+            after_is_segment = bool(after) and (after.isalnum() or after in "._-")
+            quoted = (
+                before in {'"', "'"}
+                and after == before
+                and previous_nonspace(index - 1) not in "/\\"
+            )
+            backticked = before == "`" and after == "`"
+            assigned = allow_bare_assignment and previous_nonspace(index) in {"=", ":"}
+            path_context = (
+                not single_component
+                or explicit_prefix
+                or (bool(after) and after in "/\\")
+                or quoted
+                or backticked
+                or assigned
+            )
+            explicit_same_name = (
+                not same_as_repo_name
+                or (bool(after) and after in "/\\")
+                or explicit_prefix
+                or quoted
+            )
+            if not before_is_segment and not after_is_segment and path_context and explicit_same_name:
+                return True
+            start = index + 1
+    return False
+
+
 def references(repo: Path, rel: Path) -> List[str]:
     result = run(["git", "-C", str(repo), "grep", "-l", "-F", rel.as_posix(), "--", ":(exclude)" + rel.as_posix()])
-    return sorted(
-        line
-        for line in result.stdout.splitlines()
-        if line.strip() and Path(line).name != ".gitignore"
-    )
+    references_found: List[str] = []
+    for line in result.stdout.splitlines():
+        name = line.strip()
+        if not name or Path(name).name == ".gitignore":
+            continue
+        candidate = repo / name
+        if candidate.is_file() and path_token_is_reference(
+            candidate.read_text(encoding="utf-8", errors="replace"),
+            rel,
+            repo,
+            allow_bare_assignment=candidate.suffix.casefold()
+            in {".cfg", ".ini", ".json", ".toml", ".yaml", ".yml"},
+        ):
+            references_found.append(name)
+    return sorted(references_found)
 
 
 def tracked(repo: Path, rel: Path) -> List[str]:
@@ -149,10 +215,16 @@ def build_plan(repo: Path, decisions: Dict[str, Any]) -> Dict[str, Any]:
         classification = raw.get("classification")
         action = raw.get("action", "keep")
         reason = raw.get("reason")
+        user_decision = raw.get("user_decision")
         if classification not in CLASSES:
             raise ValueError(f"item {index} has invalid classification")
         if not isinstance(reason, str) or not reason.strip():
             raise ValueError(f"item {index} requires a reason")
+        if classification == "delete_user_retired":
+            if not isinstance(user_decision, str) or not user_decision.strip():
+                raise ValueError(f"item {index}: delete_user_retired requires user_decision")
+        elif user_decision is not None:
+            raise ValueError(f"item {index}: user_decision is only valid for delete_user_retired")
         if classification in DELETE_CLASSES and action != "delete":
             raise ValueError(f"item {index}: delete classifications require action=delete")
         if classification in KEEP_CLASSES and action not in {"keep", "relocate"}:
@@ -176,6 +248,8 @@ def build_plan(repo: Path, decisions: Dict[str, Any]) -> Dict[str, Any]:
             "ignored": ignored(repo, rel),
             "references": references(repo, rel),
         }
+        if classification == "delete_user_retired":
+            item["user_decision"] = user_decision.strip()
         items.append(item)
     head = git(repo, "rev-parse", "HEAD")
     core_commit = git(repo, "log", "-1", "--format=%H", "--", CORE_REL.as_posix(), check=False) or None
@@ -195,9 +269,15 @@ def build_plan(repo: Path, decisions: Dict[str, Any]) -> Dict[str, Any]:
     return plan
 
 
-def save(path: Path, value: Dict[str, Any]) -> None:
+def save(path: Path, value: Dict[str, Any], *, compact: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    payload = (
+        json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+        if compact
+        else json.dumps(value, ensure_ascii=False, indent=2)
+    )
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(payload + "\n")
 
 
 def command_plan(args: argparse.Namespace) -> int:
@@ -238,9 +318,31 @@ def verify_identity(repo: Path, plan: Dict[str, Any], plan_id: str) -> None:
         raise ValueError("PROJECT_CORE base changed since planning")
 
 
-def verify_state(path: Path, expected: Dict[str, Any]) -> None:
-    if tree_state(path) != expected:
-        raise ValueError(f"artifact changed since planning: {path}")
+def verify_state(
+    path: Path, expected: Dict[str, Any], *, planned_file_name: Optional[str] = None
+) -> None:
+    actual = tree_state(path)
+    if actual == expected:
+        return
+    # File plans historically bind the source basename in metadata_sha256.
+    # A relocation may intentionally rename that file, so verify the target's
+    # size and mtime using the approved source basename instead of weakening the
+    # plan or rewriting its recorded state.
+    if planned_file_name is not None and path.is_file():
+        stat = path.stat()
+        digest = hashlib.sha256()
+        digest.update(planned_file_name.encode("utf-8"))
+        digest.update(str(stat.st_size).encode("ascii"))
+        digest.update(str(stat.st_mtime_ns).encode("ascii"))
+        renamed_state = {
+            "kind": "file",
+            "files": 1,
+            "bytes": stat.st_size,
+            "metadata_sha256": digest.hexdigest(),
+        }
+        if renamed_state == expected:
+            return
+    raise ValueError(f"artifact changed since planning: {path}")
 
 
 def delete_failure_inside(plan: Dict[str, Any], source: Path) -> bool:
@@ -269,12 +371,24 @@ def apply_relocate(repo: Path, plan: Dict[str, Any]) -> None:
             continue
         source = inside(repo, Path(item["path"]))
         target = inside(repo, Path(item["target"]))
+        if not source.exists() and target.exists():
+            verify_state(
+                target,
+                item["state"],
+                planned_file_name=Path(item["path"]).name,
+            )
+            plan["execution"]["relocate"].append(item["path"])
+            continue
         verify_state(source, item["state"])
         if target.exists():
             raise ValueError(f"relocation target already exists: {item['target']}")
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(source), str(target))
-        verify_state(target, item["state"])
+        verify_state(
+            target,
+            item["state"],
+            planned_file_name=Path(item["path"]).name,
+        )
         plan["execution"]["relocate"].append(item["path"])
 
 
@@ -302,6 +416,7 @@ def apply_delete(repo: Path, plan: Dict[str, Any]) -> None:
 
 
 def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
+    workflow_modified = plan["execution"].setdefault("workflow_modified", [])
     for item in plan["items"]:
         source = inside(repo, Path(item["path"]))
         if item["action"] == "keep":
@@ -309,17 +424,49 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
         elif item["action"] == "relocate":
             if source.exists():
                 raise ValueError(f"relocated source still exists: {item['path']}")
-            verify_state(inside(repo, Path(item["target"])), item["state"])
+            target = inside(repo, Path(item["target"]))
+            try:
+                verify_state(
+                    target,
+                    item["state"],
+                    planned_file_name=Path(item["path"]).name,
+                )
+            except ValueError:
+                # Workflow may update imports or entrypoints after an approved
+                # tracked-file relocation. The original remains recoverable at
+                # the plan-bound HEAD and the new bytes remain visible in Git;
+                # ignored or untracked artifacts still require exact identity.
+                if (
+                    item["state"].get("kind") != "file"
+                    or item.get("tracked") != [item["path"]]
+                    or not target.is_file()
+                    or run(
+                        [
+                            "git",
+                            "-C",
+                            str(repo),
+                            "cat-file",
+                            "-e",
+                            f"{plan['head']}:{item['path']}",
+                        ]
+                    ).returncode
+                    != 0
+                ):
+                    raise
+                if item["path"] not in workflow_modified:
+                    workflow_modified.append(item["path"])
         elif source.exists():
             raise ValueError(f"deleted source still exists: {item['path']}")
     plan["execution"]["verified"] = True
     if plan.get("important"):
         root = experiment_root(repo)
         record_rel = root / "registry" / "cleanup" / f"{plan['plan_id']}.json"
-        inventory = [
-            {key: item[key] for key in ("path", "classification", "action", "target", "reason")}
-            for item in plan["items"]
-        ]
+        inventory = []
+        for item in plan["items"]:
+            entry = {key: item[key] for key in ("path", "classification", "action", "target", "reason")}
+            if "user_decision" in item:
+                entry["user_decision"] = item["user_decision"]
+            inventory.append(entry)
         totals: Dict[str, Dict[str, int]] = {}
         groups: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
         for item in plan["items"]:
@@ -328,7 +475,8 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
             bucket["items"] += 1
             bucket["files"] += item["state"]["files"]
             bucket["bytes"] += item["state"]["bytes"]
-            key = (classification, item["action"], item["reason"])
+            user_decision = item.get("user_decision")
+            key = (classification, item["action"], item["reason"], user_decision)
             group = groups.setdefault(
                 key,
                 {
@@ -339,6 +487,8 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
                     "paths": [],
                 },
             )
+            if user_decision is not None:
+                group["user_decision"] = user_decision
             group["items"] += 1
             path_entry: Any = item["path"]
             if item["target"] is not None:
@@ -353,8 +503,14 @@ def apply_verify(repo: Path, plan: Dict[str, Any]) -> None:
             "inventory_sha256": canonical_hash({"items": inventory}),
             "totals": totals,
             "groups": list(groups.values()),
+            "execution": {
+                "relocated": len(plan["execution"]["relocate"]),
+                "deleted": len(plan["execution"]["delete"]),
+                "workflow_modified": list(workflow_modified),
+                "failures": list(plan["execution"].get("failures", [])),
+            },
         }
-        save(inside(repo, record_rel), record)
+        save(inside(repo, record_rel), record, compact=True)
 
 
 def command_apply(args: argparse.Namespace) -> int:
