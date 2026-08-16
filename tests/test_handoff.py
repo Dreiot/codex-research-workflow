@@ -216,11 +216,17 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Use `无`", normalized)
         self.assertIn("do not require independent review, review-state recording", normalized)
         self.assertIn("only for explicit formal promotion", normalized)
-        self.assertIn("Any P0 or P1 requires `REJECT`", normalized)
+        self.assertIn("Before freezing a publication evaluation", normalized)
+        self.assertIn("Any `P0` or `P1` requires `REJECT`", normalized)
+        self.assertIn("`REJECT` requires at least one such finding", normalized)
+        self.assertIn("prefix every finding with `BLOCKED:`", normalized)
+        self.assertIn("must not use blocking language", normalized)
         self.assertIn("same response may issue the next Goal", normalized)
         self.assertIn("stop when its acceptance criteria pass", normalized)
         self.assertIn("Pause for the user's decision", normalized)
+        self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
+        self.assertIn("Do not expand the threat model", normalized)
         self.assertNotIn("work-response-contract-v1", contract)
 
     def test_exploratory_commit_does_not_imply_pending_review(self):

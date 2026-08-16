@@ -43,6 +43,12 @@ Use one qualified independent review only for explicit formal promotion:
 - changing the core method;
 - raising a paper claim.
 
+Before freezing a publication evaluation, define the relevant data boundary
+and split, method configuration and baselines, primary metrics and statistical
+unit, repetitions, budget, stopping and material-failure rules, provenance,
+and permitted claims. Keep exploratory results exploratory until those choices
+are fixed.
+
 Review the exact candidate identity and relevant evidence. Record a formal
 promotion verdict once. Mechanical verification of its review-state commit is
 not another review and is not recorded again; after clean verification, the
@@ -72,8 +78,10 @@ present ordinary inspection or mechanical verification as a new formal review.
 
 Formal promotion uses one verdict: `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, or
 `BLOCKED`. `ACCEPT` has no open findings. `ACCEPT_WITH_P2` has only non-blocking
-P2 findings. Any P0 or P1 requires `REJECT`. Use `BLOCKED` only when required
-evidence or environment is unavailable, and identify each blocker.
+findings explicitly labelled `P2`; they must not use blocking language.
+Any `P0` or `P1` requires `REJECT`, and `REJECT` requires at least one such
+finding. Use `BLOCKED` only when required evidence or environment is
+unavailable, and prefix every finding with `BLOCKED:`.
 
 ### Design And Acceptance
 
@@ -111,6 +119,11 @@ formal metric, budget, stopping rule, or paper claim. Present confirmed facts,
 uncertainty, two or three options, costs and information gain, a recommendation,
 and one explicit question; set `Codex 指令` to `无`.
 
+Before pausing, one bounded, low-cost, reversible diagnostic may run when it
+does not change the core method, data split, formal metrics, formal budget, or
+claims. Ordinary repairs, clear test failures, frozen-design execution, and
+such diagnostics are not decision checkpoints.
+
 Ask before paid or materially costly work, new sensitive data or credentials,
 external live services or hardware, destructive or irreversible actions, final
 held-out testing, or formal publication-evaluation budgets. Otherwise, local,
@@ -121,7 +134,10 @@ Do not investigate adjacent issues merely for completeness. Non-blocking P2
 findings remain backlog unless they affect correctness, reproducibility,
 comparison fairness, result interpretation, or the active claim. Do not invent
 acceptance, conceal material negative evidence, raise claims beyond evidence,
-or use decorative separators and duplicate instruction blocks.
+or use decorative separators and duplicate instruction blocks. Do not expand
+the threat model or require verification unrelated to the active hypothesis,
+material failure boundaries, or intended paper claim unless the user or current
+authorities explicitly require it.
 
 ## Skeleton
 
