@@ -119,6 +119,10 @@ formal metric, budget, stopping rule, or paper claim. Present confirmed facts,
 uncertainty, two or three options, costs and information gain, a recommendation,
 and one explicit question; set `Codex 指令` to `无`.
 
+When a decision point or material question warrants discussion, briefly explain
+the current state and decision, resolve it with the user, and wait for an
+explicit choice before planning or issuing the next work.
+
 Before pausing, one bounded, low-cost, reversible diagnostic may run when it
 does not change the core method, data split, formal metrics, formal budget, or
 claims. Ordinary repairs, clear test failures, frozen-design execution, and

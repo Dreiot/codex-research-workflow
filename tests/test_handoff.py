@@ -224,6 +224,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("same response may issue the next Goal", normalized)
         self.assertIn("stop when its acceptance criteria pass", normalized)
         self.assertIn("Pause for the user's decision", normalized)
+        self.assertIn("wait for an explicit choice before planning or issuing", normalized)
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
