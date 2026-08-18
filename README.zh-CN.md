@@ -19,7 +19,7 @@
 
 ## 为什么需要它
 
-长期科研容易在聊天摘要、旧报告、历史运行与真实 worktree 之间发生漂移。本 Workflow 给 Codex 和 Browser Work 一组很小的权威入口，每次工作前可以重新恢复状态，同时不会把普通实现、smoke 或探索运行变成审查负担。
+长期科研容易在聊天摘要、旧报告、历史运行与真实 worktree 之间发生漂移。本 Workflow 给 Codex 以及 Chat 或 Work 研究控制器一组很小的权威入口，每次工作前可以重新恢复状态，同时不会把普通实现、smoke 或探索运行变成审查负担。
 
 默认流程始终是：
 
@@ -34,7 +34,7 @@
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | 初始化、迁移、权威审计、实验清单、证据候选、审查状态和恢复 Prompt | 把每次探索提升为正式 Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | 元数据盘点、六类清理分类、不可变计划身份、迁移/删除/核验 | 自行推断科研价值，或从未审批清单直接删除 |
 
-每个可执行 Browser Work Goal 都调用 Workflow；历史或批量清理同时调用两个 Skill。公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 规定四段式 Work 回复和正式审查边界。
+每个可执行的控制器 Goal 都调用 Workflow。Project Instructions 显式激活不同界面的角色：Chat 通常由 Extra High 核验证据、Pro 控制研究，Work 可以合并两个角色。历史或批量清理同时调用两个 Skill。公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 规定共同回复和正式审查边界。
 
 ## 第一次成功运行
 
@@ -79,7 +79,7 @@ experiments/
 ├── scripts/       跟踪的实验入口
 ├── configs/       跟踪的配置
 ├── registry/      跟踪的精简决策与重要清理记录
-├── evidence/      跟踪的 Work 证据候选
+├── evidence/      确有必要时跟踪的决策证据包
 ├── runs/          忽略的生成运行结果
 ├── .tmp/          忽略的临时文件与清理计划
 └── quarantine/    忽略的待裁定产物
@@ -88,10 +88,10 @@ experiments/
 核心方法代码继续放在项目已有源码区域；原始数据集和外部数据不进入实验根目录。
 
 <p align="center">
-  <img src="./assets/readme/evidence-candidate.svg" width="100%" alt="探索输出保持轻量，而会改变方向的 Work 决策需要跟踪证据候选">
+  <img src="./assets/readme/evidence-candidate.svg" width="100%" alt="探索输出保持轻量，持久决策使用可访问证据">
 </p>
 
-若 Browser Work 要采纳某个结果，或据此改变方向、方法、基线、数据划分、指标或 claim，则先建立 `experiments/evidence/<experiment-id>/<candidate-id>/`。其中包括 `manifest.json`、`analysis_report.md`；只有确实存在数值指标时才增加 `metrics.json`。结构校验只能证明可访问性与完整性，不能代替科研充分性判断。
+持久科研决策应优先复用已经 decision-complete 的跟踪报告、配置、结果和 registry。只有现有材料不足，或正式提升需要一个稳定证据集合时，才建立 `experiments/evidence/<experiment-id>/<candidate-id>/`。证据包包括 `manifest.json`、`analysis_report.md`；只有确实存在数值指标时才增加 `metrics.json`。结构校验只能证明可访问性与完整性，不能代替科研充分性判断。
 
 ## 清理必须停下来审批
 
@@ -114,7 +114,7 @@ experiments/
 | 工作通道 | 审查行为 |
 |---|---|
 | 探索 | 实现、smoke、调试、调参、指标和诊断无需 review-state |
-| 自然实现候选 | 新代码成为稳定依赖前，Browser Work 审查已推送的精确 diff；默认不形成正式状态事务 |
+| 重要实现检查 | 只有后续实验依赖该改动、测试不足或解释证据需要精确 diff 时才检查；不形成正式状态事务 |
 | 正式提升 | 接受主要基线、冻结论文评估、采纳关键结果、改变核心方法或提升 claim 时进行一次合格审查 |
 
 正式 verdict 为 `ACCEPT`、`ACCEPT_WITH_P2`、`REJECT` 或 `BLOCKED`。P0/P1 必须 `REJECT`；P2 不阻塞。机械核验不是第二次审查。
@@ -130,7 +130,7 @@ experiments/
 | `workflow.py prepare-evidence` | 建立跟踪的 `research-evidence-candidate/v1` 证据包 |
 | `workflow.py validate-evidence` | 校验 schema、报告章节、hash 和 Git 可访问性 |
 | `workflow.py record-review` | 记录一次明确的正式提升审查 |
-| `workflow.py resume-prompt` | 生成精简的 Codex 或 Browser Work 恢复 Prompt |
+| `workflow.py resume-prompt` | 生成精简的 Codex 或 Work 恢复 Prompt |
 | `cleanup.py plan` | 盘点指定路径并生成被忽略的状态绑定计划 |
 | `cleanup.py apply` | 对已批准 plan ID 执行 `relocate`、`delete` 或 `verify` |
 
@@ -146,7 +146,7 @@ experiments/
 
 ## 当前验证
 
-仓库通过 **11 项集成测试**覆盖：初始化与 `main` 推送、迁移、按需运行清单、证据校验、审查状态语义、Hook 行为、清理计划身份、审批后删除及清理核验；CI 面向 Windows 与 Linux。
+集成测试覆盖初始化与 `main` 推送、迁移、按需运行清单、证据校验、审查状态语义、Hook 行为、清理计划身份、审批后删除及清理核验；CI 面向 Windows 与 Linux。
 
 ```bash
 python -m py_compile skills/codex-research-workflow/scripts/workflow.py skills/codex-research-workflow/scripts/hook.py skills/research-artifact-cleanup/scripts/cleanup.py

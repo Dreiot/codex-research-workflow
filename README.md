@@ -19,7 +19,7 @@ Exploration stays lightweight. Decisions that change a method, baseline, data sp
 
 ## Why this exists
 
-Long-running research drifts when chat summaries, stale reports, old runs, and the working tree quietly disagree. This workflow gives Codex and Browser Work a small, canonical surface to reload before acting—without turning ordinary implementation, smoke tests, or exploratory runs into review bureaucracy.
+Long-running research drifts when chat summaries, stale reports, old runs, and the working tree quietly disagree. This workflow gives Codex and a Chat or Work research controller a small, canonical surface to reload before acting—without turning ordinary implementation, smoke tests, or exploratory runs into review bureaucracy.
 
 The operating rule is simple:
 
@@ -34,7 +34,7 @@ minimal implementation → real-data run → metrics → diagnosis → direction
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | initialization, migration, authority audit, experiment manifests, evidence candidates, review state, resume prompts | inflate every exploratory step into a formal Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | metadata inventory, six cleanup classifications, immutable plan identity, relocate/delete/verify phases | infer scientific value or delete from an unapproved inventory |
 
-Every actionable Browser Work Goal invokes the Workflow Skill. Historical or batch cleanup invokes both. The public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) defines the four-section Work response format and formal-review boundary.
+Every actionable controller-issued Goal invokes the Workflow Skill. Project Instructions explicitly activate surface-specific roles: Chat normally separates Extra High evidence review from Pro research control, while Work may combine those roles. Historical or batch cleanup invokes both Skills. The public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) defines their shared response and formal-review boundary.
 
 ## First successful run
 
@@ -80,7 +80,7 @@ experiments/
 ├── scripts/       tracked experiment entrypoints
 ├── configs/       tracked configurations
 ├── registry/      tracked compact decision and cleanup records
-├── evidence/      tracked Work evidence candidates
+├── evidence/      tracked decision evidence when a dedicated packet is needed
 ├── runs/          ignored generated run outputs
 ├── .tmp/          ignored disposable files and cleanup plans
 └── quarantine/    ignored artifacts awaiting a decision
@@ -89,10 +89,10 @@ experiments/
 Core method code stays in the project's normal source area. Raw and external datasets stay outside this root.
 
 <p align="center">
-  <img src="./assets/readme/evidence-candidate.svg" width="100%" alt="Exploratory output stays light while durable Work decisions require a tracked evidence candidate">
+  <img src="./assets/readme/evidence-candidate.svg" width="100%" alt="Exploratory output stays light while durable decisions use accessible evidence">
 </p>
 
-Create `experiments/evidence/<experiment-id>/<candidate-id>/` before Browser Work adopts a result or changes the direction, method, baseline, data split, metric, or claim from it. A candidate contains `manifest.json`, `analysis_report.md`, and `metrics.json` only when numerical metrics exist. Structural validation proves accessibility and integrity—not scientific sufficiency.
+Before a durable research decision, prefer existing tracked reports, configurations, results, and registry entries when they are already decision-complete. Create `experiments/evidence/<experiment-id>/<candidate-id>/` only when those materials are insufficient or formal promotion needs one stable bundle. A packet contains `manifest.json`, `analysis_report.md`, and `metrics.json` only when numerical metrics exist. Structural validation proves accessibility and integrity—not scientific sufficiency.
 
 ## Cleanup that stops for approval
 
@@ -118,7 +118,7 @@ A committed `PROJECT_CORE.md` change triggers a read-only cleanup plan only when
 | Lane | Review behavior |
 |---|---|
 | exploration | implementation, smoke, debugging, parameter adjustment, metrics, and diagnosis proceed without review-state recording |
-| natural implementation candidate | Browser Work reviews the exact pushed diff before the code becomes a stable dependency; no formal state transaction by default |
+| material implementation inspection | request exact-diff inspection only when later experiments depend on the change, tests are insufficient, or the diff is needed to interpret evidence; no formal state transaction |
 | formal promotion | one qualified review to accept a major baseline, freeze publication evaluation, adopt a key result, change the core method, or raise a claim |
 
 Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 requires `REJECT`; P2 is non-blocking. A mechanical verification is not another review.
@@ -134,7 +134,7 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 | `workflow.py prepare-evidence` | scaffold a tracked `research-evidence-candidate/v1` packet |
 | `workflow.py validate-evidence` | validate schema, report structure, hashes, and Git accessibility |
 | `workflow.py record-review` | record one explicit formal-promotion result |
-| `workflow.py resume-prompt` | generate a compact Codex or Browser Work restart prompt |
+| `workflow.py resume-prompt` | generate a compact Codex or Work restart prompt |
 | `cleanup.py plan` | inventory approved paths and generate an ignored, state-bound plan |
 | `cleanup.py apply` | execute `relocate`, `delete`, or `verify` for the approved plan ID |
 
@@ -150,7 +150,7 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 
 ## Verified here
 
-The repository currently exercises initialization and `main` push, migration, on-demand experiment manifests, evidence validation, review-state semantics, Hook behavior, cleanup plan identity, approved deletion, and cleanup verification through **11 integration tests** on Windows and Linux CI targets.
+The integration suite exercises initialization and `main` push, migration, on-demand experiment manifests, evidence validation, review-state semantics, Hook behavior, cleanup plan identity, approved deletion, and cleanup verification on Windows and Linux CI targets.
 
 ```bash
 python -m py_compile skills/codex-research-workflow/scripts/workflow.py skills/codex-research-workflow/scripts/hook.py skills/research-artifact-cleanup/scripts/cleanup.py

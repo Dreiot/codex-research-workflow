@@ -8,7 +8,7 @@ experiments/
 ├── scripts/       # tracked experiment entrypoints and analysis scripts
 ├── configs/       # tracked experiment configurations
 ├── registry/      # tracked important decision-chain entries
-├── evidence/      # tracked Browser Work evidence packets
+├── evidence/      # tracked decision evidence when a dedicated packet is needed
 ├── runs/          # ignored persistent local results
 ├── .tmp/          # ignored current-run temporary files
 └── quarantine/    # ignored, only when the user requests it
@@ -18,7 +18,9 @@ Core method code remains in normal source directories. Raw and external data
 remain in the project's data locations, outside this root.
 
 Only create a persistent run when results must survive for comparison,
-diagnosis, reproduction, continuation, or evidence. Every persistent run uses
+diagnosis, reproduction, continuation, or evidence. Preserve the following
+minimal provenance in the project's existing equivalent metadata when one is
+already authoritative; otherwise use
 `runs/<experiment-id>/<run-id>/manifest.json` with:
 
 ```json
@@ -39,10 +41,11 @@ diagnosis, reproduction, continuation, or evidence. Every persistent run uses
 
 Allowed statuses are `running`, `completed`, `failed`, and `interrupted`.
 Exploratory runs may start from a dirty worktree, but record a deterministic
-diff hash. Formal runs use a clean frozen commit. A run later used by Work must
-be reproducible from a commit or a bound source snapshot.
+diff hash. Formal runs use a clean frozen commit. A run later used for a durable
+controller decision must be reproducible from a commit or a bound source
+snapshot.
 
-The tracked registry includes only experiments that enter Work decisions,
+The tracked registry includes only experiments that enter controller decisions,
 formal evidence, or important negative evidence. It is not a run-by-run log.
 Directory IDs are short, stable ASCII identifiers; do not rename paths merely
 because a direction changes status.

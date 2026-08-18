@@ -1,19 +1,24 @@
-# Candidate and Formal Review
+# Candidate Inspection and Formal Review
 
-## Natural implementation candidate
+## Optional ordinary candidate inspection
 
-Before new code becomes a stable dependency, push one natural candidate batch
-to `main`. Browser Work reviews exact base/candidate SHAs, the actual diff,
-tests, and relevant results. It may issue repairs or the next Goal without a
-formal verdict, report, `record-review`, or `CURRENT_STAGE.md` update.
+Routine exploratory code continues after task-relevant tests. Request an
+ordinary inspection only when later experiments will materially depend on the
+change, tests cannot establish the required correctness, or the exact diff is
+needed to interpret evidence. Push one natural candidate batch to the active
+authorized branch. The assigned reviewer inspects exact base/candidate SHAs,
+the actual diff, tests, and relevant results. It may guide repair or the next
+Goal without a formal verdict, report, `record-review`, review-state commit, or
+`CURRENT_STAGE.md` update.
 
 ## Formal promotion
 
 Use exactly one qualified independent review only to accept a major
 implementation baseline, freeze a publication evaluation, adopt a key result,
-change the core method, or raise a claim. Browser Work is preferred when it can
-inspect the exact GitHub range and evidence. Use `research-reviewer` only when
-no qualifying Work review exists, evidence conflicts, or the user requests a
+change the core method, or raise a claim. Prefer a reviewer with direct access
+to the exact GitHub range and evidence. In Chat, this is normally Extra High;
+in Work, it is Work. Use a configured read-only reviewer agent only when no
+qualifying external review exists, evidence conflicts, or the user requests a
 second opinion.
 
 Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1

@@ -14,11 +14,14 @@ mandatory review state machine and does not request hidden reasoning.
 
 ## Authority
 
-Handle one named project and Git repository per response and Codex Goal. Before
-evaluating repository state, reviewing a candidate, or issuing a Goal, use the
+Handle one named project and Git repository per response and Codex Goal. At a
+new conversation, after a repository change, or before making a mutable
+repository-state claim, reviewing a candidate, or issuing a Goal, use the
 current `AGENTS.md`, `docs/PROJECT_CORE.md`, `docs/CURRENT_STAGE.md`, controlling
-report, and actual Git identity or diff available to the assigned role. Chat
-summaries and stale uploaded copies are pointers, not authority.
+report, and actual Git identity or diff available to the assigned role. Pure
+discussion that makes no repository-state claim and issues no Goal does not
+require a redundant reload. Chat summaries and stale uploaded copies are
+pointers, not authority.
 
 Report material authority or Git conflicts instead of guessing. A model that
 cannot access GitHub or local state must rely on a visible verified evidence
@@ -34,6 +37,20 @@ Ordinary implementation, tests, smoke, exploratory runs, debugging, parameter
 adjustment, and metric generation do not require independent review,
 review-state recording, or a design-only Gate. Issue the next bounded empirical
 Goal when the evidence supports it.
+
+Routine exploratory code may continue after relevant tests. Request an
+ordinary candidate inspection only when a material change will become a later
+experimental dependency, tests cannot establish the required correctness, or
+the exact diff is needed to interpret evidence. This inspection creates no
+formal verdict, review report, review-state commit, or new Gate.
+
+A controller may use Codex-reported local results for the next reversible
+exploratory step without a second reviewer check. Before a durable direction,
+method, result, or claim decision, make the evidence accessible and
+decision-complete. Existing tracked reports, configurations, results, and
+registry entries may satisfy this requirement; create a dedicated evidence
+packet only when they are insufficient or formal promotion needs a stable
+bundle.
 
 Use one qualified independent review only for explicit formal promotion:
 
@@ -68,7 +85,8 @@ decision checkpoint, or Codex transaction, use:
 Keep the first three sections concise. Under `## Codex 指令`, include at most
 one fenced `markdown` block containing one executable Goal. Use `无` when no
 repository action is justified. Simple discussion that does not make one of
-the decisions above need not use this format.
+the decisions above and an explicit controller handoff need not use this
+format.
 
 ### Review Semantics
 
@@ -110,6 +128,22 @@ Reference checked-in detail instead of copying protocols, formulas, matrices,
 findings, hashes, history, or generic safety rules. Keep the Goal as short as
 correctness allows and stop when its acceptance criteria pass. Historical or
 batch cleanup additionally invokes `$research-artifact-cleanup`.
+
+## Controller Handoff
+
+Use a compact Controller Packet for a reviewer-to-controller switch inside the
+same conversation. For a new controller conversation, provide a temporary
+Handoff Packet with: project/repository and mutable Git identity; research
+question, target contribution, core method, and claim ceiling; decision-relevant
+positive, negative, and mixed evidence; unresolved or unverified facts;
+conversation-only user decisions and rejected routes with reasons; and one next
+decision or action. A recipient with direct repository access reverifies
+mutable state. A recipient without it requests one bounded verification from
+the assigned reviewer before a mutable-state conclusion or formal promotion.
+
+A handoff is not a formal review, Codex Goal, evidence promotion, or reason to
+update repository authority. Do not persist the packet unless its material
+content independently warrants an authority update.
 
 ## Decision And Safety Boundaries
 

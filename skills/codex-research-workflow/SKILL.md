@@ -1,6 +1,6 @@
 ---
 name: codex-research-workflow
-description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every Browser Work-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, natural implementation-candidate review, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
+description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every research-controller-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, material implementation inspection, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
 ---
 
 # Codex Research Workflow
@@ -17,7 +17,7 @@ Treat Git and checked-in evidence as authoritative. Use:
 - `docs/CURRENT_STAGE.md` for the current Gate, reviewed identity, material
   findings, and one next action.
 
-Conversation summaries are entry pointers. Browser Work Project Instructions
+Conversation summaries are entry pointers. Chat or Work Project Instructions
 are an independent user-supplied control surface: never shorten, replace, or
 declare them redundant.
 
@@ -25,10 +25,10 @@ declare them redundant.
 
 At a new Goal, resume, or explicit handoff, read the three authorities and the
 currently controlling report, then verify that the project root is the exact
-Git root, followed by branch, HEAD,
-remote tracking ref, index, worktree, and relevant protected paths. Do not load
-chronological ledgers or old reports unless current authorities point to them,
-state conflicts, or historical tracing requires them.
+Git root, followed by branch, HEAD, remote tracking ref, index, and worktree.
+Inspect protected paths only when the Goal reads or changes data, results, or
+cleanup state. Do not load chronological ledgers or old reports unless current
+authorities point to them, state conflicts, or historical tracing requires them.
 
 Use the read-only SessionStart Hook only as a compact pointer. A Hook failure is
 fail-open; an explicit `workflow.py audit` is fail-closed for material authority
@@ -63,9 +63,9 @@ needed. New persistent artifacts must not create ad hoc top-level output roots.
 - Keep reusable method code in normal source directories.
 - Keep experiment entrypoints/configuration under `scripts/` and `configs/` in
   the experiment root when they are needed.
-- Keep persistent local runs under `runs/<experiment-id>/<run-id>/` with a
-  minimal manifest; keep raw and external datasets outside the experiment root.
-- Keep decision-complete Work evidence under
+- Keep persistent local runs under `runs/<experiment-id>/<run-id>/` with
+  minimal provenance; keep raw and external datasets outside the experiment root.
+- Keep dedicated decision-complete evidence under
   `evidence/<experiment-id>/<candidate-id>/` and track it in Git.
 - Keep large runs, temporary files, and cleanup plans ignored by Git.
 - Delete only temporary files created by the current run when they were marked
@@ -73,15 +73,17 @@ needed. New persistent artifacts must not create ad hoc top-level output roots.
 
 Read [experiments.md](references/experiments.md) before creating a persistent
 run. Read [evidence-packets.md](references/evidence-packets.md) before preparing
-material for Browser Work.
+material for a durable controller decision or formal promotion.
 
 ## Review Code And Evidence
 
-Review natural candidate batches, not every edit or commit. Before new code
-becomes a stable dependency for later research, push a candidate to `main` and
-have Browser Work inspect the exact diff, tests, and relevant results. An
-ordinary implementation-candidate review may guide repair or the next Goal
-without `record-review` or a `CURRENT_STAGE.md` update.
+Routine exploratory code may continue after task-relevant tests pass. Request
+an ordinary candidate inspection only when later experiments will materially
+depend on the change, tests cannot establish the needed correctness, or the
+exact diff is needed to interpret evidence. Inspect one natural batch on the
+active authorized branch, not every edit or commit. This inspection may guide
+repair or the next Goal without a formal verdict, `record-review`, or a
+`CURRENT_STAGE.md` update.
 
 Use formal promotion only to accept a major implementation baseline, freeze a
 publication evaluation, adopt a key result, change the core method, or raise a
@@ -89,11 +91,13 @@ claim. Pin exact base/candidate SHAs, obtain one qualified independent review,
 then record it once. Preserve rejected candidates and negative evidence in Git
 history. Read [formal-review.md](references/formal-review.md) for this lane.
 
-Codex chat output can guide another reversible exploratory step. Any result
-used by Work to change direction, adopt a method/result, or alter a claim must
-be represented by a Git-accessible, decision-complete evidence packet. Structure
-and accessibility validation cannot declare scientific sufficiency; Work may
-still return `BLOCKED`.
+Codex-reported local results can guide another reversible exploratory step.
+Before a durable direction change, method/result adoption, or claim change,
+make the evidence accessible and decision-complete. Prefer existing tracked
+reports, configurations, results, or registry entries when they already answer
+the decision question. Create a dedicated evidence packet only when those
+materials are insufficient or a formal promotion needs a stable bundle.
+Structure and accessibility validation cannot declare scientific sufficiency.
 
 ## Maintain Canonical State
 
@@ -148,16 +152,16 @@ Read [initialization.md](references/initialization.md) for `init` or `migrate`.
 `initialize` remains a compatibility alias for the former missing-file-only
 operation and is not used in new documentation.
 
-## Browser Work Contract
+## Research Controller Contract
 
-Every actionable Browser Work Codex Goal starts with
+Every actionable research-controller-issued Codex Goal starts with
 `$codex-research-workflow`. A cleanup Goal also invokes
 `$research-artifact-cleanup`. Keep Goals short by pointing to checked-in
 authorities and reports rather than copying durable detail.
 
 Read [work-response-contract.md](references/work-response-contract.md) before
-generating or evaluating a Work response. Only the user may authorize changing
-that contract.
+generating or evaluating a controller response. Only the user may authorize
+changing that contract.
 
 ## Explicit Handoff
 
@@ -166,3 +170,15 @@ explicit handoff, finish only the safely verifiable operation, re-read current
 authority and Git state, distinguish pushed facts from chat-only conclusions,
 run `audit`, and generate the relevant `resume-prompt`. Never create
 `CODEX_HANDOFF.md`, `LATEST_STATE.md`, or another dynamic authority.
+
+A controller handoff is not a formal review or a reason to update repository
+authority. A same-conversation reviewer-to-controller switch uses a compact
+Controller Packet. A new Pro conversation needs a Pro Handoff Packet containing
+the durable strategy and claim ceiling from `PROJECT_CORE.md`, the relevant
+positive and negative evidence, current Git transaction, conversation-only
+decisions or rejected options, and one next decision or action. Require the
+recipient to reverify mutable repository state when it has direct access; a
+recipient without access requests one bounded verification from its assigned
+reviewer before a mutable-state conclusion or formal promotion. Keep this
+packet temporary unless a material decision independently belongs in
+repository authority.

@@ -26,6 +26,8 @@ LEGACY_WORK_CONTRACT = (
     / "references"
     / "work-response-contract.md"
 )
+README_EN = ROOT / "README.md"
+README_ZH = ROOT / "README.zh-CN.md"
 
 
 class HandoffIntegrationTest(unittest.TestCase):
@@ -140,9 +142,9 @@ class HandoffIntegrationTest(unittest.TestCase):
             "do not require independent review or review-state commits",
             "only for an explicit formal promotion",
             "accepted implementation candidate",
-            "Browser Work responses must follow the public Work Response Contract",
+            "Research-controller responses must follow the public Work Response Contract",
             "A clean review-state verification may be followed by the next Goal",
-            "Work verification of a formal review-state commit is mechanical closure",
+            "Verification of a formal review-state commit is mechanical closure",
             "Automatic context compaction alone is not a reason",
             "Do not amend, rebase, force-push, rewrite history",
         ):
@@ -216,6 +218,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Use `无`", normalized)
         self.assertIn("do not require independent review, review-state recording", normalized)
         self.assertIn("only for explicit formal promotion", normalized)
+        self.assertIn("ordinary candidate inspection only when a material change", normalized)
+        self.assertIn("Existing tracked reports, configurations, results", normalized)
+        self.assertIn("Controller Handoff", normalized)
+        self.assertIn("Pure discussion that makes no repository-state claim", normalized)
+        self.assertIn("recipient without it requests one bounded verification", normalized)
         self.assertIn("Before freezing a publication evaluation", normalized)
         self.assertIn("Any `P0` or `P1` requires `REJECT`", normalized)
         self.assertIn("`REJECT` requires at least one such finding", normalized)
@@ -229,6 +236,16 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
         self.assertNotIn("work-response-contract-v1", contract)
+
+    def test_public_readmes_match_the_controller_neutral_review_policy(self):
+        english = " ".join(README_EN.read_text(encoding="utf-8").split())
+        chinese = " ".join(README_ZH.read_text(encoding="utf-8").split())
+        self.assertIn("Project Instructions explicitly activate surface-specific roles", english)
+        self.assertIn("existing tracked reports, configurations, results", english)
+        self.assertIn("Project Instructions 显式激活不同界面的角色", chinese)
+        self.assertIn("优先复用已经 decision-complete 的跟踪报告、配置、结果和 registry", chinese)
+        self.assertNotIn("before the code becomes a stable dependency", english)
+        self.assertNotIn("新代码成为稳定依赖前", chinese)
 
     def test_exploratory_commit_does_not_imply_pending_review(self):
         self.initialize_and_commit()
