@@ -21,6 +21,10 @@ Conversation summaries are entry pointers. Chat or Work Project Instructions
 are an independent user-supplied control surface: never shorten, replace, or
 declare them redundant.
 
+A research controller or reviewer decides and issues a Goal; Codex executes an
+already-issued Goal. When acting as the executor, do not adopt the controller
+role, issue the next Goal, or use the controller response format.
+
 ## Restore State
 
 At a new Goal, resume, or explicit handoff, read the three authorities and the
@@ -53,6 +57,15 @@ one clear choice. Do not continue until the user chooses.
 
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.
+
+## Validate Proportionately
+
+Default to semantic checks, declared numerical tolerances, material invariants,
+and existing Git identity. Add a content hash only when exact bytes outside Git
+materially affect reproducibility or a known integrity failure is not covered by
+those checks. Do not duplicate commit-bound identities with file, payload, or
+manifest hashes merely for completeness, and do not use floating-output hashes
+as numerical acceptance criteria. Preserve an explicit frozen identity contract.
 
 ## Manage Experiments
 
@@ -162,6 +175,11 @@ authorities and reports rather than copying durable detail.
 Read [work-response-contract.md](references/work-response-contract.md) before
 generating or evaluating a controller response. Only the user may authorize
 changing that contract.
+
+The Contract does not govern a Codex executor's final report. After executing a
+Goal, report only the actual outcome, changed paths, validation or experiment
+results, commit/push state, and unresolved items or blockers. Do not output the
+controller headings or a `Codex 指令` section.
 
 ## Explicit Handoff
 

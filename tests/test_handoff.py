@@ -137,12 +137,16 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Default to the shortest empirical loop",
             "Local, recoverable, no-cost work",
             "Use the simplest correct, testable implementation",
+            "Prefer semantic checks, declared numerical tolerances",
+            "Do not add redundant hashes or use floating-output hashes",
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
             "only for an explicit formal promotion",
             "accepted implementation candidate",
             "Research-controller responses must follow the public Work Response Contract",
+            "Codex is the executor, not the research controller",
+            "must not use the controller four-section format",
             "A clean review-state verification may be followed by the next Goal",
             "Verification of a formal review-state commit is mechanical closure",
             "Automatic context compaction alone is not a reason",
@@ -197,6 +201,10 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("主动询问用户", codex_prompt)
         self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
         self.assertIn("达到验收目标即停止", codex_prompt)
+        self.assertIn("你是执行端，不是 Research Controller", codex_prompt)
+        self.assertIn("不得使用 Work Response Contract 四段式", codex_prompt)
+        self.assertIn("不得自行增加冗余 hash", codex_prompt)
+        self.assertIn("不得把浮点结果 hash 作为验收条件", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
@@ -214,6 +222,8 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Only the user may authorize changing", normalized)
         self.assertIn("Agents must not modify it autonomously", normalized)
         self.assertIn("It is not a mandatory review state machine", normalized)
+        self.assertIn("It does not govern a Codex executor's final report", normalized)
+        self.assertIn("Codex executes an issued Goal and never publishes", normalized)
         self.assertIn("at most one", normalized)
         self.assertIn("Use `无`", normalized)
         self.assertIn("do not require independent review, review-state recording", normalized)
@@ -235,6 +245,13 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
+        self.assertIn("Default to semantic checks", normalized)
+        self.assertIn("Do not duplicate commit-bound identities", normalized)
+        self.assertIn("never use floating-output hashes as numerical acceptance criteria", normalized)
+        self.assertIn("Preserve an explicit frozen identity contract", normalized)
+        self.assertIn("An executing Codex instead reports the actual outcome", normalized)
+        self.assertIn("it does not output `Codex 指令`", normalized)
+        self.assertNotIn("or Codex transaction", contract)
         self.assertNotIn("work-response-contract-v1", contract)
 
     def test_public_readmes_match_the_controller_neutral_review_policy(self):

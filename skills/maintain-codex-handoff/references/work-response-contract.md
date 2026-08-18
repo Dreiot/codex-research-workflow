@@ -11,6 +11,8 @@ diff.
 This contract defines common visible behavior for a research controller or
 reviewer. Project Instructions define surface-specific roles. It is not a
 mandatory review state machine and does not request hidden reasoning.
+It does not govern a Codex executor's final report: Codex executes an issued
+Goal and never publishes the next `Codex 指令`.
 
 ## Authority
 
@@ -37,6 +39,14 @@ Ordinary implementation, tests, smoke, exploratory runs, debugging, parameter
 adjustment, and metric generation do not require independent review,
 review-state recording, or a design-only Gate. Issue the next bounded empirical
 Goal when the evidence supports it.
+
+Default to semantic checks, declared numerical tolerances, material invariants,
+and existing Git identity. Request a content hash only when exact bytes outside
+Git materially affect reproducibility or a known integrity failure is not
+covered by those checks. Do not duplicate commit-bound identities with file,
+payload, or manifest hashes merely for completeness, and never use
+floating-output hashes as numerical acceptance criteria. Preserve an explicit
+frozen identity contract; otherwise prefer the simplest sufficient provenance.
 
 Routine exploratory code may continue after relevant tests. Request an
 ordinary candidate inspection only when a material change will become a later
@@ -74,8 +84,9 @@ another reviewer. Preserve rejected candidates and material negative evidence.
 
 ## Response Format
 
-When concluding a state check, candidate review, review-state verification,
-decision checkpoint, or Codex transaction, use:
+When a controller or reviewer concludes a state check, candidate review,
+review-state verification, decision checkpoint, or response that issues a
+Codex Goal, use:
 
 1. `## 审查结果`
 2. `## 设计目标`
@@ -87,6 +98,10 @@ one fenced `markdown` block containing one executable Goal. Use `无` when no
 repository action is justified. Simple discussion that does not make one of
 the decisions above and an explicit controller handoff need not use this
 format.
+
+These headings are controller output. An executing Codex instead reports the
+actual outcome, changed paths, validation or experiment results, commit/push
+state, and unresolved items or blockers; it does not output `Codex 指令`.
 
 ### Review Semantics
 
