@@ -34,7 +34,7 @@
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | 初始化、迁移、权威审计、实验清单、证据候选、审查状态和恢复 Prompt | 把每次探索提升为正式 Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | 元数据盘点、六类清理分类、不可变计划身份、迁移/删除/核验 | 自行推断科研价值，或从未审批清单直接删除 |
 
-每个可执行的控制器 Goal 都调用 Workflow。Project Instructions 显式激活不同界面的角色：Chat 通常由 Extra High 核验证据、Pro 控制研究，Work 可以合并两个角色。历史或批量清理同时调用两个 Skill。公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 规定共同回复和正式审查边界。
+每个可执行的控制器 Codex Goal 都调用 Workflow Skill。网页 Chat 和 Work 不会加载本机安装的 Skill；它们由 Project Instructions 与公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 独立设置角色。历史或批量清理才同时调用两个本地 Skill。
 
 ## 第一次成功运行
 
@@ -114,8 +114,8 @@ experiments/
 | 工作通道 | 审查行为 |
 |---|---|
 | 探索 | 实现、smoke、调试、调参、指标和诊断无需 review-state |
-| 重要实现检查 | 只有后续实验依赖该改动、测试不足或解释证据需要精确 diff 时才检查；不形成正式状态事务 |
-| 正式提升 | 接受主要基线、冻结论文评估、采纳关键结果、改变核心方法或提升 claim 时进行一次合格审查 |
+| 可选实现检查 | 仅在测试和 Codex 结果包不足，或解释证据需要精确 diff 时使用；可检查未提交改动，commit/push 不是默认要求 |
+| 正式提升 | 接受主要基线、采纳稳定论文评价或关键结果、改变核心方法或提升 claim 时进行一次合格审查；仅在需要时提交 candidate，随后只做一次权威更新 |
 
 正式 verdict 为 `ACCEPT`、`ACCEPT_WITH_P2`、`REJECT` 或 `BLOCKED`。P0/P1 必须 `REJECT`；P2 不阻塞。机械核验不是第二次审查。
 
@@ -125,7 +125,7 @@ experiments/
 |---|---|
 | `workflow.py init` | 完成 Git/GitHub 安全检查后计划并初始化新的 `main` 仓库 |
 | `workflow.py migrate` | 补充新策略，不移动产物、不重写科研内容 |
-| `workflow.py audit` | 遇到实质权威或 Git 冲突时 fail closed |
+| `workflow.py audit` | 在 commit/push、正式提升、权威更新、显式交接或实质状态冲突前执行完整核验 |
 | `workflow.py prepare-experiment` | 按需生成忽略的 `research-experiment-run/v1` 清单 |
 | `workflow.py prepare-evidence` | 建立跟踪的 `research-evidence-candidate/v1` 证据包 |
 | `workflow.py validate-evidence` | 校验 schema、报告章节、hash 和 Git 可访问性 |

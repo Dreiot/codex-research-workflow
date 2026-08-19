@@ -1,6 +1,6 @@
 ---
 name: codex-research-workflow
-description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every research-controller-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, material implementation inspection, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
+description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every research-controller-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, optional implementation inspection, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
 ---
 
 # Codex Research Workflow
@@ -17,9 +17,7 @@ Treat Git and checked-in evidence as authoritative. Use:
 - `docs/CURRENT_STAGE.md` for the current Gate, reviewed identity, material
   findings, and one next action.
 
-Conversation summaries are entry pointers. Chat or Work Project Instructions
-are an independent user-supplied control surface: never shorten, replace, or
-declare them redundant.
+Conversation summaries are entry pointers, not repository authority.
 
 A research controller or reviewer decides and issues a Goal; Codex executes an
 already-issued Goal. When acting as the executor, do not adopt the controller
@@ -27,9 +25,13 @@ role, issue the next Goal, or use the controller response format.
 
 ## Restore State
 
-At a new Goal, resume, or explicit handoff, read the three authorities and the
-currently controlling report, then verify that the project root is the exact
-Git root, followed by branch, HEAD, remote tracking ref, index, and worktree.
+At an ordinary new Goal, read the authorities and controlling material needed
+for that Goal, then perform a lightweight local precheck: exact Git root,
+branch, HEAD against the expected base, and conflicting index or worktree
+changes. Do not repeat the controller's remote review or run a full audit merely
+because a Goal started. Fetch and check the tracking ref, then run
+`workflow.py audit`, before commit or push, formal promotion, authority updates,
+explicit handoff, or when local state conflicts with the Goal.
 Inspect protected paths only when the Goal reads or changes data, results, or
 cleanup state. Do not load chronological ledgers or old reports unless current
 authorities point to them, state conflicts, or historical tracing requires them.
@@ -94,19 +96,20 @@ material for a durable controller decision or formal promotion.
 
 ## Review Code And Evidence
 
-Routine exploratory code may continue after task-relevant tests pass. Request
-an ordinary candidate inspection only when later experiments will materially
-depend on the change, tests cannot establish the needed correctness, or the
-exact diff is needed to interpret evidence. Inspect one natural batch on the
-active authorized branch, not every edit or commit. This inspection may guide
-repair or the next Goal without a formal verdict, `record-review`, or a
-`CURRENT_STAGE.md` update.
+Routine exploratory code may continue after task-relevant tests pass. A concise
+Codex result packet is normally enough for the controller. Request an optional
+implementation inspection only when tests and results cannot establish the
+needed correctness or the exact diff is needed to interpret evidence. It may
+inspect uncommitted work and does not require commit or push unless the reviewer
+needs GitHub access or the work is entering formal promotion. It creates no
+formal verdict, `record-review`, or `CURRENT_STAGE.md` update.
 
-Use formal promotion only to accept a major implementation baseline, freeze a
-publication evaluation, adopt a key result, change the core method, or raise a
-claim. Pin exact base/candidate SHAs, obtain one qualified independent review,
-then record it once. Preserve rejected candidates and negative evidence in Git
-history. Read [formal-review.md](references/formal-review.md) for this lane.
+Use formal promotion only to accept a major implementation baseline, adopt a
+stable publication evaluation or key result, change the core method, or raise a
+claim. Pin one exact candidate commit, obtain one qualified independent review,
+then create one necessary authority update. Preserve rejected candidates and
+negative evidence in Git history. Read
+[formal-review.md](references/formal-review.md) for this lane.
 
 Codex-reported local results can guide another reversible exploratory step.
 Before a durable direction change, method/result adoption, or claim change,
@@ -193,14 +196,18 @@ authority and Git state, distinguish pushed facts from chat-only conclusions,
 run `audit`, and generate the relevant `resume-prompt`. Never create
 `CODEX_HANDOFF.md`, `LATEST_STATE.md`, or another dynamic authority.
 
+The installed Skill governs Codex handoff only. Browser Chat and Work do not
+load it; they follow their Project Instructions, visible context, and the public
+Work Response Contract. Codex may generate a temporary packet for the user to
+paste into a browser conversation.
+
 A controller handoff is not a formal review or a reason to update repository
 authority. A same-conversation reviewer-to-controller switch uses a compact
 Controller Packet. A new Pro conversation needs a Pro Handoff Packet containing
-the durable strategy and claim ceiling from `PROJECT_CORE.md`, the relevant
-positive and negative evidence, current Git transaction, conversation-only
-decisions or rejected options, and one next decision or action. Require the
-recipient to reverify mutable repository state when it has direct access; a
-recipient without access requests one bounded verification from its assigned
-reviewer before a mutable-state conclusion or formal promotion. Keep this
-packet temporary unless a material decision independently belongs in
-repository authority.
+the durable strategy and claim ceiling from `PROJECT_CORE.md`, relevant positive
+and negative evidence, the current Git transaction, conversation-only decisions
+or rejected options, and one next decision or action. A recipient with direct
+repository access reverifies mutable state; one without it requests one bounded
+verification from its assigned reviewer before a mutable-state conclusion or
+formal promotion. Keep the packet temporary unless a material decision
+independently belongs in repository authority.

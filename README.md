@@ -34,7 +34,7 @@ minimal implementation → real-data run → metrics → diagnosis → direction
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | initialization, migration, authority audit, experiment manifests, evidence candidates, review state, resume prompts | inflate every exploratory step into a formal Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | metadata inventory, six cleanup classifications, immutable plan identity, relocate/delete/verify phases | infer scientific value or delete from an unapproved inventory |
 
-Every actionable controller-issued Goal invokes the Workflow Skill. Project Instructions explicitly activate surface-specific roles: Chat normally separates Extra High evidence review from Pro research control, while Work may combine those roles. Historical or batch cleanup invokes both Skills. The public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) defines their shared response and formal-review boundary.
+Every actionable controller-issued Codex Goal invokes the Workflow Skill. Browser Chat and Work do not load the installed local Skill; their roles are configured independently through Project Instructions and the public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md). Historical or batch cleanup invokes both local Skills.
 
 ## First successful run
 
@@ -118,8 +118,8 @@ A committed `PROJECT_CORE.md` change triggers a read-only cleanup plan only when
 | Lane | Review behavior |
 |---|---|
 | exploration | implementation, smoke, debugging, parameter adjustment, metrics, and diagnosis proceed without review-state recording |
-| material implementation inspection | request exact-diff inspection only when later experiments depend on the change, tests are insufficient, or the diff is needed to interpret evidence; no formal state transaction |
-| formal promotion | one qualified review to accept a major baseline, freeze publication evaluation, adopt a key result, change the core method, or raise a claim |
+| optional implementation inspection | use only when tests and the Codex result packet are insufficient or the exact diff is needed; uncommitted work is allowed and commit/push is optional |
+| formal promotion | one qualified review to accept a major baseline, adopt a stable publication evaluation or key result, change the core method, or raise a claim; one candidate commit only when needed, followed by one authority update |
 
 Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 requires `REJECT`; P2 is non-blocking. A mechanical verification is not another review.
 
@@ -129,7 +129,7 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 |---|---|
 | `workflow.py init` | plan and initialize a new `main` repository after Git/GitHub safety checks |
 | `workflow.py migrate` | add current policy without moving artifacts or rewriting scientific content |
-| `workflow.py audit` | fail closed on material authority or Git conflicts |
+| `workflow.py audit` | full check before commit/push, formal promotion, authority updates, explicit handoff, or material state conflicts |
 | `workflow.py prepare-experiment` | create an ignored `research-experiment-run/v1` manifest on demand |
 | `workflow.py prepare-evidence` | scaffold a tracked `research-evidence-candidate/v1` packet |
 | `workflow.py validate-evidence` | validate schema, report structure, hashes, and Git accessibility |

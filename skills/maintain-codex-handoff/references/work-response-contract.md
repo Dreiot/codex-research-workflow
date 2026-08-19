@@ -66,10 +66,12 @@ payload, or manifest hashes merely for completeness, and never use
 floating-output hashes as numerical acceptance criteria. Preserve an explicit
 frozen identity contract; otherwise prefer the simplest sufficient provenance.
 
-Routine exploratory code may continue after relevant tests. Request an
-ordinary candidate inspection only when a material change will become a later
-experimental dependency, tests cannot establish the required correctness, or
-the exact diff is needed to interpret evidence. This inspection creates no
+Routine exploratory code may continue after relevant tests. A concise Codex
+result packet is normally enough for the next controller decision. Request an
+optional implementation inspection only when tests and results cannot establish
+the required correctness or the exact diff is needed to interpret evidence. It
+may inspect uncommitted work and requires no commit or push unless the reviewer
+needs GitHub access or the work is entering formal promotion. It creates no
 formal verdict, review report, review-state commit, or new Gate.
 
 A controller may use Codex-reported local results for the next reversible
@@ -96,11 +98,14 @@ unit, repetitions, resource, stopping and material-failure rules, provenance,
 and intended claim. Adjustments remain allowed when scientifically justified;
 rerun the evidence needed for the final claim and disclose material changes.
 
-Review the exact candidate identity and relevant evidence. Record a formal
-promotion verdict once. Mechanical verification of its review-state commit is
-not another review and is not recorded again; after clean verification, the
-same response may issue the next Goal. Do not duplicate a qualified review with
-another reviewer. Preserve rejected candidates and material negative evidence.
+Review the exact candidate identity and relevant evidence. If implementation or
+results to be promoted are still uncommitted, first create and push one natural
+candidate commit; otherwise reuse the existing stable commit. Record the formal
+promotion verdict once in one necessary authority update, with a separate report
+only when material findings need more space than `CURRENT_STAGE.md`. Update
+`PROJECT_CORE.md` only for a durable strategy or claim change. Mechanical
+verification creates no review, report, or commit; after clean verification,
+the same response may issue the next Goal. Do not duplicate a qualified review.
 
 ## Response Format
 
@@ -149,8 +154,12 @@ acceptance criteria.
 
 ### Codex Goal
 
-Start each actionable Goal with `$codex-research-workflow`. Codex reloads the
-repository authorities and actual Git state. Include only:
+Start each actionable Goal with `$codex-research-workflow`. Codex reads the
+authorities needed for the Goal and performs a lightweight local precheck of the
+exact root, branch, expected HEAD, and conflicting index or worktree changes.
+Require fresh remote checks and a full audit only before commit or push, formal
+promotion, authority updates, explicit handoff, or a material state conflict.
+Include only:
 
 - one Goal and its expected branch/base/candidate when needed;
 - authority or report pointers;
@@ -165,6 +174,10 @@ correctness allows and stop when its acceptance criteria pass. Historical or
 batch cleanup additionally invokes `$research-artifact-cleanup`.
 
 ## Controller Handoff
+
+Browser Chat and Work follow their Project Instructions, visible context, and
+this public Contract; they do not load the installed local Codex Skill. Codex
+may generate a temporary packet for the user to paste into a browser conversation.
 
 Use a compact Controller Packet for a reviewer-to-controller switch inside the
 same conversation. For a new controller conversation, provide a temporary

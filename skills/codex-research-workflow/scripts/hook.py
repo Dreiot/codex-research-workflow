@@ -5,9 +5,9 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from workflow import CORE_REL, STATE_REL, audit, find_repo, git, read_core, read_state
+from workflow import CORE_REL, STATE_REL, find_repo, git, read_core, read_state
 
 
 def emit(*, system_message: str = "", context: str = "", event: str = "") -> None:
@@ -106,10 +106,20 @@ def handle(payload: Dict[str, Any]) -> int:
         return 0
 
     if event == "Stop":
-        result = audit(repo)
-        issues: List[str] = list(result["errors"])
+        _, core_errors = read_core(repo)
+        _, state_errors = read_state(repo)
+        issues = [f"PROJECT_CORE: {item}" for item in core_errors] + [
+            f"CURRENT_STAGE: {item}" for item in state_errors
+        ]
+        git_dir = git(repo, "rev-parse", "--git-dir", check=False).strip()
+        if git_dir:
+            git_path = Path(git_dir)
+            if not git_path.is_absolute():
+                git_path = repo / git_path
+            if (git_path / "index.lock").exists():
+                issues.append("Git index.lock exists")
         if issues:
-            emit(system_message="Workflow closure warning: " + "; ".join(issues), event=event)
+            emit(system_message="Workflow state warning: " + "; ".join(issues), event=event)
     return 0
 
 

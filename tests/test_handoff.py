@@ -140,8 +140,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertEqual(before, after)
 
         agents_text = (self.repo / "AGENTS.md").read_text(encoding="utf-8")
+        state_text = (self.repo / "docs" / "CURRENT_STAGE.md").read_text(encoding="utf-8")
         for required_rule in (
             "## Authority",
+            "For an ordinary Goal, check the exact root, branch, expected HEAD",
+            "Run a full audit only before commit/push, formal promotion",
             "Default to the shortest empirical loop",
             "Local, recoverable, no-cost work",
             "Use the simplest correct, testable implementation",
@@ -150,6 +153,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
+            "Optional implementation inspection does not require commit or push",
             "only for an explicit formal promotion",
             "accepted implementation candidate",
             "Research-controller responses must follow the public Work Response Contract",
@@ -161,6 +165,8 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Do not amend, rebase, force-push, rewrite history",
         ):
             self.assertIn(required_rule, agents_text)
+        self.assertIn("For an ordinary Goal, check the exact Git root", state_text)
+        self.assertIn("run the full audit only before commit/push", state_text)
 
         self.run_command(
             "git",
@@ -193,6 +199,7 @@ class HandoffIntegrationTest(unittest.TestCase):
 
         work_prompt = prompts["work"]
         self.assertIn("work-response-contract.md", work_prompt)
+        self.assertIn("网页端不加载本机 Codex Skill", work_prompt)
         self.assertIn("探索性实现、测试、smoke", work_prompt)
         self.assertIn("不需要独立审查或 review-state", work_prompt)
         self.assertIn("formal promotion", work_prompt)
@@ -204,7 +211,10 @@ class HandoffIntegrationTest(unittest.TestCase):
 
         codex_prompt = prompts["codex"]
         self.assertIn("默认执行探索流程", codex_prompt)
-        self.assertIn("普通探索提交不需要审查或状态落库", codex_prompt)
+        self.assertIn("普通 Goal 只做轻量本地核对", codex_prompt)
+        self.assertIn("不要重复网页控制器已经完成的远端审查", codex_prompt)
+        self.assertIn("普通探索不要求提交、push、审查或状态落库", codex_prompt)
+        self.assertIn("结果包足以支持下一步时", codex_prompt)
         self.assertIn("才启动一次独立审查和 review-state", codex_prompt)
         self.assertIn("主动询问用户", codex_prompt)
         self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
@@ -223,6 +233,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("gate=", context)
         self.assertEqual(self.run_command("git", "-C", str(self.repo), "status", "--short"), "")
 
+        hook_text = HOOK.read_text(encoding="utf-8")
+        self.assertNotIn("result = audit(repo)", hook_text)
+        stop_payload = json.dumps({"hook_event_name": "Stop", "cwd": str(self.repo)})
+        self.assertEqual(self.run_command(sys.executable, str(HOOK), input_text=stop_payload), "")
+
     def test_work_contract_is_format_not_mandatory_review_state_machine(self):
         contract = WORK_CONTRACT.read_text(encoding="utf-8")
         self.assertEqual(contract, LEGACY_WORK_CONTRACT.read_text(encoding="utf-8"))
@@ -236,9 +251,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Use `无`", normalized)
         self.assertIn("do not require independent review, review-state recording", normalized)
         self.assertIn("only for explicit formal promotion", normalized)
-        self.assertIn("ordinary candidate inspection only when a material change", normalized)
+        self.assertIn("optional implementation inspection only when tests and results", normalized)
+        self.assertIn("requires no commit or push unless", normalized)
         self.assertIn("Existing tracked reports, configurations, results", normalized)
         self.assertIn("Controller Handoff", normalized)
+        self.assertIn("do not load the installed local Codex Skill", normalized)
         self.assertIn("Pure discussion that makes no repository-state claim", normalized)
         self.assertIn("recipient without it requests one bounded verification", normalized)
         self.assertIn(
@@ -253,11 +270,16 @@ class HandoffIntegrationTest(unittest.TestCase):
         skill = " ".join(SKILL.read_text(encoding="utf-8").split())
         self.assertIn("smallest representative case", skill)
         self.assertIn("final held-out boundary", skill)
+        self.assertIn("lightweight local precheck", skill)
+        self.assertIn("does not require commit or push", skill)
+        self.assertNotIn("never shorten, replace, or declare them redundant", skill)
         formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
         self.assertIn(
             "not a prerequisite for exploratory or publication-oriented experiment execution",
             formal_review,
         )
+        self.assertIn("review_report: null", formal_review)
+        self.assertIn("Do not create another commit merely to verify", formal_review)
         self.assertIn("Any `P0` or `P1` requires `REJECT`", normalized)
         self.assertIn("`REJECT` requires at least one such finding", normalized)
         self.assertIn("prefix every finding with `BLOCKED:`", normalized)
@@ -281,9 +303,9 @@ class HandoffIntegrationTest(unittest.TestCase):
     def test_public_readmes_match_the_controller_neutral_review_policy(self):
         english = " ".join(README_EN.read_text(encoding="utf-8").split())
         chinese = " ".join(README_ZH.read_text(encoding="utf-8").split())
-        self.assertIn("Project Instructions explicitly activate surface-specific roles", english)
+        self.assertIn("Browser Chat and Work do not load the installed local Skill", english)
         self.assertIn("existing tracked reports, configurations, results", english)
-        self.assertIn("Project Instructions 显式激活不同界面的角色", chinese)
+        self.assertIn("网页 Chat 和 Work 不会加载本机安装的 Skill", chinese)
         self.assertIn("优先复用已经 decision-complete 的跟踪报告、配置、结果和 registry", chinese)
         self.assertNotIn("before the code becomes a stable dependency", english)
         self.assertNotIn("新代码成为稳定依赖前", chinese)
