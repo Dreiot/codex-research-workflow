@@ -44,16 +44,20 @@ Default to the shortest credible empirical loop:
 
 `minimal implementation -> real-data run -> metrics -> diagnosis -> direction adjustment -> paper evidence`
 
-Local, recoverable, no-cost work using authorized data may proceed without a
-new Gate: implementation, tests, smoke, exploratory runs, parameter adjustment,
-metrics, and diagnosis. Ask before paid, sensitive, external side-effecting,
-destructive, irreversible, or final held-out actions.
+Prefer restartable end-to-end Goals that reach scientific metrics. Local,
+recoverable, no-cost work using authorized data may combine implementation,
+relevant checks, real-data execution, metrics, diagnosis, and adjustment without
+a new Gate. A separate smoke is exceptional and should test only the smallest
+representative case justified by a genuinely untested interface or an action
+that is paid, sensitive, irreversible, externally consequential, or likely to
+consume a substantial share of the experiment budget if it fails.
 
-Pause for a decision checkpoint when new evidence creates multiple materially
-different routes or could change the core method, objective, baseline, data
-split, metric, formal budget, stopping condition, or paper claim. Present facts,
-uncertainty, two or three routes, costs/information gain, a recommendation, and
-one clear choice. Do not continue until the user chooses.
+Within an issued Goal, reversible evidence-driven adjustments may proceed and
+be recorded when they do not materially change the core method, research
+objective, main baseline, final held-out boundary, paper claim, or meaningful
+cost or risk. Otherwise pause, present facts, uncertainty, two or three routes,
+costs and information gain, a recommendation, and one clear choice. Do not
+continue until the user chooses.
 
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.

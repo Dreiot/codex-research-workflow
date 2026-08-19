@@ -19,6 +19,14 @@ WORK_CONTRACT = (
     / "references"
     / "work-response-contract.md"
 )
+SKILL = ROOT / "skills" / "codex-research-workflow" / "SKILL.md"
+FORMAL_REVIEW = (
+    ROOT
+    / "skills"
+    / "codex-research-workflow"
+    / "references"
+    / "formal-review.md"
+)
 LEGACY_WORK_CONTRACT = (
     ROOT
     / "skills"
@@ -233,15 +241,31 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Controller Handoff", normalized)
         self.assertIn("Pure discussion that makes no repository-state claim", normalized)
         self.assertIn("recipient without it requests one bounded verification", normalized)
-        self.assertIn("Before freezing a publication evaluation", normalized)
+        self.assertIn(
+            "Formal promotion of a publication evaluation records a stable protocol",
+            normalized,
+        )
+        self.assertIn("no-metric preflight-only Goal", normalized)
+        self.assertIn("Observed results may guide", normalized)
+        self.assertIn("final data boundary and split", normalized)
+        self.assertIn("primary metrics and statistical unit", normalized)
+        self.assertIn("Obtain the user's explicit choice", normalized)
+        skill = " ".join(SKILL.read_text(encoding="utf-8").split())
+        self.assertIn("smallest representative case", skill)
+        self.assertIn("final held-out boundary", skill)
+        formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
+        self.assertIn(
+            "not a prerequisite for exploratory or publication-oriented experiment execution",
+            formal_review,
+        )
         self.assertIn("Any `P0` or `P1` requires `REJECT`", normalized)
         self.assertIn("`REJECT` requires at least one such finding", normalized)
         self.assertIn("prefix every finding with `BLOCKED:`", normalized)
         self.assertIn("must not use blocking language", normalized)
         self.assertIn("same response may issue the next Goal", normalized)
         self.assertIn("stop when its acceptance criteria pass", normalized)
-        self.assertIn("Pause for the user's decision", normalized)
-        self.assertIn("wait for an explicit choice before planning or issuing", normalized)
+        self.assertIn("Pause for the user only when credible routes", normalized)
+        self.assertIn("before planning or issuing the next Goal after a pause", normalized)
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)

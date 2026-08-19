@@ -40,6 +40,24 @@ adjustment, and metric generation do not require independent review,
 review-state recording, or a design-only Gate. Issue the next bounded empirical
 Goal when the evidence supports it.
 
+Prefer a restartable end-to-end Goal that reaches scientific metrics.
+Compatibility, label-boundary, resource, and completeness checks should run
+inside that Goal when practical. Do not create a no-metric preflight-only Goal
+merely because the experiment may later support a paper; publication-oriented
+execution does not change this default. A separate smoke may be used only for a
+genuinely untested interface or an action that is paid, sensitive, irreversible,
+externally consequential, or likely to consume a substantial share of the
+experiment budget if it fails. It should cover the smallest representative case
+rather than the dataset-method matrix.
+
+Observed results may guide scientifically justified changes to the method,
+parameters, dataset coverage, resource budget, metrics, and comparisons.
+Preserve material failures and the reasons for consequential changes. Once the
+design stabilizes, rerun a coherent evidence set sufficient for the intended
+paper claim. Describe the final protocol and material adaptations accurately,
+and do not conceal negative evidence that would materially change the
+conclusion.
+
 Default to semantic checks, declared numerical tolerances, material invariants,
 and existing Git identity. Request a content hash only when exact bytes outside
 Git materially affect reproducibility or a known integrity failure is not
@@ -70,11 +88,13 @@ Use one qualified independent review only for explicit formal promotion:
 - changing the core method;
 - raising a paper claim.
 
-Before freezing a publication evaluation, define the relevant data boundary
-and split, method configuration and baselines, primary metrics and statistical
-unit, repetitions, budget, stopping and material-failure rules, provenance,
-and permitted claims. Keep exploratory results exploratory until those choices
-are fixed.
+Formal promotion of a publication evaluation records a stable protocol or key
+result; it is not a prerequisite for running or iterating experiments. Before
+treating results as final paper evidence, document the final data boundary and
+split, method configurations and baselines, primary metrics and statistical
+unit, repetitions, resource, stopping and material-failure rules, provenance,
+and intended claim. Adjustments remain allowed when scientifically justified;
+rerun the evidence needed for the final claim and disclose material changes.
 
 Review the exact candidate identity and relevant evidence. Record a formal
 promotion verdict once. Mechanical verification of its review-state commit is
@@ -162,15 +182,16 @@ content independently warrants an authority update.
 
 ## Decision And Safety Boundaries
 
-Pause for the user's decision when credible routes differ materially or the
-next step may change the core method, objective, main baseline, data split,
-formal metric, budget, stopping rule, or paper claim. Present confirmed facts,
-uncertainty, two or three options, costs and information gain, a recommendation,
-and one explicit question; set `Codex 指令` to `无`.
-
-When a decision point or material question warrants discussion, briefly explain
-the current state and decision, resolve it with the user, and wait for an
-explicit choice before planning or issuing the next work.
+During reversible empirical iteration, the controller may make and record
+scientifically justified adjustments within current authority without creating
+a decision Gate. Pause for the user only when credible routes materially change
+the core method, research objective, main baseline, final held-out boundary,
+paper claim, or meaningful cost or risk. Present confirmed facts, uncertainty,
+two or three options, costs and information gain, a recommendation, and one
+explicit question; set `Codex 指令` to `无`. Obtain the user's explicit choice
+before adopting materially different exploratory choices as the final
+evaluation or paper position, or before planning or issuing the next Goal after
+a pause.
 
 Before pausing, one bounded, low-cost, reversible diagnostic may run when it
 does not change the core method, data split, formal metrics, formal budget, or

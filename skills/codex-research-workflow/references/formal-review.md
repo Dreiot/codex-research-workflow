@@ -13,13 +13,14 @@ Goal without a formal verdict, report, `record-review`, review-state commit, or
 
 ## Formal promotion
 
-Use exactly one qualified independent review only to accept a major
-implementation baseline, freeze a publication evaluation, adopt a key result,
-change the core method, or raise a claim. Prefer a reviewer with direct access
-to the exact GitHub range and evidence. In Chat, this is normally Extra High;
-in Work, it is Work. Use a configured read-only reviewer agent only when no
-qualifying external review exists, evidence conflicts, or the user requests a
-second opinion.
+Use exactly one qualified independent review only when formally adopting a
+major implementation baseline, a stable publication-evaluation protocol, a key
+result, a core-method change, or a higher claim. Formal promotion is not a
+prerequisite for exploratory or publication-oriented experiment execution.
+Prefer a reviewer with direct access to the exact GitHub range and evidence. In
+Chat, this is normally Extra High; in Work, it is Work. Use a configured
+read-only reviewer agent only when no qualifying external review exists,
+evidence conflicts, or the user requests a second opinion.
 
 Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1
 requires `REJECT`; P2 is non-blocking; `BLOCKED` means required evidence or
