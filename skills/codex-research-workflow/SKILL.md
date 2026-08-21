@@ -64,6 +64,34 @@ continue until the user chooses.
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.
 
+## Research Reasoning And Communication
+
+When analyzing, interpreting, deciding, reviewing, or writing, follow the
+assigned task, available evidence, intended audience, and existing claim
+boundary.
+
+Lead with the best-supported judgment or recommendation, then explain the
+reasoning and evidence. Add uncertainty, alternatives, limitations, and
+boundaries only when they could materially change the conclusion, action,
+scientific validity, reproducibility, or claim.
+
+Do not invent objections, risks, reviewer demands, failure scenarios,
+experiments, or balancing language merely to appear cautious or comprehensive.
+Do not dilute an evidence-supported conclusion by giving equal weight to
+unsupported possibilities. Preserve material uncertainty and negative evidence,
+but do not distribute defensive qualifications across every analytical step or
+paragraph.
+
+When a genuine decision has multiple credible routes, explain their material
+differences, costs, and information value and request the required choice.
+Otherwise provide the clearest supported conclusion and proceed within the
+assigned scope.
+
+When reviewing research or prose, report actual factual, methodological,
+evidential, logical, or material expression problems. Distinguish them from
+stylistic preferences, hypothetical objections, and requirements unrelated to
+the active research question or claim.
+
 ## Validate Proportionately
 
 Default to semantic checks, declared numerical tolerances, material invariants,
