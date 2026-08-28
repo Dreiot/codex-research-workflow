@@ -28,6 +28,8 @@ pointers, not authority.
 Report material authority or Git conflicts instead of guessing. A model that
 cannot access GitHub or local state must rely on a visible verified evidence
 packet and state that limitation; it must not claim direct verification.
+Evidence access is capability-based, not inferred from a model tier or product
+surface.
 
 ## Research Flow
 
@@ -89,6 +91,12 @@ Use one qualified independent review only for explicit formal promotion:
 - adopting a key result or statistical conclusion;
 - changing the core method;
 - raising a paper claim.
+
+Qualified independence is from the Codex executor and candidate production,
+not from a particular model tier. A controller with direct access to the exact
+candidate and evidence may perform the single review and continue. If that
+access is unavailable, request one bounded verification packet from a capable
+reviewer.
 
 Formal promotion of a publication evaluation records a stable protocol or key
 result; it is not a prerequisite for running or iterating experiments. Before
@@ -186,8 +194,10 @@ question, target contribution, core method, and claim ceiling; decision-relevant
 positive, negative, and mixed evidence; unresolved or unverified facts;
 conversation-only user decisions and rejected routes with reasons; and one next
 decision or action. A recipient with direct repository access reverifies
-mutable state. A recipient without it requests one bounded verification from
-the assigned reviewer before a mutable-state conclusion or formal promotion.
+mutable state and may perform the required review. A recipient without it
+requests one bounded verification from a reviewer with the required access
+before a mutable-state conclusion or formal promotion. Do not force a model
+switch or duplicate a qualified review.
 
 A handoff is not a formal review, Codex Goal, evidence promotion, or reason to
 update repository authority. Do not persist the packet unless its material

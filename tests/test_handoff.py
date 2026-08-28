@@ -258,6 +258,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("do not load the installed local Codex Skill", normalized)
         self.assertIn("Pure discussion that makes no repository-state claim", normalized)
         self.assertIn("recipient without it requests one bounded verification", normalized)
+        self.assertIn("Evidence access is capability-based", normalized)
+        self.assertIn("may perform the single review and continue", normalized)
+        self.assertIn("Do not force a model switch or duplicate", normalized)
         self.assertIn(
             "Formal promotion of a publication evaluation records a stable protocol",
             normalized,
@@ -280,6 +283,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         )
         self.assertIn("review_report: null", formal_review)
         self.assertIn("Do not create another commit merely to verify", formal_review)
+        self.assertIn("not by model label or surface", formal_review)
+        self.assertIn("may perform the single qualified review and continue", formal_review)
+        self.assertNotIn("normally Extra High", formal_review)
         self.assertIn("Any `P0` or `P1` requires `REJECT`", normalized)
         self.assertIn("`REJECT` requires at least one such finding", normalized)
         self.assertIn("prefix every finding with `BLOCKED:`", normalized)

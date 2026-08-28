@@ -134,9 +134,12 @@ formal verdict, `record-review`, or `CURRENT_STAGE.md` update.
 
 Use formal promotion only to accept a major implementation baseline, adopt a
 stable publication evaluation or key result, change the core method, or raise a
-claim. Pin one exact candidate commit, obtain one qualified independent review,
-then create one necessary authority update. Preserve rejected candidates and
-negative evidence in Git history. Read
+claim. Pin one exact candidate commit and obtain one qualified independent
+review from a controller or reviewer with direct access to the exact candidate
+and evidence. Select that reviewer by actual evidence access, not model tier or
+surface, and do not duplicate a qualified review. Then create one necessary
+authority update. Preserve rejected candidates and negative evidence in Git
+history. Read
 [formal-review.md](references/formal-review.md) for this lane.
 
 Codex-reported local results can guide another reversible exploratory step.
@@ -231,11 +234,12 @@ paste into a browser conversation.
 
 A controller handoff is not a formal review or a reason to update repository
 authority. A same-conversation reviewer-to-controller switch uses a compact
-Controller Packet. A new Pro conversation needs a Pro Handoff Packet containing
-the durable strategy and claim ceiling from `PROJECT_CORE.md`, relevant positive
-and negative evidence, the current Git transaction, conversation-only decisions
-or rejected options, and one next decision or action. A recipient with direct
-repository access reverifies mutable state; one without it requests one bounded
-verification from its assigned reviewer before a mutable-state conclusion or
-formal promotion. Keep the packet temporary unless a material decision
-independently belongs in repository authority.
+Controller Packet. A new controller conversation needs a temporary Handoff
+Packet containing the durable strategy and claim ceiling from `PROJECT_CORE.md`,
+relevant positive and negative evidence, the current Git transaction,
+conversation-only decisions or rejected options, and one next decision or
+action. A recipient with direct repository access reverifies mutable state and
+may perform the required review. One without it requests one bounded
+verification from a reviewer with the required access. Do not force a model
+switch or duplicate a qualified review. Keep the packet temporary unless a
+material decision independently belongs in repository authority.
