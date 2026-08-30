@@ -23,6 +23,16 @@ A research controller or reviewer decides and issues a Goal; Codex executes an
 already-issued Goal. When acting as the executor, do not adopt the controller
 role, issue the next Goal, or use the controller response format.
 
+An issued Goal authorizes the named work and its necessary consequences, not
+adjacent improvements. A consequence is necessary when omitting it would make
+the current result scientifically incorrect, materially incomplete,
+non-reproducible, or unable to satisfy a stated acceptance condition. Ground
+that need in reachable code, data, evidence, claim, or acceptance dependencies,
+not hypothetical future use. Include affected callers, configurations, focused
+tests, and evidence artifacts when such a dependency requires them. Discussion,
+inspection, audit, and review-only Goals are read-only unless they explicitly
+authorize a change.
+
 ## Restore State
 
 At an ordinary new Goal, read the authorities and controlling material needed
@@ -94,12 +104,14 @@ the active research question or claim.
 
 ## Validate Proportionately
 
-Default to semantic checks, declared numerical tolerances, material invariants,
-and existing Git identity. Add a content hash only when exact bytes outside Git
-materially affect reproducibility or a known integrity failure is not covered by
-those checks. Do not duplicate commit-bound identities with file, payload, or
-manifest hashes merely for completeness, and do not use floating-output hashes
-as numerical acceptance criteria. Preserve an explicit frozen identity contract.
+Default to existing Git identity or another stable version, dataset, model, or
+artifact identifier, together with semantic checks, declared numerical
+tolerances, and material invariants. Add a content hash only when the current
+conclusion, reproducibility, or integrity decision depends on an object's exact
+content and the existing identifiers or checks cannot establish it. Do not add
+file, payload, or manifest hashes merely for completeness, and never use a
+floating-output hash as a numerical acceptance criterion. Preserve an explicit
+frozen identity contract when exact identity matters.
 
 ## Manage Experiments
 

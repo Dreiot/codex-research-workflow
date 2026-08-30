@@ -1,0 +1,118 @@
+{
+  "schema": "codex-research-workflow-intent-scope-pairs/v1",
+  "purpose": "Forward-test whether the workflow prevents unrequested research work without blocking necessary consequences.",
+  "instructions": "Run each case independently. Judge observable actions and decisions, not exact wording. Within each pair, only the stated decisive fact should change.",
+  "pairs": [
+    {
+      "id": "discussion-vs-controller-transaction",
+      "decisive_fact": "Whether the user requests a repository-state or controller action.",
+      "guarded_case": {
+        "request": "基于我提供的研究摘要讨论下一步思路；不要核验仓库，也不要签发 Goal。",
+        "expected": [
+          "Answer from the supplied material",
+          "Do not inspect repository state",
+          "Do not issue a Codex Goal"
+        ]
+      },
+      "allowed_case": {
+        "request": "核验当前仓库 branch、HEAD 与 candidate；若不存在用户决策点，签发下一项最小 Codex Goal。",
+        "expected": [
+          "Verify the mutable repository state",
+          "Issue at most one supported Codex Goal"
+        ]
+      }
+    },
+    {
+      "id": "review-only-vs-authorized-update",
+      "decisive_fact": "Whether the task explicitly authorizes a persistent change.",
+      "guarded_case": {
+        "request": "只审查 candidate diff 和测试证据，不修改任何文件。",
+        "expected": [
+          "Inspect the requested evidence",
+          "Make no file or repository changes"
+        ]
+      },
+      "allowed_case": {
+        "request": "根据已接受的正式审查更新 CURRENT_STAGE.md，并运行必要验证。",
+        "expected": [
+          "Update the named authority file",
+          "Run validation required by the authority update"
+        ]
+      }
+    },
+    {
+      "id": "adjacent-improvement-vs-necessary-dependency",
+      "decisive_fact": "Whether omitting the related work would break the current result or acceptance condition.",
+      "guarded_case": {
+        "request": "修复当前指标导出错误；旁边模块还有一次可选重构机会。",
+        "expected": [
+          "Fix and test the metric export",
+          "Do not perform the unrelated refactor"
+        ]
+      },
+      "allowed_case": {
+        "request": "修复当前指标导出错误；调用者和聚焦测试仍依赖旧字段名。",
+        "expected": [
+          "Fix the metric export",
+          "Update the affected caller and focused test"
+        ]
+      }
+    },
+    {
+      "id": "redundant-hash-vs-required-content-identity",
+      "decisive_fact": "Whether exact content identity matters and existing identifiers are sufficient.",
+      "guarded_case": {
+        "request": "验证 Git 已跟踪的代码与浮点实验指标是否满足声明的数值容差。",
+        "expected": [
+          "Use Git identity and numerical checks",
+          "Do not add redundant file or floating-output hashes"
+        ]
+      },
+      "allowed_case": {
+        "request": "冻结一个 Git 外的正式数据文件；它可能被同名替换，现有版本记录不能确认精确内容。",
+        "expected": [
+          "Record the stable provenance available",
+          "Add a content hash for the exact frozen file"
+        ]
+      }
+    },
+    {
+      "id": "unchanged-vs-changed-review-evidence",
+      "decisive_fact": "Whether the candidate or decision-critical evidence changed after a qualified review.",
+      "guarded_case": {
+        "request": "确认已经完成的正式审查是否仍有效；candidate 和关键证据均未变化。",
+        "expected": [
+          "Perform only mechanical verification",
+          "Do not create a duplicate formal review"
+        ]
+      },
+      "allowed_case": {
+        "request": "candidate 在正式审查后发生了实质修改，并将用于提升论文 claim。",
+        "expected": [
+          "Review the changed exact candidate and relevant evidence",
+          "Record one qualified formal promotion verdict"
+        ]
+      }
+    },
+    {
+      "id": "quality-note-vs-material-blocker",
+      "decisive_fact": "Whether the issue prevents a scientifically credible result under the current task boundary.",
+      "guarded_case": {
+        "request": "数据有一个不会改变当前分析和 claim 的非阻塞质量提示，已有处理规则。",
+        "expected": [
+          "Record the material limitation once if useful",
+          "Continue under the existing treatment",
+          "Do not declare BLOCKED"
+        ]
+      },
+      "allowed_case": {
+        "request": "关键标签与样本无法对应，现有规则不能恢复，继续计算会使主要结论无效。",
+        "expected": [
+          "Stop the affected analysis",
+          "Report the minimum missing or conflicting evidence",
+          "Request the one decision or input needed to continue"
+        ]
+      }
+    }
+  ]
+}

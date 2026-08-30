@@ -148,8 +148,12 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Default to the shortest empirical loop",
             "Local, recoverable, no-cost work",
             "Use the simplest correct, testable implementation",
-            "Prefer semantic checks, declared numerical tolerances",
-            "Do not add redundant hashes or use floating-output hashes",
+            "A Goal authorizes the named work and necessary consequences",
+            "review-only Goals are read-only unless they explicitly authorize a change",
+            "Include affected callers, configurations, focused tests",
+            "Prefer existing Git or other stable identities",
+            "Add a content hash only when exact content matters",
+            "Never use floating-output hashes as numerical acceptance criteria",
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
@@ -208,6 +212,8 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("达到验收目标即停止", work_prompt)
         self.assertIn("最多给出一个 Codex Goal", work_prompt)
         self.assertIn("无需逐次询问", work_prompt)
+        self.assertIn("纯讨论、解释、构思或已有材料分析不得自动升级", work_prompt)
+        self.assertIn("只授权命名工作及其必要后果", work_prompt)
 
         codex_prompt = prompts["codex"]
         self.assertIn("默认执行探索流程", codex_prompt)
@@ -219,9 +225,12 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("主动询问用户", codex_prompt)
         self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
         self.assertIn("达到验收目标即停止", codex_prompt)
+        self.assertIn("Goal 只授权其中命名的工作及其必要后果", codex_prompt)
+        self.assertIn("review-only Goal 默认只读", codex_prompt)
         self.assertIn("你是执行端，不是 Research Controller", codex_prompt)
         self.assertIn("不得使用 Work Response Contract 四段式", codex_prompt)
-        self.assertIn("不得自行增加冗余 hash", codex_prompt)
+        self.assertIn("现有身份或检查不足时才增加 content hash", codex_prompt)
+        self.assertIn("不得为完整性装饰增加 hash", codex_prompt)
         self.assertIn("不得把浮点结果 hash 作为验收条件", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
@@ -257,6 +266,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Controller Handoff", normalized)
         self.assertIn("do not load the installed local Codex Skill", normalized)
         self.assertIn("Pure discussion that makes no repository-state claim", normalized)
+        self.assertIn("Do not turn pure discussion, explanation, ideation", normalized)
+        self.assertIn("authorizing the named work and its necessary consequences", normalized)
+        self.assertIn("reachable code, data, evidence, claim, or acceptance dependencies", normalized)
         self.assertIn("recipient without it requests one bounded verification", normalized)
         self.assertIn("Evidence access is capability-based", normalized)
         self.assertIn("may perform the single review and continue", normalized)
@@ -275,6 +287,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("final held-out boundary", skill)
         self.assertIn("lightweight local precheck", skill)
         self.assertIn("does not require commit or push", skill)
+        self.assertIn("An issued Goal authorizes the named work and its necessary consequences", skill)
+        self.assertIn("review-only Goals are read-only unless they explicitly authorize a change", skill)
+        self.assertIn("existing identifiers or checks cannot establish it", skill)
         self.assertNotIn("never shorten, replace, or declare them redundant", skill)
         formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
         self.assertIn(
@@ -297,10 +312,12 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
-        self.assertIn("Default to semantic checks", normalized)
-        self.assertIn("Do not duplicate commit-bound identities", normalized)
-        self.assertIn("never use floating-output hashes as numerical acceptance criteria", normalized)
-        self.assertIn("Preserve an explicit frozen identity contract", normalized)
+        self.assertIn("another stable version, dataset, model, or artifact identifier", normalized)
+        self.assertIn("depends on an object's exact content", normalized)
+        self.assertIn("existing identifiers or checks cannot establish it", normalized)
+        self.assertIn("never use a floating-output hash as a numerical acceptance criterion", normalized)
+        self.assertIn("Preserve an explicit frozen identity contract when exact identity matters", normalized)
+        self.assertNotIn("exact bytes outside Git", normalized)
         self.assertIn("An executing Codex instead reports the actual outcome", normalized)
         self.assertIn("it does not output `Codex 指令`", normalized)
         self.assertNotIn("or Codex transaction", contract)

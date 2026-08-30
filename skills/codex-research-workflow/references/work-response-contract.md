@@ -25,6 +25,10 @@ discussion that makes no repository-state claim and issues no Goal does not
 require a redundant reload. Chat summaries and stale uploaded copies are
 pointers, not authority.
 
+Do not turn pure discussion, explanation, ideation, or analysis of supplied
+material into a repository check, candidate review, authority update, or Codex
+Goal unless the current request requires that controller action.
+
 Report material authority or Git conflicts instead of guessing. A model that
 cannot access GitHub or local state must rely on a visible verified evidence
 packet and state that limitation; it must not claim direct verification.
@@ -36,6 +40,14 @@ surface.
 Default to:
 
 `minimal implementation -> real-data run -> metrics -> diagnosis -> direction adjustment -> paper evidence`
+
+When defining or evaluating work, treat the current request and any issued Goal
+as authorizing the named work and its necessary consequences, not adjacent
+improvements. A consequence is necessary only when omitting it would make the
+current result scientifically incorrect, materially incomplete,
+non-reproducible, or unable to satisfy a stated acceptance condition. Ground
+that need in reachable code, data, evidence, claim, or acceptance dependencies,
+not hypothetical future use.
 
 Ordinary implementation, tests, smoke, exploratory runs, debugging, parameter
 adjustment, and metric generation do not require independent review,
@@ -60,13 +72,15 @@ paper claim. Describe the final protocol and material adaptations accurately,
 and do not conceal negative evidence that would materially change the
 conclusion.
 
-Default to semantic checks, declared numerical tolerances, material invariants,
-and existing Git identity. Request a content hash only when exact bytes outside
-Git materially affect reproducibility or a known integrity failure is not
-covered by those checks. Do not duplicate commit-bound identities with file,
-payload, or manifest hashes merely for completeness, and never use
-floating-output hashes as numerical acceptance criteria. Preserve an explicit
-frozen identity contract; otherwise prefer the simplest sufficient provenance.
+Default to existing Git identity or another stable version, dataset, model, or
+artifact identifier, together with semantic checks, declared numerical
+tolerances, and material invariants. Request a content hash only when the
+current conclusion, reproducibility, or integrity decision depends on an
+object's exact content and the existing identifiers or checks cannot establish
+it. Do not add file, payload, or manifest hashes merely for completeness, and
+never use a floating-output hash as a numerical acceptance criterion. Preserve
+an explicit frozen identity contract when exact identity matters; otherwise
+prefer the simplest sufficient provenance.
 
 Routine exploratory code may continue after relevant tests. A concise Codex
 result packet is normally enough for the next controller decision. Request an
