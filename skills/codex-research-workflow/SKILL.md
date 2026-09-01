@@ -71,6 +71,20 @@ cost or risk. Otherwise pause, present facts, uncertainty, two or three routes,
 costs and information gain, a recommendation, and one clear choice. Do not
 continue until the user chooses.
 
+During exploration, actively identify and rank mechanism-matched datasets,
+subgroups, regimes, parameter ranges, metrics, and comparisons that show the
+method's clearest positive value. Report their mechanism rationale, positive
+evidence, supportable claim, exploratory origin, material counterevidence, and
+smallest useful follow-up to the controller or user. Do not require uniform
+wins or let mechanism-mismatched settings dominate the method assessment.
+
+The user decides which post-hoc positive findings guide follow-up work, formal
+claims, or the paper narrative. Codex does not independently promote them or
+insert their exploratory provenance into manuscript or reviewer-response text.
+Do not describe a post-hoc choice as prespecified. If the selection materially
+affects statistical interpretation or claim validity, flag that once for the
+user's decision; otherwise continue within the selected scope.
+
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.
 

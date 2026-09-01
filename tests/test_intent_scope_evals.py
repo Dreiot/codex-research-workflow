@@ -11,7 +11,7 @@ class IntentScopeEvalCatalogueTest(unittest.TestCase):
     def test_pairs_are_complete_and_minimally_contrasted(self):
         payload = json.loads(CASES.read_text(encoding="utf-8"))
         self.assertEqual(payload["schema"], "codex-research-workflow-intent-scope-pairs/v1")
-        self.assertEqual(len(payload["pairs"]), 6)
+        self.assertEqual(len(payload["pairs"]), 7)
 
         identifiers = set()
         for pair in payload["pairs"]:
