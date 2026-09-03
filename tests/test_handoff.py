@@ -158,12 +158,14 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
+            "A decision-complete Codex result packet normally supports the next decision",
             "Optional implementation inspection does not require commit or push",
             "only for an explicit formal promotion",
             "accepted implementation candidate",
             "Research-controller responses must follow the public Work Response Contract",
             "Codex is the executor, not the research controller",
             "must not use the controller four-section format",
+            "repository paths support verification and do not replace that summary",
             "A clean review-state verification may be followed by the next Goal",
             "Verification of a formal review-state commit is mechanical closure",
             "Automatic context compaction alone is not a reason",
@@ -211,6 +213,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("机械验收通过后可立即签发下一 Goal", work_prompt)
         self.assertIn("真实数据运行", work_prompt)
         self.assertIn("达到验收目标即停止", work_prompt)
+        self.assertIn("简洁且 decision-complete 地输出", work_prompt)
         self.assertIn("最多给出一个 Codex Goal", work_prompt)
         self.assertIn("无需逐次询问", work_prompt)
         self.assertIn("纯讨论、解释、构思或已有材料分析不得自动升级", work_prompt)
@@ -221,7 +224,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("普通 Goal 只做轻量本地核对", codex_prompt)
         self.assertIn("不要重复网页控制器已经完成的远端审查", codex_prompt)
         self.assertIn("普通探索不要求提交、push、审查或状态落库", codex_prompt)
-        self.assertIn("结果包足以支持下一步时", codex_prompt)
+        self.assertIn("结果包在保留下一决策所需科研实质后再精简", codex_prompt)
         self.assertIn("才启动一次独立审查和 review-state", codex_prompt)
         self.assertIn("主动询问用户", codex_prompt)
         self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
@@ -234,6 +237,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Git 外不可变文件必须锁定到精确字节", codex_prompt)
         self.assertIn("不得重复 hash Git 已跟踪文件", codex_prompt)
         self.assertIn("不得整体 hash 环境、目录、缓存", codex_prompt)
+        self.assertIn("仓库路径用于复核，不能替代核心信息", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
@@ -263,6 +267,12 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("do not require independent review, review-state recording", normalized)
         self.assertIn("only for explicit formal promotion", normalized)
         self.assertIn("optional implementation inspection only when tests and results", normalized)
+        self.assertIn("A decision-complete Codex result packet", normalized)
+        self.assertIn("concise but decision-complete", normalized)
+        self.assertIn(
+            "replace a decision-complete report with a commit/path/validation-only",
+            normalized,
+        )
         self.assertIn("requires no commit or push unless", normalized)
         self.assertIn("Existing tracked reports, configurations, results", normalized)
         self.assertIn("Controller Handoff", normalized)
@@ -293,6 +303,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("review-only Goals are read-only unless they explicitly authorize a change", skill)
         self.assertIn("no stable identifier is sufficient", skill)
         self.assertIn("Do not hash a Git-tracked file again", skill)
+        self.assertIn("their paths are verification pointers", skill)
         self.assertNotIn("never shorten, replace, or declare them redundant", skill)
         formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
         self.assertIn(
@@ -328,8 +339,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("one authority for each mutable fact", normalized)
         self.assertIn("named held-out execution within the current Goal", normalized)
         self.assertIn("Do not request the same authorization twice", normalized)
-        self.assertIn("An executing Codex instead reports the actual outcome", normalized)
-        self.assertIn("it does not output `Codex 指令`", normalized)
+        self.assertIn("An executing Codex follows its installed Skill", normalized)
+        self.assertIn("and does not output `Codex 指令`", normalized)
+        self.assertNotIn("A concise Codex result packet", normalized)
         self.assertNotIn("or Codex transaction", contract)
         self.assertNotIn("work-response-contract-v1", contract)
 

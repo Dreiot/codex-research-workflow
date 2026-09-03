@@ -2,14 +2,14 @@
 
 ## Optional implementation inspection
 
-Routine exploratory code continues after task-relevant tests, and its Codex
-result packet normally supports the next controller decision. Request an
-inspection only when tests and results cannot establish the required
-correctness or the exact diff is needed to interpret evidence. The reviewer may
-inspect uncommitted work. Commit and push only when the reviewer needs GitHub
-access or the work is entering formal promotion. The inspection may guide repair
-or the next Goal without a formal verdict, report, `record-review`, review-state
-commit, or `CURRENT_STAGE.md` update.
+Routine exploratory code continues after task-relevant tests, and its
+decision-complete Codex result packet normally supports the next controller
+decision. Request an inspection only when tests and results cannot establish
+the required correctness or the exact diff is needed to interpret evidence.
+The reviewer may inspect uncommitted work. Commit and push only when the
+reviewer needs GitHub access or the work is entering formal promotion. The
+inspection may guide repair or the next Goal without a formal verdict, report,
+`record-review`, review-state commit, or `CURRENT_STAGE.md` update.
 
 ## Formal promotion
 

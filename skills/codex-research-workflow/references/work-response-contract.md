@@ -64,11 +64,11 @@ externally consequential, or likely to consume a substantial share of the
 experiment budget if it fails. It should cover the smallest representative case
 rather than the dataset-method matrix.
 
-Keep outputs decision-complete rather than exhaustive. Do not generate a
-Cartesian product of scenario sets, metrics, display choices, registries, and
-file formats, or prepare future audit plans, unless the current decision needs
-them. Preserve reusable source data and generation code, then render additional
-variants after the user selects them.
+Keep generated evidence and deliverables decision-complete rather than
+exhaustive. Do not generate a Cartesian product of scenario sets, metrics,
+display choices, registries, and file formats, or prepare future audit plans,
+unless the current decision needs them. Preserve reusable source data and
+generation code, then render additional variants after the user selects them.
 
 Observed results may guide scientifically justified changes to the method,
 parameters, dataset coverage, resource budget, metrics, and comparisons.
@@ -96,13 +96,15 @@ transformation. Do not revalidate unrelated accepted candidates or require byte
 preservation when Git identity, a focused diff, or semantic invariants already
 establish the needed fact.
 
-Routine exploratory code may continue after relevant tests. A concise Codex
-result packet is normally enough for the next controller decision. Request an
-optional implementation inspection only when tests and results cannot establish
-the required correctness or the exact diff is needed to interpret evidence. It
-may inspect uncommitted work and requires no commit or push unless the reviewer
-needs GitHub access or the work is entering formal promotion. It creates no
-formal verdict, review report, review-state commit, or new Gate.
+Routine exploratory code may continue after relevant tests. A decision-complete
+Codex result packet is normally enough for the next controller decision; make
+it concise only after retaining the scientific substance needed for that
+decision. Request an optional implementation inspection only when tests and
+results cannot establish the required correctness or the exact diff is needed
+to interpret evidence. It may inspect uncommitted work and requires no commit
+or push unless the reviewer needs GitHub access or the work is entering formal
+promotion. It creates no formal verdict, review report, review-state commit, or
+new Gate.
 
 A controller may use Codex-reported local results for the next reversible
 exploratory step without a second reviewer check. Before a durable direction,
@@ -154,15 +156,15 @@ Codex Goal, use:
 3. `## 验收目标`
 4. `## Codex 指令`
 
-Keep the first three sections concise. Under `## Codex 指令`, include at most
-one fenced `markdown` block containing one executable Goal. Use `无` when no
-repository action is justified. Simple discussion that does not make one of
-the decisions above and an explicit controller handoff need not use this
-format.
+Keep the first three sections concise but decision-complete; remove repeated
+background before removing evidence needed for the current conclusion or
+choice. Under `## Codex 指令`, include at most one fenced `markdown` block
+containing one executable Goal. Use `无` when no repository action is justified.
+Simple discussion that does not make one of the decisions above and an explicit
+controller handoff need not use this format.
 
-These headings are controller output. An executing Codex instead reports the
-actual outcome, changed paths, validation or experiment results, commit/push
-state, and unresolved items or blockers; it does not output `Codex 指令`.
+These headings are controller output. An executing Codex follows its installed
+Skill for a decision-complete final report and does not output `Codex 指令`.
 
 ### Review Semantics
 
@@ -214,9 +216,11 @@ clauses already implied by the cited authorities, merge repeated validation,
 stop, and return requirements, and retain only necessary task-specific scope,
 exceptions, and acceptance evidence. State a negative boundary only for a
 plausible adjacent action that would materially change the result or permission
-boundary. Do not repeat the executor's default final-report fields. A complex
-Goal may remain long when required detail is not already authoritative; length
-itself is not evidence of rigor. Stop when its acceptance criteria pass.
+boundary. Do not repeat the executor's default final-report fields or replace a
+decision-complete report with a commit/path/validation-only `Return` checklist.
+Omit a return schema unless the task has a nonstandard reporting requirement. A
+complex Goal may remain long when required detail is not already authoritative;
+length itself is not evidence of rigor. Stop when its acceptance criteria pass.
 Historical or batch cleanup additionally invokes `$research-artifact-cleanup`.
 
 When an authorization manifest, runtime guard, and result registry coexist,
@@ -283,13 +287,13 @@ authorities explicitly require it.
 ## Skeleton
 
     ## 审查结果
-    <Concise state, review, verification, or decision conclusion.>
+    <Concise, decision-complete state, review, verification, or decision conclusion.>
 
     ## 设计目标
     <Next useful research action.>
 
     ## 验收目标
-    <Minimal completion evidence.>
+    <Evidence needed to decide completion.>
 
     ## Codex 指令
     ```markdown

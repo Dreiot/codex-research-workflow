@@ -72,11 +72,11 @@ material external quota, new sensitive data or credentials, destructive or
 irreversible external effects, material budget expansion, or a change to the
 evaluation or claim boundary. Do not request the same authorization twice.
 
-Keep outputs decision-complete rather than exhaustive. Do not generate a
-Cartesian product of scenario sets, metrics, display choices, registries, and
-file formats, or prepare future audit plans, unless the current decision needs
-them. Preserve reusable source data and generation code, then render additional
-variants after the user selects them.
+Keep generated evidence and deliverables decision-complete rather than
+exhaustive. Do not generate a Cartesian product of scenario sets, metrics,
+display choices, registries, and file formats, or prepare future audit plans,
+unless the current decision needs them. Preserve reusable source data and
+generation code, then render additional variants after the user selects them.
 
 Within an issued Goal, reversible evidence-driven adjustments may proceed and
 be recorded when they do not materially change the core method, research
@@ -181,8 +181,10 @@ material for a durable controller decision or formal promotion.
 
 ## Review Code And Evidence
 
-Routine exploratory code may continue after task-relevant tests pass. A concise
-Codex result packet is normally enough for the controller. Request an optional
+Routine exploratory code may continue after task-relevant tests pass. A
+decision-complete Codex result packet is normally enough for the controller;
+make it concise only after retaining the scientific substance needed for the
+next decision. Request an optional
 implementation inspection only when tests and results cannot establish the
 needed correctness or the exact diff is needed to interpret evidence. It may
 inspect uncommitted work and does not require commit or push unless the reviewer
@@ -274,17 +276,36 @@ merge repeated validation, stop, and return requirements, and retain only the
 current task's necessary scope, exceptions, and acceptance evidence. State a
 negative boundary only for a plausible adjacent action that would materially
 change the result or permission boundary. Do not repeat the executor's default
-final-report fields. A complex Goal may remain long when the required detail is
-not already authoritative; length itself is not evidence of rigor.
+final-report fields or replace a decision-complete report with a
+commit/path/validation-only `Return` checklist. Omit a return schema unless the
+task has a nonstandard reporting requirement. A complex Goal may remain long
+when the required detail is not already authoritative; length itself is not
+evidence of rigor.
 
 Read [work-response-contract.md](references/work-response-contract.md) before
 generating or evaluating a controller response. Only the user may authorize
 changing that contract.
 
-The Contract does not govern a Codex executor's final report. After executing a
-Goal, report only the actual outcome, changed paths, validation or experiment
-results, commit/push state, and unresolved items or blockers. Do not output the
-controller headings or a `Codex 指令` section.
+The Contract does not govern a Codex executor's final report. For ordinary
+mechanical implementation, report the actual outcome, changed paths,
+task-relevant validation, commit/push state, and unresolved items or blockers.
+
+When execution produces or records decision-relevant scientific evidence,
+closes a formal review or authority transaction, or performs an explicit
+handoff, make the final report self-contained enough for the controller to
+understand the substantive result and evaluate the next decision. Include the
+best-supported conclusion and, as applicable, key quantitative comparisons,
+material positive, negative, or mixed evidence, scientific interpretation and
+claim boundary, unresolved blockers, and a supported next action or exact
+decision when one remains. For a docs-only authority update, summarize the
+recorded substantive verdict or finding and its operative consequence, not only
+the commit and changed paths. Repository artifacts remain authoritative when
+fresh verification is required; their paths are verification pointers, not
+substitutes for this core information.
+
+Scale detail to the decision. Do not reproduce complete authorities, raw logs,
+exhaustive tables, or unrelated file inventories. Do not output the controller
+headings or a `Codex 指令` section, and do not issue the next Goal.
 
 ## Explicit Handoff
 
