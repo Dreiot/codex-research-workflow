@@ -127,8 +127,8 @@ experiments/
 | `workflow.py migrate` | 补充新策略，不移动产物、不重写科研内容 |
 | `workflow.py audit` | 在 commit/push、正式提升、权威更新、显式交接或实质状态冲突前执行完整核验 |
 | `workflow.py prepare-experiment` | 按需生成忽略的 `research-experiment-run/v1` 清单 |
-| `workflow.py prepare-evidence` | 建立跟踪的 `research-evidence-candidate/v1` 证据包 |
-| `workflow.py validate-evidence` | 校验 schema、报告章节、hash 和 Git 可访问性 |
+| `workflow.py prepare-evidence` | 建立跟踪的 `research-evidence-candidate/v2` 证据包 |
+| `workflow.py validate-evidence` | 校验 schema、报告章节、产物完整性和 Git 可访问性，并兼容旧 v1 hash 校验 |
 | `workflow.py record-review` | 记录一次明确的正式提升审查 |
 | `workflow.py resume-prompt` | 生成精简的 Codex 或 Work 恢复 Prompt |
 | `cleanup.py plan` | 盘点指定路径并生成被忽略的状态绑定计划 |

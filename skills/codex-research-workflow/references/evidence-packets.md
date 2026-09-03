@@ -21,14 +21,14 @@ analysis_report.md
 metrics.json       # only when the task produces numerical results
 ```
 
-The manifest uses `research-evidence-candidate/v1` and records:
+New manifests use `research-evidence-candidate/v2` and record:
 
 - experiment and candidate IDs;
 - candidate kind;
 - exact code commit;
 - source run IDs;
 - configuration pointer;
-- evidence file paths and SHA-256 values;
+- evidence file paths, whose committed Git identity provides byte provenance;
 - task-specific validator command/status when applicable; and
 - the exact question for the controller or reviewer.
 
@@ -46,8 +46,14 @@ If required material is unsuitable for Git, stop for a user choice among a
 necessary subset, an approved accessible store, or an explicit insufficient-
 evidence outcome. Never enable Git LFS automatically.
 
-`validate-evidence` checks schema, hashes, Git accessibility, references, and
-required report sections. It cannot determine scientific sufficiency.
+`validate-evidence` checks schema, artifact-list completeness, Git
+accessibility, references, and required report sections. It does not hash
+tracked packet files. Legacy `research-evidence-candidate/v1` manifests retain
+their recorded SHA-256 checks for compatibility. If an active decision truly
+needs the exact bytes of a Git-external immutable file, record and validate that
+identity in the task-specific protocol or validator; do not add hashes to the
+packet merely for completeness. Structural validation cannot determine
+scientific sufficiency.
 
 A temporary Controller or Pro Handoff Packet is not a research evidence packet
 and does not need to be committed.

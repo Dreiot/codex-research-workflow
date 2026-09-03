@@ -118,14 +118,22 @@ the active research question or claim.
 
 ## Validate Proportionately
 
-Default to existing Git identity or another stable version, dataset, model, or
-artifact identifier, together with semantic checks, declared numerical
-tolerances, and material invariants. Add a content hash only when the current
-conclusion, reproducibility, or integrity decision depends on an object's exact
-content and the existing identifiers or checks cannot establish it. Do not add
-file, payload, or manifest hashes merely for completeness, and never use a
-floating-output hash as a numerical acceptance criterion. Preserve an explicit
-frozen identity contract when exact identity matters.
+Do not calculate or require a content hash by default. Prefer Git commit/blob
+identity or another stable dataset, model, or artifact version, together with
+semantic checks, material-field checks, declared numerical tolerances, and
+material invariants.
+
+Use SHA-256 only for one specifically identified Git-external immutable file
+whose exact bytes must be frozen for the active decision or run and for which no
+stable identifier is sufficient. State the file and why byte identity matters.
+Do not hash a Git-tracked file again, a complete environment, directory, cache,
+report, registry, manifest, or dynamic output. Never use byte equality for
+floating or stochastic results or as evidence of scientific validity.
+
+An approved project-level frozen contract remains authoritative, but it does
+not justify adding redundant hashes or exact matching of immaterial fields. If
+relaxing an existing contract would change a formal evaluation boundary, stop
+and request that scoped project amendment rather than bypassing it.
 
 ## Manage Experiments
 

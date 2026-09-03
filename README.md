@@ -131,8 +131,8 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 | `workflow.py migrate` | add current policy without moving artifacts or rewriting scientific content |
 | `workflow.py audit` | full check before commit/push, formal promotion, authority updates, explicit handoff, or material state conflicts |
 | `workflow.py prepare-experiment` | create an ignored `research-experiment-run/v1` manifest on demand |
-| `workflow.py prepare-evidence` | scaffold a tracked `research-evidence-candidate/v1` packet |
-| `workflow.py validate-evidence` | validate schema, report structure, hashes, and Git accessibility |
+| `workflow.py prepare-evidence` | scaffold a tracked `research-evidence-candidate/v2` packet |
+| `workflow.py validate-evidence` | validate schema, report structure, artifact completeness, and Git accessibility; retain legacy v1 hash checks |
 | `workflow.py record-review` | record one explicit formal-promotion result |
 | `workflow.py resume-prompt` | generate a compact Codex or Work restart prompt |
 | `cleanup.py plan` | inventory approved paths and generate an ignored, state-bound plan |

@@ -30,7 +30,9 @@ WORK_CONTRACT_URL = (
 EXPERIMENT_ROOT_DEFAULT = Path("experiments")
 EXPERIMENT_ID_RE = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,62})$")
 RUN_SCHEMA = "research-experiment-run/v1"
-EVIDENCE_SCHEMA = "research-evidence-candidate/v1"
+EVIDENCE_SCHEMA = "research-evidence-candidate/v2"
+LEGACY_EVIDENCE_SCHEMA = "research-evidence-candidate/v1"
+EVIDENCE_SCHEMAS = {EVIDENCE_SCHEMA, LEGACY_EVIDENCE_SCHEMA}
 RUN_STATUSES = {"running", "completed", "failed", "interrupted"}
 EVIDENCE_KINDS = {"direction_decision", "formal_evidence", "implementation_review"}
 EVIDENCE_REPORT_HEADINGS = {
@@ -282,10 +284,12 @@ def initialize_authorities(repo: Path) -> List[str]:
             "final held-out evaluation work.\n"
             "- Use the simplest correct, testable implementation. Do not add speculative abstractions "
             "or design-only Gates unless they directly block the current research decision.\n"
-            "- Prefer existing Git or other stable identities, semantic checks, declared numerical tolerances, "
-            "and material invariants. Add a content hash only when exact content matters to the current "
-            "conclusion, reproducibility, or integrity decision and existing identifiers or checks are "
-            "insufficient. Never use floating-output hashes as numerical acceptance criteria.\n"
+            "- Do not require a content hash by default. Prefer Git commit/blob or another stable identity, "
+            "material-field and semantic checks, declared numerical tolerances, and material invariants. "
+            "Use SHA-256 only for a specifically identified Git-external immutable file whose exact bytes "
+            "matter and lack a sufficient stable identity. Do not hash Git-tracked files again, complete "
+            "environments, directories, caches, reports, registries, manifests, or dynamic outputs. Never "
+            "use byte equality for floating or stochastic results or as evidence of scientific validity.\n"
             "- Stop when acceptance criteria pass or metrics are sufficient to choose the next direction.\n\n"
             "## Review And State\n\n"
             "- Exploratory implementation, tests, smoke, debugging, parameter adjustment, and metric "
@@ -1080,14 +1084,21 @@ def evidence_manifest(
     candidate_id: str,
     base: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    artifacts: Dict[str, str] = {}
     target = repo / rel_dir
-    for path in sorted(target.iterdir()):
-        if path.is_file() and path.name != "manifest.json":
-            artifacts[path.name] = sha256_file(path)
     manifest = dict(base or {})
+    schema = manifest.get("schema", EVIDENCE_SCHEMA)
+    artifact_names = [
+        path.name
+        for path in sorted(target.iterdir())
+        if path.is_file() and path.name != "manifest.json"
+    ]
+    if schema == LEGACY_EVIDENCE_SCHEMA:
+        artifacts: Any = {name: sha256_file(target / name) for name in artifact_names}
+    else:
+        schema = EVIDENCE_SCHEMA
+        artifacts = artifact_names
     manifest.update({
-        "schema": EVIDENCE_SCHEMA,
+        "schema": schema,
         "experiment_id": experiment_id,
         "candidate_id": candidate_id,
         "artifacts": artifacts,
@@ -1157,7 +1168,8 @@ def command_validate_evidence(args: argparse.Namespace) -> int:
         if not manifest_path.is_file() or not report_path.is_file() or not report_path.read_text(encoding="utf-8").strip():
             raise ValueError("evidence candidate requires non-empty manifest.json and analysis_report.md")
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if manifest.get("schema") != EVIDENCE_SCHEMA:
+        schema = manifest.get("schema")
+        if schema not in EVIDENCE_SCHEMAS:
             raise ValueError("invalid evidence schema")
         required = {
             "experiment_id",
@@ -1198,10 +1210,31 @@ def command_validate_evidence(args: argparse.Namespace) -> int:
             manifest_path.write_text(json.dumps(refreshed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             manifest = refreshed
         errors: List[str] = []
-        for name, expected in manifest.get("artifacts", {}).items():
-            path = target / name
-            if not path.is_file() or sha256_file(path) != expected:
-                errors.append(f"artifact hash mismatch: {name}")
+        artifacts = manifest.get("artifacts")
+        if schema == LEGACY_EVIDENCE_SCHEMA:
+            if not isinstance(artifacts, dict):
+                raise ValueError("legacy evidence artifacts must be a hash map")
+            for name, expected in artifacts.items():
+                path = target / name
+                if not path.is_file() or sha256_file(path) != expected:
+                    errors.append(f"artifact hash mismatch: {name}")
+        else:
+            if (
+                not isinstance(artifacts, list)
+                or not all(isinstance(name, str) and name for name in artifacts)
+                or len(set(artifacts)) != len(artifacts)
+            ):
+                raise ValueError("evidence artifacts must be a unique path array")
+            expected_names = set(artifacts)
+            actual_names = {
+                path.name
+                for path in target.iterdir()
+                if path.is_file() and path.name != "manifest.json"
+            }
+            for name in sorted(expected_names - actual_names):
+                errors.append(f"artifact missing: {name}")
+            for name in sorted(actual_names - expected_names):
+                errors.append(f"artifact not listed: {name}")
         for path in target.iterdir():
             if path.is_file() and not git_accessible(repo, path.relative_to(repo)):
                 errors.append(f"artifact is not tracked or staged: {path.relative_to(repo).as_posix()}")
@@ -1365,9 +1398,11 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "合格的独立审查不得重复；机械验收不得生成新的审查报告。完成后报告实际 "
             "diff、验证、实验指标、commit/push 和未闭环事项。达到验收目标即停止，不调查相邻问题。"
             "你是执行端，不是 Research Controller；最终不得使用 Work Response Contract 四段式或输出 "
-            "`Codex 指令`。默认采用现有 Git 或其他稳定身份、语义验证、声明的数值容差和关键不变量。"
-            "只有当前结论、复现或完整性判断依赖对象的精确内容，且现有身份或检查不足时才增加 content "
-            "hash；不得为完整性装饰增加 hash，也不得把浮点结果 hash 作为验收条件。"
+            "`Codex 指令`。默认不计算或要求 content hash；采用 Git commit/blob 或其他稳定身份、关键字段、"
+            "语义验证、声明的数值容差和关键不变量。只有一个明确的 Git 外不可变文件必须锁定到精确字节，"
+            "且没有足够的稳定身份时，才对该文件使用 SHA-256 并说明理由。不得重复 hash Git 已跟踪文件，"
+            "不得整体 hash 环境、目录、缓存、报告、registry、manifest 或动态输出，也不得把字节一致性作为"
+            "浮点或随机结果以及科研有效性的验收条件。"
             "对已获授权的本地、可恢复、无付费真实数据工作不得增加 Gate；仅在涉及付费、敏感数据、"
             "外部副作用、破坏性或不可逆操作时主动询问用户。"
         )

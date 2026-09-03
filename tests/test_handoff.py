@@ -151,9 +151,10 @@ class HandoffIntegrationTest(unittest.TestCase):
             "A Goal authorizes the named work and necessary consequences",
             "review-only Goals are read-only unless they explicitly authorize a change",
             "Include affected callers, configurations, focused tests",
-            "Prefer existing Git or other stable identities",
-            "Add a content hash only when exact content matters",
-            "Never use floating-output hashes as numerical acceptance criteria",
+            "Do not require a content hash by default",
+            "Use SHA-256 only for a specifically identified Git-external immutable file",
+            "Do not hash Git-tracked files again",
+            "Never use byte equality for floating or stochastic results",
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
@@ -229,9 +230,10 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("review-only Goal 默认只读", codex_prompt)
         self.assertIn("你是执行端，不是 Research Controller", codex_prompt)
         self.assertIn("不得使用 Work Response Contract 四段式", codex_prompt)
-        self.assertIn("现有身份或检查不足时才增加 content hash", codex_prompt)
-        self.assertIn("不得为完整性装饰增加 hash", codex_prompt)
-        self.assertIn("不得把浮点结果 hash 作为验收条件", codex_prompt)
+        self.assertIn("默认不计算或要求 content hash", codex_prompt)
+        self.assertIn("Git 外不可变文件必须锁定到精确字节", codex_prompt)
+        self.assertIn("不得重复 hash Git 已跟踪文件", codex_prompt)
+        self.assertIn("不得整体 hash 环境、目录、缓存", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
@@ -289,7 +291,8 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("does not require commit or push", skill)
         self.assertIn("An issued Goal authorizes the named work and its necessary consequences", skill)
         self.assertIn("review-only Goals are read-only unless they explicitly authorize a change", skill)
-        self.assertIn("existing identifiers or checks cannot establish it", skill)
+        self.assertIn("no stable identifier is sufficient", skill)
+        self.assertIn("Do not hash a Git-tracked file again", skill)
         self.assertNotIn("never shorten, replace, or declare them redundant", skill)
         formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
         self.assertIn(
@@ -312,12 +315,12 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
         self.assertIn("without per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
-        self.assertIn("another stable version, dataset, model, or artifact identifier", normalized)
-        self.assertIn("depends on an object's exact content", normalized)
-        self.assertIn("existing identifiers or checks cannot establish it", normalized)
-        self.assertIn("never use a floating-output hash as a numerical acceptance criterion", normalized)
-        self.assertIn("Preserve an explicit frozen identity contract when exact identity matters", normalized)
-        self.assertNotIn("exact bytes outside Git", normalized)
+        self.assertIn("another stable dataset, model, or artifact version", normalized)
+        self.assertIn("specifically identified Git-external immutable file", normalized)
+        self.assertIn("no stable identifier is sufficient", normalized)
+        self.assertIn("Never use byte equality for floating or stochastic results", normalized)
+        self.assertIn("approved project-level frozen contract remains authoritative", normalized)
+        self.assertIn("does not justify redundant hashes", normalized)
         self.assertIn("An executing Codex instead reports the actual outcome", normalized)
         self.assertIn("it does not output `Codex 指令`", normalized)
         self.assertNotIn("or Codex transaction", contract)

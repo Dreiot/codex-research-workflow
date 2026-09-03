@@ -62,10 +62,10 @@
       "id": "redundant-hash-vs-required-content-identity",
       "decisive_fact": "Whether exact content identity matters and existing identifiers are sufficient.",
       "guarded_case": {
-        "request": "验证 Git 已跟踪的代码与浮点实验指标是否满足声明的数值容差。",
+        "request": "验证 Git 已跟踪的代码、环境锁与浮点实验指标是否满足协议和声明的数值容差。",
         "expected": [
-          "Use Git identity and numerical checks",
-          "Do not add redundant file or floating-output hashes"
+          "Use Git identity, material environment fields, and numerical checks",
+          "Do not add redundant hashes for tracked files, the full environment, or floating outputs"
         ]
       },
       "allowed_case": {

@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import stat
@@ -130,6 +131,11 @@ class CommandTest(unittest.TestCase):
                 "--with-metrics",
             ).stdout
         )
+        self.assertEqual(evidence["manifest"]["schema"], "research-evidence-candidate/v2")
+        self.assertEqual(
+            evidence["manifest"]["artifacts"],
+            ["analysis_report.md", "metrics.json"],
+        )
         self.git(repo, "add", evidence["path"])
         validated = json.loads(
             self.run_cmd(
@@ -143,6 +149,55 @@ class CommandTest(unittest.TestCase):
             ).stdout
         )
         self.assertEqual(validated["status"], "valid")
+
+        evidence_dir = repo / evidence["path"]
+        metrics_path = evidence_dir / "metrics.json"
+        metrics_path.write_text('{"score": 1.0}\n', encoding="utf-8")
+        self.git(repo, "add", evidence["path"])
+        validated_after_edit = json.loads(
+            self.run_cmd(
+                sys.executable,
+                str(WORKFLOW),
+                "validate-evidence",
+                "--repo",
+                str(repo),
+                "--path",
+                evidence["path"],
+            ).stdout
+        )
+        self.assertEqual(validated_after_edit["status"], "valid")
+
+        manifest_path = evidence_dir / "manifest.json"
+        legacy_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        legacy_manifest["schema"] = "research-evidence-candidate/v1"
+        legacy_manifest["artifacts"] = {
+            name: hashlib.sha256((evidence_dir / name).read_bytes()).hexdigest()
+            for name in legacy_manifest["artifacts"]
+        }
+        manifest_path.write_text(json.dumps(legacy_manifest, indent=2) + "\n", encoding="utf-8")
+        self.git(repo, "add", evidence["path"])
+        self.run_cmd(
+            sys.executable,
+            str(WORKFLOW),
+            "validate-evidence",
+            "--repo",
+            str(repo),
+            "--path",
+            evidence["path"],
+        )
+        metrics_path.write_text('{"score": 2.0}\n', encoding="utf-8")
+        self.git(repo, "add", evidence["path"])
+        legacy_mismatch = self.run_cmd(
+            sys.executable,
+            str(WORKFLOW),
+            "validate-evidence",
+            "--repo",
+            str(repo),
+            "--path",
+            evidence["path"],
+            expected=2,
+        )
+        self.assertIn("artifact hash mismatch: metrics.json", legacy_mismatch.stderr)
 
     def test_commands_reject_nested_or_inexact_project_roots(self):
         project = self.base / "project-root"
