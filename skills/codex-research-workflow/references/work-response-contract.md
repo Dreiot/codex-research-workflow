@@ -64,6 +64,12 @@ externally consequential, or likely to consume a substantial share of the
 experiment budget if it fails. It should cover the smallest representative case
 rather than the dataset-method matrix.
 
+Keep outputs decision-complete rather than exhaustive. Do not generate a
+Cartesian product of scenario sets, metrics, display choices, registries, and
+file formats, or prepare future audit plans, unless the current decision needs
+them. Preserve reusable source data and generation code, then render additional
+variants after the user selects them.
+
 Observed results may guide scientifically justified changes to the method,
 parameters, dataset coverage, resource budget, metrics, and comparisons.
 Preserve material failures and the reasons for consequential changes. Once the
@@ -84,6 +90,11 @@ equality for floating or stochastic results or as evidence of scientific
 validity. An approved project-level frozen contract remains authoritative, but
 does not justify redundant hashes or exact matching of immaterial fields; a
 material relaxation requires a scoped project amendment rather than bypass.
+
+Target independent recomputation at the active defect or decision-critical
+transformation. Do not revalidate unrelated accepted candidates or require byte
+preservation when Git identity, a focused diff, or semantic invariants already
+establish the needed fact.
 
 Routine exploratory code may continue after relevant tests. A concise Codex
 result packet is normally enough for the next controller decision. Request an
@@ -166,6 +177,10 @@ Any `P0` or `P1` requires `REJECT`, and `REJECT` requires at least one such
 finding. Use `BLOCKED` only when required evidence or environment is
 unavailable, and prefix every finding with `BLOCKED:`.
 
+Do not carry superseded or candidate-specific P2 findings into a later Goal or
+current finding list unless they still materially apply. Preserve them in the
+original review report or Git history.
+
 ### Design And Acceptance
 
 `设计目标` names the next useful research action and why it matters. Prefer
@@ -194,9 +209,19 @@ Include only:
 - stop or user-decision condition.
 
 Reference checked-in detail instead of copying protocols, formulas, matrices,
-findings, hashes, history, or generic safety rules. Keep the Goal as short as
-correctness allows and stop when its acceptance criteria pass. Historical or
-batch cleanup additionally invokes `$research-artifact-cleanup`.
+findings, hashes, history, or generic safety rules. Before issuing, remove
+clauses already implied by the cited authorities, merge repeated validation,
+stop, and return requirements, and retain only necessary task-specific scope,
+exceptions, and acceptance evidence. State a negative boundary only for a
+plausible adjacent action that would materially change the result or permission
+boundary. Do not repeat the executor's default final-report fields. A complex
+Goal may remain long when required detail is not already authoritative; length
+itself is not evidence of rigor. Stop when its acceptance criteria pass.
+Historical or batch cleanup additionally invokes `$research-artifact-cleanup`.
+
+When an authorization manifest, runtime guard, and result registry coexist,
+give each a distinct role and keep one authority for each mutable fact. Other
+artifacts reference that authority instead of maintaining duplicate state.
 
 ## Controller Handoff
 
@@ -238,11 +263,13 @@ does not change the core method, data split, formal metrics, formal budget, or
 claims. Ordinary repairs, clear test failures, frozen-design execution, and
 such diagnostics are not decision checkpoints.
 
-Ask before paid or materially costly work, new sensitive data or credentials,
-external live services or hardware, destructive or irreversible actions, final
-held-out testing, or formal publication-evaluation budgets. Otherwise, local,
-recoverable, no-cost work within existing permissions may proceed without
-per-run approval.
+Experiment runs, batches, safe resumes, and named held-out execution within the
+current Goal or frozen protocol do not need per-run approval. Briefly state the
+purpose, scope, material cost, and stop condition, then proceed. Ask only for
+work not already authorized that introduces paid or material external quota,
+new sensitive data or credentials, destructive or irreversible external
+effects, material budget expansion, or a change to the evaluation or claim
+boundary. Do not request the same authorization twice.
 
 Do not investigate adjacent issues merely for completeness. Non-blocking P2
 findings remain backlog unless they affect correctness, reproducibility,

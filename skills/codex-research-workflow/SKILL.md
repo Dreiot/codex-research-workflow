@@ -64,6 +64,20 @@ representative case justified by a genuinely untested interface or an action
 that is paid, sensitive, irreversible, externally consequential, or likely to
 consume a substantial share of the experiment budget if it fails.
 
+An issued Goal or frozen protocol authorizes the experiment runs, batches, safe
+resumes, and named held-out execution within its scope. Briefly state the
+purpose, scope, material cost, and stop condition, then proceed without per-run
+approval. Pause only for work not already authorized that introduces paid or
+material external quota, new sensitive data or credentials, destructive or
+irreversible external effects, material budget expansion, or a change to the
+evaluation or claim boundary. Do not request the same authorization twice.
+
+Keep outputs decision-complete rather than exhaustive. Do not generate a
+Cartesian product of scenario sets, metrics, display choices, registries, and
+file formats, or prepare future audit plans, unless the current decision needs
+them. Preserve reusable source data and generation code, then render additional
+variants after the user selects them.
+
 Within an issued Goal, reversible evidence-driven adjustments may proceed and
 be recorded when they do not materially change the core method, research
 objective, main baseline, final held-out boundary, paper claim, or meaningful
@@ -135,6 +149,11 @@ not justify adding redundant hashes or exact matching of immaterial fields. If
 relaxing an existing contract would change a formal evaluation boundary, stop
 and request that scoped project amendment rather than bypassing it.
 
+Target independent recomputation at the active defect or decision-critical
+transformation. Do not revalidate unrelated accepted candidates or require byte
+preservation when Git identity, a focused diff, or semantic invariants already
+establish the needed fact.
+
 ## Manage Experiments
 
 Use one experiment root inside the project root, default `experiments/`; a project may
@@ -151,6 +170,10 @@ needed. New persistent artifacts must not create ad hoc top-level output roots.
 - Keep large runs, temporary files, and cleanup plans ignored by Git.
 - Delete only temporary files created by the current run when they were marked
   temporary in advance, the run succeeded, and no reference remains.
+
+When an authorization manifest, runtime guard, and result registry coexist,
+give each a distinct role and keep one authority for each mutable fact. Other
+artifacts reference that authority instead of maintaining duplicate state.
 
 Read [experiments.md](references/experiments.md) before creating a persistent
 run. Read [evidence-packets.md](references/evidence-packets.md) before preparing
@@ -198,6 +221,10 @@ historical detail belongs in reports and Git. Do not enforce byte, line, or
 token budgets on either authority. Historical accumulation is a warning;
 conflicting current authorities are an error.
 
+Do not carry superseded or candidate-specific P2 findings into a later Goal or
+current finding list unless they still materially apply. Preserve them in their
+original review report or Git history.
+
 Existing `codex-project-core` and `codex-handoff-state` markers remain the
 compatible internal schema. A brand rename does not create a data migration.
 
@@ -241,8 +268,14 @@ operation and is not used in new documentation.
 
 Every actionable research-controller-issued Codex Goal starts with
 `$codex-research-workflow`. A cleanup Goal also invokes
-`$research-artifact-cleanup`. Keep Goals short by pointing to checked-in
-authorities and reports rather than copying durable detail.
+`$research-artifact-cleanup`. Before issuing a Goal, compress it: point to
+checked-in authorities and reports, remove clauses already implied by them,
+merge repeated validation, stop, and return requirements, and retain only the
+current task's necessary scope, exceptions, and acceptance evidence. State a
+negative boundary only for a plausible adjacent action that would materially
+change the result or permission boundary. Do not repeat the executor's default
+final-report fields. A complex Goal may remain long when the required detail is
+not already authoritative; length itself is not evidence of rigor.
 
 Read [work-response-contract.md](references/work-response-contract.md) before
 generating or evaluating a controller response. Only the user may authorize

@@ -133,6 +133,60 @@
           "Do not require uniform wins across unrelated settings"
         ]
       }
+    },
+    {
+      "id": "authorized-run-vs-new-material-external-cost",
+      "decisive_fact": "Whether the experiment is already within the current Goal or frozen protocol and whether it adds a new material external cost.",
+      "guarded_case": {
+        "request": "当前 Goal 已授权按冻结协议完成普通批次、断点恢复和已命名 held-out；没有付费服务、敏感数据或额外预算。",
+        "expected": [
+          "Briefly state the run scope and stop condition",
+          "Proceed without asking for per-run or repeated authorization"
+        ]
+      },
+      "allowed_case": {
+        "request": "下一步需要调用尚未授权的 CIM 外部服务，并可能消耗大量付费额度。",
+        "expected": [
+          "State the expected external cost and scientific value",
+          "Request explicit user authorization before consuming the quota"
+        ]
+      }
+    },
+    {
+      "id": "unrelated-revalidation-vs-defect-focused-recomputation",
+      "decisive_fact": "Whether the independent validation directly tests the active defect or merely rechecks unrelated accepted work.",
+      "guarded_case": {
+        "request": "修复当前 Scheme-B 阈值来源；已接受的 Scheme-A 路径没有被修改，Git diff 已能证明。",
+        "expected": [
+          "Validate the Scheme-B threshold correction",
+          "Do not rerun byte-preservation validation for unrelated Scheme-A artifacts"
+        ]
+      },
+      "allowed_case": {
+        "request": "当前缺陷影响全部90个cell的阈值，请独立重建阈值并核对修正后的聚合。",
+        "expected": [
+          "Independently reconstruct the decision-critical thresholds for all affected cells",
+          "Validate the corrected aggregates without reimplementing unrelated pipeline stages"
+        ]
+      }
+    },
+    {
+      "id": "copied-protocol-vs-task-specific-exception",
+      "decisive_fact": "Whether the detail is already authoritative or is a new task-specific exception required for correct execution.",
+      "guarded_case": {
+        "request": "冻结协议已在仓库中完整记录；请签发执行 Goal。",
+        "expected": [
+          "Point to the frozen protocol and current authorities",
+          "Do not copy its formulas, matrix, hashes, findings, and generic safety rules into the Goal"
+        ]
+      },
+      "allowed_case": {
+        "request": "本轮新增一个尚未写入权威文件、且省略会改变执行结果的例外条件。",
+        "expected": [
+          "State the task-specific exception explicitly",
+          "Keep unrelated protocol detail referenced rather than copied"
+        ]
+      }
     }
   ]
 }

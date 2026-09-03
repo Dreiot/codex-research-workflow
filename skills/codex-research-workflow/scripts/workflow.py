@@ -279,9 +279,11 @@ def initialize_authorities(repo: Path) -> List[str]:
             "artifacts when a current dependency requires them.\n"
             "- Default to the shortest empirical loop: minimal implementation, real-data run, "
             "metrics, diagnosis, direction adjustment, and paper evidence.\n"
-            "- Local, recoverable, no-cost work using project-authorized data is allowed by default. "
-            "Ask before paid, sensitive, externally side-effecting, destructive, irreversible, or "
-            "final held-out evaluation work.\n"
+            "- An issued Goal or frozen protocol authorizes its experiment runs, batches, safe resumes, "
+            "and named held-out execution without per-run approval. Briefly state purpose, scope, material "
+            "cost, and stop condition, then proceed. Ask only for work not already authorized that adds paid "
+            "or material external quota, new sensitive data or credentials, destructive or irreversible "
+            "external effects, material budget expansion, or a changed evaluation or claim boundary.\n"
             "- Use the simplest correct, testable implementation. Do not add speculative abstractions "
             "or design-only Gates unless they directly block the current research decision.\n"
             "- Do not require a content hash by default. Prefer Git commit/blob or another stable identity, "
@@ -1373,10 +1375,12 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "smoke、调试和调参不需要独立审查或 review-state。只有明确准备接受主要实现、采纳"
             "稳定的正式论文评价方案或关键结果、改变核心方法或提升论文 claim 时，才进行一次 formal "
             "promotion 审查并记录结论；机械验收通过后可立即签发下一 Goal。\n\n"
-            "按公开 Contract 简洁输出，最多给出一个 Codex Goal。Goal 引用仓库权威内容，不复制"
-            "完整协议、历史、hash 或通用规则。达到验收目标即停止，相邻问题只记录。已授权的本地、"
-            "可恢复、无付费真实数据工作无需逐次询问；只有付费、敏感数据、外部副作用、破坏性或"
-            "不可逆操作需要先询问。若权威状态存在实质冲突，只给出最小核对或修正 Goal。"
+            "按公开 Contract 简洁输出，最多给出一个 Codex Goal。签发前删除已由仓库权威覆盖的协议、"
+            "历史、hash 和通用规则，合并重复的验证、停止与回报要求。达到验收目标即停止，相邻问题"
+            "只记录。当前 Goal 或冻结协议内的实验、批次、安全恢复和已命名 held-out 无需逐次询问；"
+            "简要说明后推进。只有未被现有授权覆盖的付费或大量外部额度、新敏感数据或凭据、破坏性"
+            "或不可逆外部操作、显著预算扩张或评估/claim 边界变化需要先询问。若权威状态存在实质"
+            "冲突，只给出最小核对或修正 Goal。"
         )
     else:
         print(
@@ -1403,8 +1407,9 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "且没有足够的稳定身份时，才对该文件使用 SHA-256 并说明理由。不得重复 hash Git 已跟踪文件，"
             "不得整体 hash 环境、目录、缓存、报告、registry、manifest 或动态输出，也不得把字节一致性作为"
             "浮点或随机结果以及科研有效性的验收条件。"
-            "对已获授权的本地、可恢复、无付费真实数据工作不得增加 Gate；仅在涉及付费、敏感数据、"
-            "外部副作用、破坏性或不可逆操作时主动询问用户。"
+            "当前 Goal 或冻结协议内的实验、批次、安全恢复和已命名 held-out 无需逐次授权；简要说明"
+            "后推进。只有未被现有授权覆盖的付费或大量外部额度、新敏感数据或凭据、破坏性或不可逆"
+            "外部操作、显著预算扩张或评估/claim 边界变化需要主动询问用户。"
         )
     return 0
 

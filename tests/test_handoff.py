@@ -146,7 +146,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             "For an ordinary Goal, check the exact root, branch, expected HEAD",
             "Run a full audit only before commit/push, formal promotion",
             "Default to the shortest empirical loop",
-            "Local, recoverable, no-cost work",
+            "named held-out execution without per-run approval",
             "Use the simplest correct, testable implementation",
             "A Goal authorizes the named work and necessary consequences",
             "review-only Goals are read-only unless they explicitly authorize a change",
@@ -309,11 +309,11 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("prefix every finding with `BLOCKED:`", normalized)
         self.assertIn("must not use blocking language", normalized)
         self.assertIn("same response may issue the next Goal", normalized)
-        self.assertIn("stop when its acceptance criteria pass", normalized)
+        self.assertIn("Stop when its acceptance criteria pass", normalized)
         self.assertIn("Pause for the user only when credible routes", normalized)
         self.assertIn("before planning or issuing the next Goal after a pause", normalized)
         self.assertIn("one bounded, low-cost, reversible diagnostic", normalized)
-        self.assertIn("without per-run approval", normalized)
+        self.assertIn("do not need per-run approval", normalized)
         self.assertIn("Do not expand the threat model", normalized)
         self.assertIn("another stable dataset, model, or artifact version", normalized)
         self.assertIn("specifically identified Git-external immutable file", normalized)
@@ -321,6 +321,13 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("Never use byte equality for floating or stochastic results", normalized)
         self.assertIn("approved project-level frozen contract remains authoritative", normalized)
         self.assertIn("does not justify redundant hashes", normalized)
+        self.assertIn("Cartesian product of scenario sets", normalized)
+        self.assertIn("Target independent recomputation at the active defect", normalized)
+        self.assertIn("Do not carry superseded or candidate-specific P2 findings", normalized)
+        self.assertIn("Before issuing, remove clauses already implied", normalized)
+        self.assertIn("one authority for each mutable fact", normalized)
+        self.assertIn("named held-out execution within the current Goal", normalized)
+        self.assertIn("Do not request the same authorization twice", normalized)
         self.assertIn("An executing Codex instead reports the actual outcome", normalized)
         self.assertIn("it does not output `Codex 指令`", normalized)
         self.assertNotIn("or Codex transaction", contract)
