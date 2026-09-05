@@ -35,15 +35,23 @@ already authoritative; otherwise use
   "git_head": "<40-character SHA>",
   "worktree_dirty": false,
   "diff_hash": null,
+  "source_snapshot": null,
   "status": "running"
 }
 ```
 
 Allowed statuses are `running`, `completed`, `failed`, and `interrupted`.
-Exploratory runs may start from a dirty worktree, but record a deterministic
-diff hash. Formal runs use a clean frozen commit. A run later used for a durable
-controller decision must be reproducible from a commit or a bound source
-snapshot.
+Exploratory preparation may start from a dirty worktree. Record the base commit
+and dirty status without hashing the worktree or unrelated untracked files.
+When reproduction depends on uncommitted code, preserve a patch or source
+archive containing the experiment's relevant changes and dependencies; pass its
+existing repository-relative path with `--source-snapshot`. Preparation may
+leave this pointer unset, but dirty status alone does not establish reproducibility.
+Formal runs use a clean frozen commit. Before a run supports a durable decision,
+its source must be recoverable from that commit or the retained scoped snapshot.
+Existing manifests with `diff_hash` remain historical records; no rehash or
+manifest migration is required. New manifests retain that compatibility field
+as `null` and do not calculate it.
 
 The tracked registry includes only experiments that enter controller decisions,
 formal evidence, or important negative evidence. It is not a run-by-run log.

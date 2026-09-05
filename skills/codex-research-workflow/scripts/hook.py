@@ -44,6 +44,8 @@ def handle(payload: Dict[str, Any]) -> int:
         return 0
 
     if event == "SessionStart":
+        if not any((repo / rel).is_file() for rel in (CORE_REL, STATE_REL)):
+            return 0
         core, core_errors = read_core(repo)
         state, state_errors = read_state(repo)
         issues = [f"PROJECT_CORE: {item}" for item in core_errors] + [
@@ -51,24 +53,31 @@ def handle(payload: Dict[str, Any]) -> int:
         ]
         if core and state:
             context = (
-                f"Use $codex-research-workflow. Authorities: AGENTS.md, {CORE_REL.as_posix()}, "
-                f"{STATE_REL.as_posix()}. Verify Git. Project={state['project']}; "
+                f"Research state pointers: AGENTS.md, {CORE_REL.as_posix()}, "
+                f"{STATE_REL.as_posix()}. Project={state['project']}; "
                 f"direction={core['primary_direction']}; gate={state['current_gate']}; "
                 f"next={state['next_action']}."
             )
         else:
             context = (
-                f"Use $codex-research-workflow. Read AGENTS.md, {CORE_REL.as_posix()}, and "
+                f"Research state pointers: AGENTS.md, {CORE_REL.as_posix()}, and "
                 f"{STATE_REL.as_posix()}; authority is incomplete, so do not infer state from chat."
             )
+        context += (
+            " Use these pointers only when the current task depends on project state. "
+            "This hint does not itself invoke a skill, Git verification, audit, or review; "
+            "follow the current request and the workflow's task-specific triggers."
+        )
         emit(system_message=" | ".join(issues), context=context, event=event)
         return 0
 
     if event == "SubagentStart":
         emit(
             context=(
-                "You are a fresh research reviewer. Review only the supplied base and candidate SHAs. "
-                "Do not edit. Return P0/P1/P2 findings and ACCEPT, ACCEPT_WITH_P2, REJECT, or BLOCKED."
+                "For an explicitly authorized formal-promotion review, inspect only the supplied "
+                "base and candidate SHAs and decision-relevant evidence. Do not edit. "
+                "Return P0/P1/P2 findings and one formal verdict. Ordinary inspection does not "
+                "create a formal review or require a verdict."
             ),
             event=event,
         )

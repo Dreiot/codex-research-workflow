@@ -9,8 +9,10 @@ installed skill; update affected tests and prompts; validate; and review the
 diff.
 
 This contract defines common visible behavior for a research controller or
-reviewer. Project Instructions define surface-specific roles. It is not a
-mandatory review state machine and does not request hidden reasoning.
+reviewer. Project Instructions define the user-assigned controller, reviewer, and executor
+roles independently of model names or reasoning effort. A model or effort change
+alone does not change roles, invalidate evidence, or trigger a new review.
+It is not a mandatory review state machine and does not request hidden reasoning.
 It does not govern a Codex executor's final report: Codex executes an issued
 Goal and never publishes the next `Codex 指令`.
 

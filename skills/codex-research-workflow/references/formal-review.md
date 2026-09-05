@@ -11,6 +11,10 @@ reviewer needs GitHub access or the work is entering formal promotion. The
 inspection may guide repair or the next Goal without a formal verdict, report,
 `record-review`, review-state commit, or `CURRENT_STAGE.md` update.
 
+The configured `research-reviewer` profile is for explicit formal promotion.
+Use a bounded read-only inspection for this optional lane; do not import the
+formal profile's exact-commit or verdict requirements into uncommitted work.
+
 ## Formal promotion
 
 Use exactly one qualified independent review only when formally adopting a

@@ -1,4 +1,6 @@
 import hashlib
+import importlib.util
+import io
 import json
 import os
 import stat
@@ -6,7 +8,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -116,6 +120,43 @@ class CommandTest(unittest.TestCase):
         )
         self.assertEqual(run_result["manifest"]["schema"], "research-experiment-run/v1")
         self.assertTrue((repo / run_result["path"] / "manifest.json").is_file())
+        self.assertFalse(run_result["manifest"]["worktree_dirty"])
+        self.assertIsNone(run_result["manifest"]["diff_hash"])
+
+        unrelated = repo / "unrelated-notes.txt"
+        unrelated.write_text("not an input to this experiment\n", encoding="utf-8")
+        snapshot = repo / "experiment-source.patch"
+        snapshot.write_text("retained experiment-specific source patch\n", encoding="utf-8")
+        spec = importlib.util.spec_from_file_location("workflow_under_test", WORKFLOW)
+        workflow = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(workflow)
+        args = workflow.build_parser().parse_args([
+            "prepare-experiment", "--repo", str(repo), "--experiment-id", "dirty-run",
+            "--entrypoint", "experiment.py", "--source-snapshot", snapshot.name,
+        ])
+        original_open = Path.open
+
+        def scoped_open(path, *open_args, **open_kwargs):
+            if path == unrelated:
+                self.fail("experiment preparation read unrelated untracked content")
+            return original_open(path, *open_args, **open_kwargs)
+
+        output = io.StringIO()
+        with patch.object(Path, "open", scoped_open), redirect_stdout(output):
+            self.assertEqual(args.func(args), 0)
+        dirty_manifest = json.loads(output.getvalue())["manifest"]
+        self.assertTrue(dirty_manifest["worktree_dirty"])
+        self.assertEqual(dirty_manifest["source_snapshot"], snapshot.name)
+        self.assertEqual(dirty_manifest["git_head"], self.git(repo, "rev-parse", "HEAD"))
+        self.assertIsNone(dirty_manifest["diff_hash"])
+
+        missing_snapshot = self.run_cmd(
+            sys.executable, str(WORKFLOW), "prepare-experiment", "--repo", str(repo),
+            "--experiment-id", "missing-source", "--entrypoint", "experiment.py",
+            "--source-snapshot", "missing.patch", expected=2,
+        )
+        self.assertIn("source snapshot is not a file", missing_snapshot.stderr)
+        self.assertFalse((repo / "experiments/runs/missing-source").exists())
 
         evidence = json.loads(
             self.run_cmd(

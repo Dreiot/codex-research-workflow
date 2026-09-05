@@ -188,26 +188,6 @@ def experiment_root(repo: Path) -> Path:
     return EXPERIMENT_ROOT_DEFAULT
 
 
-def worktree_fingerprint(repo: Path) -> Tuple[bool, Optional[str]]:
-    status = git(repo, "status", "--porcelain=v1", "--untracked-files=all")
-    if not status:
-        return False, None
-    digest = hashlib.sha256()
-    digest.update(status.encode("utf-8"))
-    for args in (("diff", "--binary", "HEAD"), ("diff", "--cached", "--binary", "HEAD")):
-        result = run(["git", "-C", str(repo), *args])
-        digest.update(result.stdout.encode("utf-8"))
-    for line in status.splitlines():
-        if not line.startswith("?? "):
-            continue
-        rel = line[3:]
-        path = repo / rel
-        if path.is_file():
-            digest.update(rel.encode("utf-8"))
-            digest.update(sha256_file(path).encode("ascii"))
-    return True, digest.hexdigest()
-
-
 def clean_worktree(repo: Path) -> bool:
     return not bool(git(repo, "status", "--porcelain=v1", "--untracked-files=all"))
 
@@ -1058,7 +1038,12 @@ def command_prepare_experiment(args: argparse.Namespace) -> int:
         target = repo / rel_dir
         if target.exists():
             raise ValueError(f"run already exists: {rel_dir.as_posix()}")
-        dirty, diff_hash = worktree_fingerprint(repo)
+        source_snapshot = args.source_snapshot
+        if source_snapshot:
+            snapshot_path = repo / require_relative_path(source_snapshot, "source-snapshot")
+            if not snapshot_path.is_file():
+                raise ValueError(f"source snapshot is not a file: {source_snapshot}")
+        dirty = not clean_worktree(repo)
         manifest = {
             "schema": RUN_SCHEMA,
             "experiment_id": experiment_id,
@@ -1069,7 +1054,8 @@ def command_prepare_experiment(args: argparse.Namespace) -> int:
             "data_ids": args.data_id or [],
             "git_head": current_head(repo),
             "worktree_dirty": dirty,
-            "diff_hash": diff_hash,
+            "diff_hash": None,
+            "source_snapshot": source_snapshot,
             "status": args.status,
         }
         target.mkdir(parents=True)
@@ -1445,6 +1431,10 @@ def build_parser() -> argparse.ArgumentParser:
     experiment_parser.add_argument("--run-id")
     experiment_parser.add_argument("--entrypoint", required=True)
     experiment_parser.add_argument("--config")
+    experiment_parser.add_argument(
+        "--source-snapshot",
+        help="existing repository-relative patch or source archive for this run; no content hash",
+    )
     experiment_parser.add_argument("--data-id", action="append")
     experiment_parser.add_argument("--status", choices=sorted(RUN_STATUSES), default="running")
     experiment_parser.set_defaults(func=command_prepare_experiment)

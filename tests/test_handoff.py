@@ -88,6 +88,16 @@ class HandoffIntegrationTest(unittest.TestCase):
         payload = text.split("<!-- codex-handoff-state\n", 1)[1].split("\n-->", 1)[0]
         return json.loads(payload)
 
+    def test_session_start_is_silent_in_an_ordinary_git_repository(self):
+        (self.repo / "AGENTS.md").write_text("# Ordinary editing conventions\n", encoding="utf-8")
+        before = self.run_command("git", "-C", str(self.repo), "status", "--short")
+        for source in ("startup", "resume", "compact"):
+            with self.subTest(source=source):
+                payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo), "source": source})
+                self.assertEqual(self.run_command(sys.executable, str(HOOK), input_text=payload), "")
+        self.assertEqual(self.run_command("git", "-C", str(self.repo), "status", "--short"), before)
+        self.assertFalse((self.repo / "docs").exists())
+
     def record_review(self, candidate, candidate_kind, verdict, report_name):
         report_path = self.repo / "docs" / report_name
         report_path.write_text(f"# Review\n\nCandidate: `{candidate}`\n", encoding="utf-8")
@@ -243,7 +253,8 @@ class HandoffIntegrationTest(unittest.TestCase):
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
         parsed = json.loads(hook_output)
         context = parsed["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("Use $codex-research-workflow", context)
+        self.assertNotIn("Use $codex-research-workflow", context)
+        self.assertIn("only when the current task depends on project state", context)
         self.assertIn("direction=", context)
         self.assertIn("gate=", context)
         self.assertEqual(self.run_command("git", "-C", str(self.repo), "status", "--short"), "")
