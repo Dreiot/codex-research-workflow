@@ -178,7 +178,8 @@ class HandoffIntegrationTest(unittest.TestCase):
             "repository paths support verification and do not replace that summary",
             "A clean review-state verification may be followed by the next Goal",
             "Verification of a formal review-state commit is mechanical closure",
-            "Automatic context compaction alone is not a reason",
+            "Automatic context compaction or a larger context window",
+            "After compaction, re-ground only from the active Goal",
             "Do not amend, rebase, force-push, rewrite history",
         ):
             self.assertIn(required_rule, agents_text)
@@ -201,6 +202,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertNotIn("ERROR:", audit)
 
         prompts = {}
+        current_head = self.run_command("git", "-C", str(self.repo), "rev-parse", "HEAD")
         for surface in ("codex", "work"):
             prompts[surface] = self.run_command(
                 sys.executable,
@@ -213,41 +215,28 @@ class HandoffIntegrationTest(unittest.TestCase):
             )
             for authority in ("AGENTS.md", "PROJECT_CORE.md", "CURRENT_STAGE.md"):
                 self.assertIn(authority, prompts[surface])
+            self.assertIn(f"- Project: `{self.repo.name}`", prompts[surface])
+            self.assertIn(f"- Git root: `{self.repo}`", prompts[surface])
+            self.assertIn(f"- Expected HEAD: `{current_head}`", prompts[surface])
 
         work_prompt = prompts["work"]
         self.assertIn("work-response-contract.md", work_prompt)
         self.assertIn("网页端不加载本机 Codex Skill", work_prompt)
-        self.assertIn("探索性实现、测试、smoke", work_prompt)
-        self.assertIn("不需要独立审查或 review-state", work_prompt)
-        self.assertIn("formal promotion", work_prompt)
-        self.assertIn("机械验收通过后可立即签发下一 Goal", work_prompt)
-        self.assertIn("真实数据运行", work_prompt)
-        self.assertIn("达到验收目标即停止", work_prompt)
-        self.assertIn("简洁且 decision-complete 地输出", work_prompt)
-        self.assertIn("最多给出一个 Codex Goal", work_prompt)
-        self.assertIn("无需逐次询问", work_prompt)
-        self.assertIn("纯讨论、解释、构思或已有材料分析不得自动升级", work_prompt)
-        self.assertIn("只授权命名工作及其必要后果", work_prompt)
+        self.assertIn("新对话仍须从 GitHub 核验可变状态", work_prompt)
+        self.assertIn("权威文件无法恢复的用户决定", work_prompt)
+        self.assertIn("没有增量时直接从权威状态继续", work_prompt)
+        self.assertNotIn("默认推进：最小实现", work_prompt)
 
         codex_prompt = prompts["codex"]
-        self.assertIn("默认执行探索流程", codex_prompt)
-        self.assertIn("普通 Goal 只做轻量本地核对", codex_prompt)
-        self.assertIn("不要重复网页控制器已经完成的远端审查", codex_prompt)
-        self.assertIn("普通探索不要求提交、push、审查或状态落库", codex_prompt)
-        self.assertIn("结果包在保留下一决策所需科研实质后再精简", codex_prompt)
-        self.assertIn("才启动一次独立审查和 review-state", codex_prompt)
-        self.assertIn("主动询问用户", codex_prompt)
-        self.assertIn("机械验收不得生成新的审查报告", codex_prompt)
-        self.assertIn("达到验收目标即停止", codex_prompt)
-        self.assertIn("Goal 只授权其中命名的工作及其必要后果", codex_prompt)
-        self.assertIn("review-only Goal 默认只读", codex_prompt)
-        self.assertIn("你是执行端，不是 Research Controller", codex_prompt)
-        self.assertIn("不得使用 Work Response Contract 四段式", codex_prompt)
-        self.assertIn("默认不计算或要求 content hash", codex_prompt)
-        self.assertIn("Git 外不可变文件必须锁定到精确字节", codex_prompt)
-        self.assertIn("不得重复 hash Git 已跟踪文件", codex_prompt)
-        self.assertIn("不得整体 hash 环境、目录、缓存", codex_prompt)
-        self.assertIn("仓库路径用于复核，不能替代核心信息", codex_prompt)
+        self.assertTrue(codex_prompt.startswith("$codex-research-workflow"))
+        self.assertIn("这是状态恢复骨架，不是新的研究 Goal", codex_prompt)
+        self.assertIn("附加 Goal 所需的当前报告", codex_prompt)
+        self.assertIn("轻量核对 Git 根、branch、HEAD", codex_prompt)
+        self.assertIn("未附 Controller Goal 时只恢复并报告状态", codex_prompt)
+        self.assertIn("不回放完整历史", codex_prompt)
+        self.assertIn("不在旧长上下文中反复生成", codex_prompt)
+        self.assertNotIn("默认执行探索流程", codex_prompt)
+        self.assertNotIn("content hash", codex_prompt)
 
         payload = json.dumps({"hook_event_name": "SessionStart", "cwd": str(self.repo)})
         hook_output = self.run_command(sys.executable, str(HOOK), input_text=payload)
@@ -287,6 +276,10 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("requires no commit or push unless", normalized)
         self.assertIn("Existing tracked reports, configurations, results", normalized)
         self.assertIn("Controller Handoff", normalized)
+        self.assertIn("Context compaction and larger context windows support continuation", normalized)
+        self.assertIn("Add a short Handoff Delta only", normalized)
+        self.assertIn("reuse that Goal unchanged", normalized)
+        self.assertIn("Discard a malformed", normalized)
         self.assertIn("do not load the installed local Codex Skill", normalized)
         self.assertIn("Pure discussion that makes no repository-state claim", normalized)
         self.assertIn("Do not turn pure discussion, explanation, ideation", normalized)
@@ -315,6 +308,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("no stable identifier is sufficient", skill)
         self.assertIn("Do not hash a Git-tracked file again", skill)
         self.assertIn("their paths are verification pointers", skill)
+        self.assertIn("Context compaction and larger context windows are continuation aids", skill)
+        self.assertIn("reuse that Goal unchanged in the new task", skill)
+        self.assertIn("repeated regeneration in the same long context", skill)
         self.assertNotIn("never shorten, replace, or declare them redundant", skill)
         formal_review = " ".join(FORMAL_REVIEW.read_text(encoding="utf-8").split())
         self.assertIn(

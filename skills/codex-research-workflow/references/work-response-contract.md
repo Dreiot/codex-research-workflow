@@ -235,17 +235,35 @@ Browser Chat and Work follow their Project Instructions, visible context, and
 this public Contract; they do not load the installed local Codex Skill. Codex
 may generate a temporary packet for the user to paste into a browser conversation.
 
+Context compaction and larger context windows support continuation; they do not
+change roles, repository authority, evidence status, permissions, or review
+validity, and do not by themselves require a handoff. After compaction,
+re-ground only from the active task and the minimum current authority needed for
+the next state-sensitive decision instead of replaying the full history.
+
 Use a compact Controller Packet for a reviewer-to-controller switch inside the
-same conversation. For a new controller conversation, provide a temporary
-Handoff Packet with: project/repository and mutable Git identity; research
-question, target contribution, core method, and claim ceiling; decision-relevant
-positive, negative, and mixed evidence; unresolved or unverified facts;
-conversation-only user decisions and rejected routes with reasons; and one next
-decision or action. A recipient with direct repository access reverifies
-mutable state and may perform the required review. A recipient without it
-requests one bounded verification from a reviewer with the required access
-before a mutable-state conclusion or formal promotion. Do not force a model
-switch or duplicate a qualified review.
+same conversation. For a new conversation, start from repository authority and
+the standard `resume-prompt`. Add a short Handoff Delta only for information not
+recoverable there: conversation-only user decisions or rejected routes,
+unfinished authorized local work, unrecorded decision-relevant evidence or a
+real blocker, and one unresolved decision or action. Do not copy research
+background, method, claim limits, results, or history already available in the
+current authorities and reports. If no such delta exists, the standard prompt
+is sufficient. If a complete Codex Goal already exists and no local-only state
+remains, reuse that Goal unchanged rather than asking the old conversation to
+rewrite it.
+
+A recipient with direct repository access reverifies mutable state and may
+perform the required review. A recipient without it requests one bounded
+verification from a reviewer with the required access before a mutable-state
+conclusion or formal promotion. Do not force a model switch or duplicate a
+qualified review.
+
+Discard a malformed, incomplete, placeholder-bearing, or draft-leaking handoff.
+Prefer a new conversation based on the standard `resume-prompt`, repository
+authority, and original Goal over repeated regeneration in the same long
+context. The invalid packet does not invalidate previously verified state or a
+qualified review.
 
 A handoff is not a formal review, Codex Goal, evidence promotion, or reason to
 update repository authority. Do not persist the packet unless its material

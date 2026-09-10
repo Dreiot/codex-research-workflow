@@ -291,7 +291,9 @@ def initialize_authorities(repo: Path) -> List[str]:
             "authority update, or handoff, summarize the substantive conclusion and consequence; repository "
             "paths support verification and do not replace that summary.\n"
             "- Verification of a formal review-state commit is mechanical closure, not a new review.\n"
-            "- Automatic context compaction alone is not a reason to stop, commit, or hand off.\n\n"
+            "- Automatic context compaction or a larger context window does not change authority, permission, "
+            "review state, or require a handoff. After compaction, re-ground only from the active Goal and "
+            "minimum current authority needed for the next state-sensitive action.\n\n"
             "## Experiment Artifacts\n\n"
             "- Experiment root: `experiments`\n"
             "- Create experiment directories only when persistent artifacts are needed. Keep core "
@@ -1347,60 +1349,49 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
     if core["project"] != state["project"]:
         print("cannot generate prompt: PROJECT_CORE and CURRENT_STAGE project values differ", file=sys.stderr)
         return 2
+    snapshot = audit(repo)
+    if snapshot["errors"]:
+        print(
+            "cannot generate prompt from invalid current state: " + "; ".join(snapshot["errors"]),
+            file=sys.stderr,
+        )
+        return 2
+    identity = (
+        f"- Project: `{core['project']}`\n"
+        f"- Git root: `{snapshot['repo']}`\n"
+        f"- Expected branch: `{snapshot['branch']}`\n"
+        f"- Expected HEAD: `{snapshot['head']}`\n"
+        f"- Worktree clean when generated: `{str(snapshot['worktree_clean']).lower()}`\n"
+    )
     if args.surface == "work":
         print(
-            "这是该项目的新 Browser ChatGPT Work 主控对话。\n\n"
+            f"这是项目 `{core['project']}` 的新 Browser ChatGPT Work 主控对话。\n\n"
+            "生成时本地接续身份如下；它只是入口，新对话仍须从 GitHub 核验可变状态：\n\n"
+            f"{identity}\n"
             "先从 GitHub 重新读取 `AGENTS.md`、`docs/PROJECT_CORE.md`、"
             "`docs/CURRENT_STAGE.md` 及其指向的最新报告，核验远端分支与实际 HEAD；"
             "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
             f"{WORK_CONTRACT_URL}\n\n"
             "网页端不加载本机 Codex Skill；请遵守本项目的 Project Instructions、可见上下文和"
-            "上述公开 Contract。\n\n"
-            "纯讨论、解释、构思或已有材料分析不得自动升级为仓库核验、candidate review、authority "
-            "update 或 Codex Goal。需要执行时，当前请求和 Goal 只授权命名工作及其必要后果；必要后果"
-            "必须由当前代码、数据、证据、claim 或验收依赖证明，而不是假设性的未来需求。\n\n"
-            "默认推进：最小实现 → 真实数据运行 → 指标 → 诊断 → 方向调整。探索性实现、测试、"
-            "smoke、调试和调参不需要独立审查或 review-state。只有明确准备接受主要实现、采纳"
-            "稳定的正式论文评价方案或关键结果、改变核心方法或提升论文 claim 时，才进行一次 formal "
-            "promotion 审查并记录结论；机械验收通过后可立即签发下一 Goal。\n\n"
-            "按公开 Contract 简洁且 decision-complete 地输出，最多给出一个 Codex Goal。签发前删除已由仓库权威覆盖的协议、"
-            "历史、hash 和通用规则，合并重复的验证、停止与回报要求。达到验收目标即停止，相邻问题"
-            "只记录。当前 Goal 或冻结协议内的实验、批次、安全恢复和已命名 held-out 无需逐次询问；"
-            "简要说明后推进。只有未被现有授权覆盖的付费或大量外部额度、新敏感数据或凭据、破坏性"
-            "或不可逆外部操作、显著预算扩张或评估/claim 边界变化需要先询问。若权威状态存在实质"
-            "冲突，只给出最小核对或修正 Goal。"
+            "上述公开 Contract。上下文压缩或扩窗不改变角色、证据或审查状态。仅在存在权威文件"
+            "无法恢复的用户决定、本地事务、未落库证据或唯一待决问题时附一段简短 Handoff Delta；"
+            "没有增量时直接从权威状态继续。"
         )
     else:
         print(
-            "这是该项目的新 Codex 任务。\n\n"
-            "请显式使用 `$codex-research-workflow`。"
+            "$codex-research-workflow\n\n"
+            f"这是项目 `{core['project']}` 的新 Codex 任务。\n\n"
+            "这是状态恢复骨架，不是新的研究 Goal。若已有完整的 Controller Goal，请将原文直接附在"
+            "本 Prompt 后；没有本地独有状态时，不需要让旧任务改写 Goal 或生成额外交接包。\n\n"
+            "生成时的确定性接续身份：\n\n"
+            f"{identity}\n"
             "先读取并遵守 `AGENTS.md`，再读取 `docs/PROJECT_CORE.md`、"
-            "`docs/CURRENT_STAGE.md` 及本 Goal 所需的当前报告。普通 Goal 只做轻量本地核对："
-            f"精确 Git 根、分支、HEAD 是否符合预期（记录分支为 `{state['branch']}`）以及 index/worktree "
-            "是否有冲突性修改。不要重复网页控制器已经完成的远端审查。只有准备 commit/push、formal "
-            "promotion、权威文件更新、显式交接，或发现实质状态冲突时，才 fetch、核验远端并运行完整 "
-            "audit。冲突时停止，不得依赖本 Prompt 或旧聊天自行补全。\n\n"
-            "Goal 只授权其中命名的工作及其必要后果，不授权相邻改进或假设性的未来需求。讨论、核验、"
-            "audit 和 review-only Goal 默认只读，除非 Goal 明确授权修改；当前依赖确实需要时，应同步"
-            "处理受影响的调用者、配置、聚焦测试和证据产物。\n\n"
-            "默认执行探索流程：最小实现、测试、真实数据运行、指标、诊断和方向调整。只有 Goal、"
-            "用户或 CURRENT_STAGE 明确要求正式提升主要实现、稳定论文评价、关键结果、核心方法或论文 "
-            "claim 时，才启动一次独立审查和 review-state。普通探索不要求提交、push、审查或状态落库；"
-            "Codex 结果包在保留下一决策所需科研实质后再精简；足以支持下一步时，不增加 "
-            "implementation inspection。合格的独立审查不得重复；机械验收不得生成新的审查报告。"
-            "完成后按 Skill 返回 decision-complete 结果包：普通机械任务可以简短；若本轮产生或记录"
-            "决策相关科研证据、formal review、authority transaction 或显式交接，则概括核心结论、"
-            "关键证据与比较、解释或 claim 边界和待决事项。仓库路径用于复核，不能替代核心信息。"
-            "达到验收目标即停止，不调查相邻问题。"
-            "你是执行端，不是 Research Controller；最终不得使用 Work Response Contract 四段式或输出 "
-            "`Codex 指令`。默认不计算或要求 content hash；采用 Git commit/blob 或其他稳定身份、关键字段、"
-            "语义验证、声明的数值容差和关键不变量。只有一个明确的 Git 外不可变文件必须锁定到精确字节，"
-            "且没有足够的稳定身份时，才对该文件使用 SHA-256 并说明理由。不得重复 hash Git 已跟踪文件，"
-            "不得整体 hash 环境、目录、缓存、报告、registry、manifest 或动态输出，也不得把字节一致性作为"
-            "浮点或随机结果以及科研有效性的验收条件。"
-            "当前 Goal 或冻结协议内的实验、批次、安全恢复和已命名 held-out 无需逐次授权；简要说明"
-            "后推进。只有未被现有授权覆盖的付费或大量外部额度、新敏感数据或凭据、破坏性或不可逆"
-            "外部操作、显著预算扩张或评估/claim 边界变化需要主动询问用户。"
+            "`docs/CURRENT_STAGE.md` 及附加 Goal 所需的当前报告，然后轻量核对 Git 根、branch、HEAD 和"
+            "冲突性工作树状态；实质冲突时停止。未附 Controller Goal 时只恢复并报告状态，不自行选择"
+            "下一研究任务。\n\n"
+            "上下文压缩或扩窗不改变权威、权限或 review state。压缩后只按当前 Goal 所需的最小权威"
+            "重新落地，不回放完整历史。若旧任务生成的交接出现乱码、占位符、草稿泄漏或不完整内容，"
+            "丢弃该交接并从本 Prompt、仓库权威和原始 Goal 开始，不在旧长上下文中反复生成。"
         )
     return 0
 

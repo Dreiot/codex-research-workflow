@@ -309,11 +309,22 @@ headings or a `Codex 指令` section, and do not issue the next Goal.
 
 ## Explicit Handoff
 
-Automatic context compaction is normal and is not itself a handoff. At an
-explicit handoff, finish only the safely verifiable operation, re-read current
-authority and Git state, distinguish pushed facts from chat-only conclusions,
-run `audit`, and generate the relevant `resume-prompt`. Never create
-`CODEX_HANDOFF.md`, `LATEST_STATE.md`, or another dynamic authority.
+Context compaction and larger context windows are continuation aids, not
+authority, permission, or handoff triggers. After compaction, do not replay the
+full history; before a state-sensitive action, re-ground only from the active
+Goal and the minimum current authority needed for that action.
+
+At an explicit handoff, finish only the safely verifiable operation, re-read
+current authority and Git state, distinguish pushed facts from chat-only
+conclusions, run `audit`, and use the relevant `resume-prompt` as the
+deterministic base. If a complete controller-issued Goal already exists and no
+local-only state remains, reuse that Goal unchanged in the new task; no extra
+handoff packet is needed. Otherwise append only a short Handoff Delta containing
+conversation-only decisions, unfinished authorized work or local state,
+unrecorded decision-relevant evidence or blockers, and one unresolved decision
+or action. Do not ask the old task to reconstruct authority content or rewrite
+an issued Goal. Never create `CODEX_HANDOFF.md`, `LATEST_STATE.md`, or another
+dynamic authority.
 
 The installed Skill governs Codex handoff only. Browser Chat and Work do not
 load it; they follow their Project Instructions, visible context, and the public
@@ -322,12 +333,16 @@ paste into a browser conversation.
 
 A controller handoff is not a formal review or a reason to update repository
 authority. A same-conversation reviewer-to-controller switch uses a compact
-Controller Packet. A new controller conversation needs a temporary Handoff
-Packet containing the durable strategy and claim ceiling from `PROJECT_CORE.md`,
-relevant positive and negative evidence, the current Git transaction,
-conversation-only decisions or rejected options, and one next decision or
-action. A recipient with direct repository access reverifies mutable state and
-may perform the required review. One without it requests one bounded
-verification from a reviewer with the required access. Do not force a model
-switch or duplicate a qualified review. Keep the packet temporary unless a
+Controller Packet. A new controller conversation starts from repository
+authority and the Work `resume-prompt`, with only the Handoff Delta described
+above when one exists. A recipient with direct repository access reverifies
+mutable state and may perform the required review. One without it requests one
+bounded verification from a reviewer with the required access. Do not force a
+model switch or duplicate a qualified review. Keep any delta temporary unless a
 material decision independently belongs in repository authority.
+
+If a generated handoff is malformed, incomplete, contains placeholders, or
+leaks drafting text, discard that packet. Prefer a new task based on the
+deterministic `resume-prompt`, repository authority, and the original Goal over
+repeated regeneration in the same long context. An invalid packet does not
+invalidate previously verified repository state or a qualified review.
