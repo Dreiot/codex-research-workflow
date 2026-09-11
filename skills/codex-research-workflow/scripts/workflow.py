@@ -1363,9 +1363,20 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
         f"- Expected HEAD: `{snapshot['head']}`\n"
         f"- Worktree clean when generated: `{str(snapshot['worktree_clean']).lower()}`\n"
     )
+    context_primer = (
+        f"- Research question: {' '.join(str(core['research_question']).split())}\n"
+        f"- Current phase: {' '.join(str(state['research_phase']).split())}\n"
+        f"- Current gate: {' '.join(str(state['current_gate']).split())}\n"
+    )
     if args.surface == "work":
         print(
             f"这是项目 `{core['project']}` 的新 Browser ChatGPT Work 主控对话。\n\n"
+            "## Context Primer\n\n"
+            "本项目采用 ChatGPT Research Controller 与 Codex 本地执行端协作：Controller 负责判断、"
+            "claim 和 Goal，Codex 负责执行并返回证据；详细角色与流程由 Project Instructions 约束。\n\n"
+            f"{context_primer}\n"
+            "以上只是确定性定向信息。交接方应另用一个短段概括目标贡献、核心方法链、论文或交付目标"
+            "和 claim ceiling；详细方法、证据、数值和历史仍从下列权威文件与其报告核验。\n\n"
             "生成时本地接续身份如下；它只是入口，新对话仍须从 GitHub 核验可变状态：\n\n"
             f"{identity}\n"
             "先从 GitHub 重新读取 `AGENTS.md`、`docs/PROJECT_CORE.md`、"
@@ -1373,9 +1384,11 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
             f"{WORK_CONTRACT_URL}\n\n"
             "网页端不加载本机 Codex Skill；请遵守本项目的 Project Instructions、可见上下文和"
-            "上述公开 Contract。上下文压缩或扩窗不改变角色、证据或审查状态。仅在存在权威文件"
-            "无法恢复的用户决定、本地事务、未落库证据或唯一待决问题时附一段简短 Handoff Delta；"
-            "没有增量时直接从权威状态继续。"
+            "上述公开 Contract。交接方还应提供一段紧凑的 Current Chat-Codex Transaction，说明相关"
+            "Codex 任务、Goal、状态、输入基线、预期产物以及应等待、检查、审查或处理的 blocker。"
+            "仅在存在权威文件无法恢复的用户决定、本地事务、未落库证据或待决问题时附 Handoff Delta，"
+            "并以一个下一行动结束。不要复制 Project Instructions 或完整 Codex Goal。上下文压缩或"
+            "扩窗不改变角色、证据或审查状态。"
         )
     else:
         print(

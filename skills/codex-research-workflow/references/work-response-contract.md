@@ -242,16 +242,28 @@ re-ground only from the active task and the minimum current authority needed for
 the next state-sensitive decision instead of replaying the full history.
 
 Use a compact Controller Packet for a reviewer-to-controller switch inside the
-same conversation. For a new conversation, start from repository authority and
-the standard `resume-prompt`. Add a short Handoff Delta only for information not
-recoverable there: conversation-only user decisions or rejected routes,
-unfinished authorized local work, unrecorded decision-relevant evidence or a
-real blocker, and one unresolved decision or action. Do not copy research
-background, method, claim limits, results, or history already available in the
-current authorities and reports. If no such delta exists, the standard prompt
-is sufficient. If a complete Codex Goal already exists and no local-only state
-remains, reuse that Goal unchanged rather than asking the old conversation to
-rewrite it.
+same conversation. A new browser controller conversation starts from repository
+authority and the standard Work `resume-prompt`, then receives a compact Context
+Primer and the current Chat-Codex transaction. The primer briefly explains the
+user's controller-executor workflow, the project research question, target
+contribution, core method chain, intended paper or deliverable, current phase,
+and claim ceiling. It may summarize authority for orientation, but detailed
+methods, metrics, protocols, findings, and history remain in the current
+authorities and reports.
+
+The current transaction identifies the relevant Codex task, its one-sentence
+Goal, status, input baseline, expected deliverables, and whether the controller
+should wait, inspect, review, or resolve a blocker. Distinguish verified
+repository state from Codex-reported local state. Add a short Handoff Delta only
+for information not recoverable from Project Instructions or repository
+authority: conversation-only user decisions or rejected routes, unfinished
+authorized local work, unrecorded decision-relevant evidence or a real blocker,
+and one unresolved decision or action. End with one next action and the material
+work that must not be duplicated. Do not copy Project Instructions or the full
+Codex Goal into the handoff.
+
+For a new Codex task, if a complete Goal already exists and no local-only state
+remains, reuse that Goal unchanged; add only the necessary local Handoff Delta.
 
 A recipient with direct repository access reverifies mutable state and may
 perform the required review. A recipient without it requests one bounded
@@ -266,8 +278,8 @@ context. The invalid packet does not invalidate previously verified state or a
 qualified review.
 
 A handoff is not a formal review, Codex Goal, evidence promotion, or reason to
-update repository authority. Do not persist the packet unless its material
-content independently warrants an authority update.
+update repository authority. Do not persist the Context Primer or Handoff Delta
+unless its material content independently warrants an authority update.
 
 ## Decision And Safety Boundaries
 

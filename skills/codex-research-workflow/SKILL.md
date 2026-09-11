@@ -333,12 +333,28 @@ paste into a browser conversation.
 
 A controller handoff is not a formal review or a reason to update repository
 authority. A same-conversation reviewer-to-controller switch uses a compact
-Controller Packet. A new controller conversation starts from repository
-authority and the Work `resume-prompt`, with only the Handoff Delta described
-above when one exists. A recipient with direct repository access reverifies
-mutable state and may perform the required review. One without it requests one
-bounded verification from a reviewer with the required access. Do not force a
-model switch or duplicate a qualified review. Keep any delta temporary unless a
+Controller Packet.
+
+A new browser controller conversation uses the Work `resume-prompt` plus a
+compact Context Primer and the current Chat-Codex transaction. The Context
+Primer briefly explains the user's controller-executor workflow, the project's
+research question, target contribution, core method chain, intended paper or
+deliverable, current phase, and claim ceiling. It may summarize repository
+authority for orientation but does not replace it; detailed methods, metrics,
+protocols, findings, and history remain in current authorities and reports.
+
+The current transaction identifies the relevant Codex task, its one-sentence
+Goal, status, input baseline, expected deliverables, and whether the controller
+should wait, inspect, review, or resolve a blocker. Distinguish verified
+repository state from Codex-reported local state. Append the Handoff Delta
+described above only when one exists, then end with one next action and the
+material work that must not be duplicated. Do not copy Project Instructions or
+the full Codex Goal into the handoff.
+
+A recipient with direct repository access reverifies mutable state and may
+perform the required review. One without it requests one bounded verification
+from a reviewer with the required access. Do not force a model switch or
+duplicate a qualified review. Keep the primer and delta temporary unless a
 material decision independently belongs in repository authority.
 
 If a generated handoff is malformed, incomplete, contains placeholders, or
