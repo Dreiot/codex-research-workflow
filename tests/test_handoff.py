@@ -216,7 +216,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             for authority in ("AGENTS.md", "PROJECT_CORE.md", "CURRENT_STAGE.md"):
                 self.assertIn(authority, prompts[surface])
             self.assertIn(f"- Project: `{self.repo.name}`", prompts[surface])
-            self.assertIn(f"- Git root: `{self.repo}`", prompts[surface])
+            self.assertIn(f"- Project root: `{self.repo}`", prompts[surface])
             self.assertIn(f"- Expected HEAD: `{current_head}`", prompts[surface])
 
         work_prompt = prompts["work"]
@@ -228,7 +228,9 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertNotIn("- Target outcome:", work_prompt)
         self.assertNotIn("- Primary direction:", work_prompt)
         self.assertIn("另用一个短段概括目标贡献、核心方法链", work_prompt)
-        self.assertIn("新对话仍须从 GitHub 核验可变状态", work_prompt)
+        self.assertIn("新对话仍须核验可变状态", work_prompt)
+        self.assertIn("先通过可访问的本地文件", work_prompt)
+        self.assertNotIn("先从 GitHub 重新读取", work_prompt)
         self.assertIn("Current Chat-Codex Transaction", work_prompt)
         self.assertIn("权威文件无法恢复的用户决定", work_prompt)
         self.assertIn("不要复制 Project Instructions 或完整 Codex Goal", work_prompt)
@@ -238,7 +240,8 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertTrue(codex_prompt.startswith("$codex-research-workflow"))
         self.assertIn("这是状态恢复骨架，不是新的研究 Goal", codex_prompt)
         self.assertIn("附加 Goal 所需的当前报告", codex_prompt)
-        self.assertIn("轻量核对 Git 根、branch、HEAD", codex_prompt)
+        self.assertIn("轻量核对项目根及相关来源版本", codex_prompt)
+        self.assertIn("已有Git时再核对branch、HEAD", codex_prompt)
         self.assertIn("未附 Controller Goal 时只恢复并报告状态", codex_prompt)
         self.assertIn("不回放完整历史", codex_prompt)
         self.assertIn("不在旧长上下文中反复生成", codex_prompt)

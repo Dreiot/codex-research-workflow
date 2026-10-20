@@ -1,19 +1,30 @@
 # Initialization and Migration
 
-The Codex-opened project root, authority root, and exact Git root are one
-directory. `--repo` always names that directory. A nested Git repository is an
-invalid project layout, not a supported multi-root mode.
+The Codex-opened project root and authority root are one directory. `--repo`
+always names it. If Git exists, its exact root must be the same directory;
+nested Git repositories remain an invalid project layout.
 
 ## New projects
 
-Run `workflow.py init --repo <repo>` without `--apply` first. The plan must
-report the exact target, Git status, branch/history, nested repositories,
-remote/GitHub state, proposed authority files, `.gitignore` additions, upload
-scope, exclusions, suspected credentials, large files, and blockers.
+Run `workflow.py init --repo <project>` without `--apply` first. By default it
+plans only local authority files, preserving existing files and scientific
+constraints. A plain directory needs neither Git nor a GitHub account; no
+repository, commit, remote, upload or `.gitignore` is created for it.
+
+Only after an explicit user request to create repositories:
+
+- `--create-git` enables local Git creation at the project root.
+- `--github-repo OWNER/NAME --visibility ...` explicitly enables GitHub creation
+  and implies local Git creation. Do not infer this request from “initialize”.
+
+For Git-enabled initialization, the plan additionally reports Git status,
+branch/history, nested repositories, remote state, `.gitignore` additions,
+exact commit/upload scope, exclusions, suspected credentials, large files and
+blockers. The existing protections continue to apply:
 
 - Use `main` for a new repository without creating another branch.
-- If GitHub is absent, require the user to choose owner, repository name, and
-  visibility before creation.
+- If GitHub creation is requested, require owner, repository name and visibility;
+  otherwise a local-only repository needs no remote.
 - If a remote contains history, stop; never overwrite, force-push, or infer a
   merge.
 - For a nonempty directory, stage the exact reviewed safe scope, never
@@ -28,10 +39,14 @@ history, remote, or safety finding invalidates approval.
 
 ## Existing governed projects
 
-Use `workflow.py migrate --repo <repo>` rather than `init`. The migration plan
+Use `workflow.py migrate --repo <project>` rather than `init`. The migration plan
 may add current stable experiment-root and ignore rules while preserving
 existing authorities, internal schema markers, Git history, reports, and
 project-specific supporting documents.
+
+Without Git, migration updates only local files and does not commit, push or
+create a repository. Git-dependent history checks and commit/push behavior
+apply only to an existing Git repository and its configured remote.
 
 Migration does not compact authorities, relocate experiments, or delete
 artifacts. Those are independent user-authorized transactions. Existing remote

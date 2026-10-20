@@ -6,12 +6,12 @@
 
 # Codex Research Workflow
 
-两个按需加载、互相配合的 Codex Skill，面向既要快速推进、又不能丢失精确科研状态的长期研究仓库。
+两个按需加载、互相配合的 Codex Skill，面向既要快速推进、又不能丢失精确科研状态的长期研究项目。
 
 - **`$codex-research-workflow`** 统一 Git 身份、长期方向、当前 Gate、实验产物、证据、审查与交接。
 - **`$research-artifact-cleanup`** 只通过用户批准、与项目状态绑定的精确计划清理过时科研产物。
 
-探索保持轻量；会改变方法、基线、数据划分、指标、停止条件或论文 claim 的决定，必须落成 Git 可访问证据。
+探索保持轻量；会改变方法、基线、数据划分、指标、停止条件或论文 claim 的决定，必须有可访问、足以支持决策的证据。Git 与 GitHub 可选；已有历史仍具权威，基于精确提交的正式提升仍保留原有前提。
 
 <p align="center">
   <img src="./assets/readme/system-map.svg" width="100%" alt="Git 权威进入最小科研执行、证据候选与明确方向决策">
@@ -50,7 +50,7 @@ npx skills add Dreiot/codex-research-workflow
 py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.py" audit --repo C:\项目路径
 ```
 
-Codex 打开的项目根与精确 Git 根必须是同一目录。嵌套或双根结构会停止，等待显式根目录迁移。
+只有用户明确要求时才创建 Git 或 GitHub 仓库。没有 Git 时，`init` 只计划本地权威文件；明确要求创建本地仓库时使用 `--create-git`，明确要求创建 GitHub 仓库时使用 `--github-repo OWNER/NAME --visibility ...`。已有 Git 时，其精确根必须与 Codex 打开的项目根相同；嵌套或双根结构仍会停止，等待显式根目录迁移。
 
 旧治理项目先只查看迁移计划：
 
@@ -68,7 +68,7 @@ py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.p
 | `docs/PROJECT_CORE.md` | 长期 | 研究问题、主方向、创新假设、组件、往期方向综合裁定、claim 上限 | 当前分支、Gate 或下一动作 |
 | `docs/CURRENT_STAGE.md` | 当前 | 分支、当前 Gate、reviewed/accepted identity、findings、唯一下一动作 | 编年历史 |
 
-Git 与已提交证据保持权威。聊天摘要只是入口，不是状态。改名前创建的项目继续兼容 `codex-project-core` 与 `codex-handoff-state` 内部标识。
+已有 Git 历史与已提交证据保持权威。没有 Git 时使用本地权威文件及保留的来源、证据版本，分支和 SHA 字段为 `null`，不虚构身份。聊天摘要只是入口，不是状态。改名前创建的项目继续兼容 `codex-project-core` 与 `codex-handoff-state` 内部标识。
 
 ## 实验产物不再污染仓库根目录
 
@@ -123,10 +123,10 @@ experiments/
 
 | 命令 | 用途 |
 |---|---|
-| `workflow.py init` | 完成 Git/GitHub 安全检查后计划并初始化新的 `main` 仓库 |
+| `workflow.py init` | 计划本地权威文件；仅在明确要求时创建 Git/GitHub，并保留建仓和上传安全检查 |
 | `workflow.py migrate` | 补充新策略，不移动产物、不重写科研内容 |
 | `workflow.py audit` | 在 commit/push、正式提升、权威更新、显式交接或实质状态冲突前执行完整核验 |
-| `workflow.py prepare-experiment` | 按需生成忽略的 `research-experiment-run/v1` 清单 |
+| `workflow.py prepare-experiment` | 按需生成本地 `research-experiment-run/v1` 清单；使用 Git 时保持 ignored |
 | `workflow.py prepare-evidence` | 建立跟踪的 `research-evidence-candidate/v2` 证据包 |
 | `workflow.py validate-evidence` | 校验 schema、报告章节、产物完整性和 Git 可访问性，并兼容旧 v1 hash 校验 |
 | `workflow.py record-review` | 记录一次明确的正式提升审查 |
@@ -140,7 +140,7 @@ experiments/
 
 - 可选 `SessionStart` Hook 只读且 fail-open，仅注入精简权威/Gate 指针；显式 `audit` 仍然 fail-closed。
 - reviewer Hook 保留正式审查边界，不会因为咨询过 reviewer 就自动生成状态事务。
-- 新项目初始化拒绝嵌套仓库、可疑上传范围、敏感/超大文件和已有远端历史，永不 force-push。
+- 新项目初始化拒绝嵌套仓库；启用 Git 时还保留上传范围、敏感/超大文件和已有远端历史检查，永不 force-push。
 - Cleanup 盘点只读取元数据、跟踪引用和 Git 状态，不读取大型运行内容或原始数据来擅自分类。
 - 兼容 Contract 路径与新路径保持字节一致，旧 ChatGPT Work Project Instruction 在改名后仍能继续读取。
 

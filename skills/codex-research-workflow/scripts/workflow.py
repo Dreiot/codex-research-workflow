@@ -107,14 +107,19 @@ BLOCKING_LANGUAGE_RE = re.compile(
 
 
 def git(repo: Path, *args: str, check: bool = True) -> str:
-    result = subprocess.run(
-        ["git", "-C", str(repo), *args],
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        capture_output=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo), *args],
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        if check:
+            raise RuntimeError("Git is unavailable for this Git-specific operation")
+        return ""
     if check and result.returncode != 0:
         raise RuntimeError(result.stderr.strip() or "git command failed")
     return result.stdout.strip()
@@ -242,6 +247,9 @@ def initialize_authorities(repo: Path) -> List[str]:
         agents.write_text(
             "# Project Agent Rules\n\n"
             "## Authority\n\n"
+            "- Git and GitHub are optional. Create either only at the user's explicit request, "
+            "inside this project root. Without Git, use the local authority files and retained "
+            "evidence; Git root/branch/HEAD, tracking and commit rules below apply only where available.\n"
             "- Read `docs/PROJECT_CORE.md` for durable strategy and `docs/CURRENT_STAGE.md` "
             "for current state. For an ordinary Goal, check the exact root, branch, expected HEAD, "
             "and conflicting local changes. Run a full audit only before commit/push, formal promotion, "
@@ -336,7 +344,7 @@ def initialize_authorities(repo: Path) -> List[str]:
         state = {
             "schema_version": 1,
             "project": repo.name,
-            "branch": git(repo, "branch", "--show-current") or "main",
+            "branch": (git(repo, "branch", "--show-current") or "main") if exact_repo(repo) else None,
             "research_phase": "exploratory_iteration",
             "current_gate": "Begin the shortest empirical loop",
             "last_reviewed_candidate": None,
@@ -359,7 +367,7 @@ def initialize_authorities(repo: Path) -> List[str]:
 
 def initialize_experiment_policy(repo: Path) -> List[str]:
     changed: List[str] = []
-    if merge_ignore_rules(repo / ".gitignore"):
+    if exact_repo(repo) and merge_ignore_rules(repo / ".gitignore"):
         changed.append(".gitignore")
     return changed
 
@@ -369,17 +377,30 @@ def json_print(value: Dict[str, Any]) -> None:
 
 
 def find_repo(start: Path) -> Optional[Path]:
-    result = subprocess.run(
-        ["git", "-C", str(start), "rev-parse", "--show-toplevel"],
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        capture_output=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(start), "rev-parse", "--show-toplevel"],
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return None
     if result.returncode != 0:
         return None
     return Path(result.stdout.strip()).resolve()
+
+
+def find_project(start: Path) -> Optional[Path]:
+    repo = find_repo(start)
+    if repo:
+        return repo
+    for directory in (start, *start.parents):
+        if any((directory / rel).is_file() for rel in (CORE_REL, STATE_REL)):
+            return directory
+    return None
 
 
 def read_envelope(path: Path, marker: str, label: str) -> Tuple[Optional[Dict[str, Any]], List[str], str]:
@@ -511,9 +532,15 @@ def validate_state(repo: Path, state: Dict[str, Any]) -> List[str]:
         errors.extend(
             validate_review_semantics(state.get("review_verdict"), state.get("open_findings"))
         )
-    for key in ("project", "branch", "research_phase", "current_gate", "next_gate", "next_action"):
+    for key in ("project", "research_phase", "current_gate", "next_gate", "next_action"):
         if not isinstance(state.get(key), str) or not state.get(key, "").strip():
             errors.append(f"{key} must be a non-empty string")
+    branch = state.get("branch")
+    if branch is None:
+        if exact_repo(repo):
+            errors.append("branch must be a non-empty string in a Git repository")
+    elif not isinstance(branch, str) or not branch.strip():
+        errors.append("branch must be a non-empty string or null without Git")
     for key in ("last_reviewed_candidate", "accepted_code_commit"):
         value = state.get(key)
         if value is not None and (not isinstance(value, str) or not SHA_RE.fullmatch(value)):
@@ -582,7 +609,7 @@ def render_state(state: Dict[str, Any]) -> str:
     return (
         "# Current Stage\n\n"
         f"{STATE_START}\n{payload}\n{ENVELOPE_END}\n\n"
-        "This file is the canonical volatile handoff state. Verify all SHAs against Git; "
+        "This file is the canonical volatile handoff state. Git is optional; verify recorded SHAs against Git; "
         "the JSON block never records the commit that contains this file.\n\n"
         "## Current Gate\n\n"
         f"- Research phase: `{state['research_phase']}`\n"
@@ -599,7 +626,9 @@ def render_state(state: Dict[str, Any]) -> str:
         "## Resume Rule\n\n"
         "Read `AGENTS.md`, `docs/PROJECT_CORE.md`, and this file. For an ordinary Goal, check "
         "the exact Git root, branch, actual HEAD against the Goal's expected base, and conflicting "
-        "index or worktree changes. Fetch, check the tracking ref, and run the full audit only before "
+        "index or worktree changes when Git exists; otherwise verify the project root, local "
+        "authorities and relevant source/evidence versions. Fetch and check the tracking ref "
+        "when a remote exists, and run the full audit only before "
         "commit/push, formal promotion, authority updates, explicit handoff, or a material state "
         "conflict. Stop and report any mismatch.\n"
     )
@@ -732,15 +761,16 @@ def audit(repo: Path) -> Dict[str, Any]:
                 + ", ".join(run_headings)
             )
 
-    branch = git(repo, "branch", "--show-current")
-    head = git(repo, "rev-parse", "HEAD")
-    status = git(repo, "status", "--short", "--untracked-files=all")
+    has_git = exact_repo(repo) is not None
+    branch = git(repo, "branch", "--show-current") if has_git else None
+    head = git(repo, "rev-parse", "HEAD") if has_git else None
+    status = git(repo, "status", "--short", "--untracked-files=all") if has_git else None
     if state:
         if state.get("branch") != branch:
             errors.append(f"state branch {state.get('branch')!r} != Git branch {branch!r}")
         for key in ("last_reviewed_candidate", "accepted_code_commit"):
             sha = state.get(key)
-            if sha and not commit_exists(repo, sha):
+            if sha and (not has_git or not commit_exists(repo, sha)):
                 errors.append(f"{key} is not available in Git: {sha}")
             elif sha and not is_ancestor(repo, sha, head):
                 errors.append(f"{key} is not an ancestor of HEAD: {sha}")
@@ -761,17 +791,18 @@ def audit(repo: Path) -> Dict[str, Any]:
     if legacy:
         warnings.append("legacy handoff files present: " + ", ".join(legacy))
 
-    state_commit = git(repo, "log", "-1", "--format=%H", "--", STATE_REL.as_posix(), check=False)
-    core_commit = git(repo, "log", "-1", "--format=%H", "--", CORE_REL.as_posix(), check=False)
+    state_commit = git(repo, "log", "-1", "--format=%H", "--", STATE_REL.as_posix(), check=False) if has_git else None
+    core_commit = git(repo, "log", "-1", "--format=%H", "--", CORE_REL.as_posix(), check=False) if has_git else None
     head_newer_than_state = bool(state_commit and state_commit != head)
     return {
         "repo": str(repo),
+        "git_repository": has_git,
         "branch": branch,
         "head": head,
         "state_commit": state_commit or None,
         "core_commit": core_commit or None,
         "head_newer_than_state": head_newer_than_state,
-        "worktree_clean": not bool(status),
+        "worktree_clean": not bool(status) if has_git else None,
         "errors": errors,
         "warnings": warnings,
         "core": core,
@@ -781,7 +812,7 @@ def audit(repo: Path) -> Dict[str, Any]:
 
 def command_audit(args: argparse.Namespace) -> int:
     try:
-        repo = require_exact_git_repo(args.repo)
+        repo = require_project_root(args.repo, require_history=True)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -802,7 +833,7 @@ def command_audit(args: argparse.Namespace) -> int:
 
 def command_initialize(args: argparse.Namespace) -> int:
     try:
-        repo = require_exact_git_repo(args.repo, require_history=False)
+        repo = require_project_root(args.repo)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -826,11 +857,15 @@ def sensitive_initial_path(rel: Path) -> bool:
     )
 
 
-def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str]) -> Dict[str, Any]:
+def init_plan(
+    target: Path, github_repo: Optional[str], visibility: Optional[str], create_git: bool = False
+) -> Dict[str, Any]:
     target = target.resolve()
     if not target.is_dir():
         raise ValueError("target directory does not exist")
     discovered = find_repo(target)
+    if not discovered and any((directory / ".git").exists() for directory in (target, *target.parents)):
+        raise ValueError("existing Git metadata cannot be resolved; inspect it before initialization")
     if discovered and discovered != target:
         raise ValueError(f"target is nested inside Git repository: {discovered}")
     nested = [item for item in target.rglob(".git") if item.parent != target]
@@ -839,6 +874,7 @@ def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str
     repo = discovered
     if repo and current_head(repo):
         raise ValueError("repository already has commits; use migrate")
+    use_git = bool(repo or create_git or github_repo)
     origin = remote_url(repo) if repo else None
     if origin:
         probe = run(["git", "-C", str(repo), "ls-remote", "--heads", "origin"])
@@ -846,8 +882,6 @@ def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str
             raise ValueError("cannot verify origin remote")
         if probe.stdout.strip():
             raise ValueError("origin already has branch history; refusing overwrite")
-    elif not github_repo:
-        raise ValueError("no origin remote; provide --github-repo OWNER/NAME and --visibility")
     if github_repo and not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", github_repo):
         raise ValueError("--github-repo must be OWNER/NAME")
     if github_repo and visibility not in {"public", "private", "internal"}:
@@ -855,7 +889,7 @@ def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str
 
     include: List[Dict[str, Any]] = []
     blocked: List[str] = []
-    for path in sorted(target.rglob("*")):
+    for path in sorted(target.rglob("*")) if use_git else []:
         if not path.is_file() or ".git" in path.parts:
             continue
         rel = path.relative_to(target)
@@ -869,10 +903,11 @@ def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str
         "origin": origin,
         "github_repo": github_repo,
         "visibility": visibility,
+        "create_git": bool(not repo and (create_git or github_repo)),
         "initial_files": include,
         "blocked_files": blocked,
-        "creates": ["AGENTS.md", CORE_REL.as_posix(), STATE_REL.as_posix(), ".gitignore"],
-        "branch": "main",
+        "creates": ["AGENTS.md", CORE_REL.as_posix(), STATE_REL.as_posix()] + ([".gitignore"] if use_git else []),
+        "branch": "main" if use_git else None,
     }
     payload["plan_id"] = stable_id(payload, "init")
     return payload
@@ -881,7 +916,7 @@ def init_plan(target: Path, github_repo: Optional[str], visibility: Optional[str
 def command_init(args: argparse.Namespace) -> int:
     target = Path(args.repo).resolve()
     try:
-        plan = init_plan(target, args.github_repo, args.visibility)
+        plan = init_plan(target, args.github_repo, args.visibility, args.create_git)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -895,14 +930,18 @@ def command_init(args: argparse.Namespace) -> int:
         print("plan changed or --expected-plan-id is missing", file=sys.stderr)
         return 2
     repo = exact_repo(target)
-    if not repo:
+    if not repo and plan["create_git"]:
         result = run(["git", "init", "-b", "main", str(target)])
         if result.returncode != 0:
             print(result.stderr.strip(), file=sys.stderr)
             return 2
         repo = target
-    else:
+    elif repo:
         git(repo, "branch", "-M", "main")
+    if not repo:
+        created = initialize_authorities(target)
+        json_print({"status": "initialized", "plan_id": plan["plan_id"], "head": None, "created": created})
+        return 0
     if not remote_url(repo) and args.github_repo:
         create = run(
             ["gh", "repo", "create", args.github_repo, f"--{args.visibility}", "--source", str(repo), "--remote", "origin"]
@@ -921,16 +960,16 @@ def command_init(args: argparse.Namespace) -> int:
         print("nothing staged; initialization aborted", file=sys.stderr)
         return 2
     git(repo, "commit", "-m", "chore: initialize Codex Research Workflow")
-    git(repo, "push", "-u", "origin", "main")
+    if remote_url(repo):
+        git(repo, "push", "-u", "origin", "main")
     json_print({"status": "initialized", "plan_id": plan["plan_id"], "head": git(repo, "rev-parse", "HEAD"), "staged_paths": staged.splitlines()})
     return 0
 
 
 def migration_plan(repo: Path) -> Dict[str, Any]:
-    repo = repo.resolve()
-    if exact_repo(repo) != repo or not current_head(repo):
-        raise ValueError("migrate requires the exact root of an existing Git repository")
-    if not clean_worktree(repo):
+    repo = require_project_root(str(repo), require_history=True)
+    has_git = exact_repo(repo) is not None
+    if has_git and not clean_worktree(repo):
         raise ValueError("migrate requires a clean worktree")
     agents = repo / "AGENTS.md"
     agents_text = agents.read_text(encoding="utf-8", errors="replace") if agents.is_file() else ""
@@ -940,7 +979,7 @@ def migration_plan(repo: Path) -> Dict[str, Any]:
     root = experiment_root(repo).as_posix().rstrip("/")
     ignore_rules = tuple(f"{root}/{part}/" for part in ("runs", ".tmp", "quarantine"))
     ignore_text = (repo / ".gitignore").read_text(encoding="utf-8", errors="replace") if (repo / ".gitignore").is_file() else ""
-    if any(rule not in {line.strip() for line in ignore_text.splitlines()} for rule in ignore_rules):
+    if has_git and any(rule not in {line.strip() for line in ignore_text.splitlines()} for rule in ignore_rules):
         changes.append("add generated-artifact ignore rules")
     for rel in ("AGENTS.md", CORE_REL.as_posix(), STATE_REL.as_posix()):
         if not (repo / rel).is_file():
@@ -991,10 +1030,13 @@ def command_migrate(args: argparse.Namespace) -> int:
     if append_experiment_policy(repo):
         changed.append("AGENTS.md")
     root = experiment_root(repo).as_posix().rstrip("/")
-    if merge_ignore_rules(repo / ".gitignore", tuple(f"{root}/{part}/" for part in ("runs", ".tmp", "quarantine"))):
+    if exact_repo(repo) and merge_ignore_rules(repo / ".gitignore", tuple(f"{root}/{part}/" for part in ("runs", ".tmp", "quarantine"))):
         changed.append(".gitignore")
     if not changed:
         json_print({"status": "already-current", "plan_id": plan["plan_id"], "head": current_head(repo)})
+        return 0
+    if not exact_repo(repo):
+        json_print({"status": "migrated", "plan_id": plan["plan_id"], "head": None, "changed": sorted(set(changed))})
         return 0
     git(repo, "add", "--", *sorted(set(changed)))
     git(repo, "commit", "-m", "chore: migrate to Codex Research Workflow")
@@ -1023,6 +1065,20 @@ def require_exact_git_repo(value: str, require_history: bool = True) -> Path:
     raise ValueError("command requires one project root that is also the exact Git root")
 
 
+def require_project_root(value: str, require_history: bool = False) -> Path:
+    project = Path(value).resolve()
+    if not project.is_dir():
+        raise ValueError("target directory does not exist")
+    discovered = find_repo(project)
+    if discovered:
+        return require_exact_git_repo(value, require_history=require_history)
+    if any((directory / ".git").exists() for directory in (project, *project.parents)):
+        raise ValueError("existing Git metadata cannot be resolved")
+    if any(path.parent != project for path in project.rglob(".git")):
+        raise ValueError("project root contains a nested Git repository; use one project root")
+    return project
+
+
 def require_ignored(repo: Path, rel: Path) -> None:
     probe = run(["git", "-C", str(repo), "check-ignore", "--no-index", "--quiet", rel.as_posix()])
     if probe.returncode != 0:
@@ -1031,12 +1087,13 @@ def require_ignored(repo: Path, rel: Path) -> None:
 
 def command_prepare_experiment(args: argparse.Namespace) -> int:
     try:
-        repo = require_exact_git_repo(args.repo)
+        repo = require_project_root(args.repo, require_history=True)
         experiment_id = validate_id(args.experiment_id, "experiment-id")
         root = experiment_root(repo)
         run_id = validate_id(args.run_id or next_identifier(repo / root / "runs" / experiment_id, "r"), "run-id")
         rel_dir = root / "runs" / experiment_id / run_id
-        require_ignored(repo, rel_dir / "manifest.json")
+        if exact_repo(repo):
+            require_ignored(repo, rel_dir / "manifest.json")
         target = repo / rel_dir
         if target.exists():
             raise ValueError(f"run already exists: {rel_dir.as_posix()}")
@@ -1045,7 +1102,7 @@ def command_prepare_experiment(args: argparse.Namespace) -> int:
             snapshot_path = repo / require_relative_path(source_snapshot, "source-snapshot")
             if not snapshot_path.is_file():
                 raise ValueError(f"source snapshot is not a file: {source_snapshot}")
-        dirty = not clean_worktree(repo)
+        dirty = not clean_worktree(repo) if exact_repo(repo) else None
         manifest = {
             "schema": RUN_SCHEMA,
             "experiment_id": experiment_id,
@@ -1334,9 +1391,10 @@ def command_record_review(args: argparse.Namespace) -> int:
 
 
 def command_resume_prompt(args: argparse.Namespace) -> int:
-    repo = find_repo(Path(args.repo).resolve())
-    if not repo:
-        print("not a Git repository", file=sys.stderr)
+    try:
+        repo = require_project_root(args.repo, require_history=True)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 2
     core, core_errors = read_core(repo)
     state, state_errors = read_state(repo)
@@ -1356,12 +1414,23 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         return 2
-    identity = (
-        f"- Project: `{core['project']}`\n"
-        f"- Git root: `{snapshot['repo']}`\n"
-        f"- Expected branch: `{snapshot['branch']}`\n"
-        f"- Expected HEAD: `{snapshot['head']}`\n"
-        f"- Worktree clean when generated: `{str(snapshot['worktree_clean']).lower()}`\n"
+    identity = f"- Project: `{core['project']}`\n- Project root: `{snapshot['repo']}`\n"
+    if snapshot["git_repository"]:
+        identity += (
+            f"- Expected branch: `{snapshot['branch']}`\n"
+            f"- Expected HEAD: `{snapshot['head']}`\n"
+            f"- Worktree clean when generated: `{str(snapshot['worktree_clean']).lower()}`\n"
+        )
+    else:
+        identity += "- Git/GitHub: not enabled; use local authorities and retained source/evidence versions.\n"
+    remote = remote_url(repo) if snapshot["git_repository"] else None
+    work_source = (
+        "先从已配置远端重新读取 `AGENTS.md`、`docs/PROJECT_CORE.md`、"
+        "`docs/CURRENT_STAGE.md` 及其指向的最新报告，核验远端分支与实际 HEAD；"
+        if remote else
+        "先通过可访问的本地文件、已授权连接或用户提供的副本重新读取 `AGENTS.md`、"
+        "`docs/PROJECT_CORE.md`、`docs/CURRENT_STAGE.md` 及其指向的最新报告；"
+        "无法直接读取时，获取一次有位置依据的本地核对，不要求为此创建Git或GitHub仓库。"
     )
     context_primer = (
         f"- Research question: {' '.join(str(core['research_question']).split())}\n"
@@ -1377,10 +1446,9 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             f"{context_primer}\n"
             "以上只是确定性定向信息。交接方应另用一个短段概括目标贡献、核心方法链、论文或交付目标"
             "和 claim ceiling；详细方法、证据、数值和历史仍从下列权威文件与其报告核验。\n\n"
-            "生成时本地接续身份如下；它只是入口，新对话仍须从 GitHub 核验可变状态：\n\n"
+            "生成时本地接续身份如下；它只是入口，新对话仍须核验可变状态：\n\n"
             f"{identity}\n"
-            "先从 GitHub 重新读取 `AGENTS.md`、`docs/PROJECT_CORE.md`、"
-            "`docs/CURRENT_STAGE.md` 及其指向的最新报告，核验远端分支与实际 HEAD；"
+            f"{work_source}"
             "本 Prompt 和旧聊天摘要都不是权威状态。再读取公开输出规范：\n"
             f"{WORK_CONTRACT_URL}\n\n"
             "网页端不加载本机 Codex Skill；请遵守本项目的 Project Instructions、可见上下文和"
@@ -1399,8 +1467,9 @@ def command_resume_prompt(args: argparse.Namespace) -> int:
             "生成时的确定性接续身份：\n\n"
             f"{identity}\n"
             "先读取并遵守 `AGENTS.md`，再读取 `docs/PROJECT_CORE.md`、"
-            "`docs/CURRENT_STAGE.md` 及附加 Goal 所需的当前报告，然后轻量核对 Git 根、branch、HEAD 和"
-            "冲突性工作树状态；实质冲突时停止。未附 Controller Goal 时只恢复并报告状态，不自行选择"
+            "`docs/CURRENT_STAGE.md` 及附加 Goal 所需的当前报告，然后轻量核对项目根及相关来源版本；"
+            "已有Git时再核对branch、HEAD和冲突性工作树状态。实质冲突时停止受影响操作。"
+            "未附 Controller Goal 时只恢复并报告状态，不自行选择"
             "下一研究任务。\n\n"
             "上下文压缩或扩窗不改变权威、权限或 review state。压缩后只按当前 Goal 所需的最小权威"
             "重新落地，不回放完整历史。若旧任务生成的交接出现乱码、占位符、草稿泄漏或不完整内容，"
@@ -1418,7 +1487,8 @@ def build_parser() -> argparse.ArgumentParser:
     audit_parser.set_defaults(func=command_audit)
     init_parser = sub.add_parser("init")
     init_parser.add_argument("--repo", default=".")
-    init_parser.add_argument("--github-repo")
+    init_parser.add_argument("--create-git", action="store_true", help="create local Git only after an explicit user request")
+    init_parser.add_argument("--github-repo", help="explicitly create OWNER/NAME on GitHub; implies --create-git")
     init_parser.add_argument("--visibility", choices=("public", "private", "internal"))
     init_parser.add_argument("--apply", action="store_true")
     init_parser.add_argument("--expected-plan-id")

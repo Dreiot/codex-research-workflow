@@ -6,12 +6,12 @@
 
 # Codex Research Workflow
 
-Two progressive-disclosure Codex Skills for research repositories that must move quickly without losing the exact state of the work.
+Two progressive-disclosure Codex Skills for research projects that must move quickly without losing the exact state of the work.
 
 - **`$codex-research-workflow`** keeps Git identity, durable direction, the current Gate, experiments, evidence, reviews, and handoffs coherent.
 - **`$research-artifact-cleanup`** removes obsolete research artifacts only through an explicit, state-bound plan approved by the user.
 
-Exploration stays lightweight. Decisions that change a method, baseline, data split, metric, stopping rule, or paper claim become Git-accessible evidence.
+Exploration stays lightweight. Decisions that change a method, baseline, data split, metric, stopping rule, or paper claim need accessible, decision-complete evidence. Git and GitHub are optional; existing history remains authoritative, and formal commit-backed promotion retains its prerequisites.
 
 <p align="center">
   <img src="./assets/readme/system-map.svg" width="100%" alt="Git authority flows into minimal execution, tracked evidence, and an explicit research decision">
@@ -50,8 +50,12 @@ Then audit an existing governed project:
 py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.py" audit --repo C:\path\to\project
 ```
 
-The Codex-opened project root and exact Git root must be the same directory.
-Nested or split-root project layouts stop for an explicit root migration.
+Git and GitHub repositories are created only at the user's explicit request.
+Without Git, `init` plans local authority files only. Use `--create-git` for an
+explicit local-repository request, or `--github-repo OWNER/NAME --visibility ...`
+for an explicit GitHub-repository request. When Git exists, its exact root must
+be the Codex-opened project root. Nested or split-root project layouts still
+stop for an explicit root migration.
 
 For an older governed project, preview migration before changing anything:
 
@@ -69,7 +73,7 @@ py -3 "$env:USERPROFILE\.codex\skills\codex-research-workflow\scripts\workflow.p
 | `docs/PROJECT_CORE.md` | durable | research question, main direction, innovation hypotheses, components, synthesized past-direction decisions, claim ceiling | current branch, Gate, or next action |
 | `docs/CURRENT_STAGE.md` | current | branch, current Gate, reviewed/accepted identity, findings, one next action | chronological history |
 
-Git and checked-in evidence remain authoritative. Chat summaries are pointers, not state. Existing `codex-project-core` and `codex-handoff-state` markers remain compatible with projects created before the rename.
+Existing Git history and checked-in evidence remain authoritative. Without Git, use local authority files and retained source/evidence versions; branch and SHA fields are `null`, not invented identities. Chat summaries are pointers, not state. Existing `codex-project-core` and `codex-handoff-state` markers remain compatible with projects created before the rename.
 
 ## Experiments without repository sprawl
 
@@ -127,10 +131,10 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 
 | Command | Purpose |
 |---|---|
-| `workflow.py init` | plan and initialize a new `main` repository after Git/GitHub safety checks |
+| `workflow.py init` | plan local authority files; create Git/GitHub only when explicitly requested, retaining creation and upload safety checks |
 | `workflow.py migrate` | add current policy without moving artifacts or rewriting scientific content |
 | `workflow.py audit` | full check before commit/push, formal promotion, authority updates, explicit handoff, or material state conflicts |
-| `workflow.py prepare-experiment` | create an ignored `research-experiment-run/v1` manifest on demand |
+| `workflow.py prepare-experiment` | create a local `research-experiment-run/v1` manifest on demand, ignored when Git is in use |
 | `workflow.py prepare-evidence` | scaffold a tracked `research-evidence-candidate/v2` packet |
 | `workflow.py validate-evidence` | validate schema, report structure, artifact completeness, and Git accessibility; retain legacy v1 hash checks |
 | `workflow.py record-review` | record one explicit formal-promotion result |
@@ -144,7 +148,7 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1 r
 
 - The optional `SessionStart` Hook is read-only and fail-open; it injects only a compact authority/Gate pointer. Explicit `audit` remains fail-closed.
 - Reviewer hooks retain the formal-review boundary and do not turn a consulted reviewer into a state transaction.
-- New-project initialization refuses nested repositories, suspicious upload scope, sensitive/oversized files, and non-empty remote history. It never force-pushes.
+- New-project initialization refuses nested repositories. Git-enabled initialization also retains upload-scope, sensitive/oversized-file, and non-empty-remote-history checks. It never force-pushes.
 - Cleanup inventory reads metadata, tracked references, and Git state—not large run contents or raw datasets—to assign no classification by itself.
 - The compatibility Contract path remains byte-identical so existing ChatGPT Work project instructions continue to resolve after the rename.
 

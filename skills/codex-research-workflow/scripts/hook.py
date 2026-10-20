@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
-from workflow import CORE_REL, STATE_REL, find_repo, git, read_core, read_state
+from workflow import CORE_REL, STATE_REL, find_project, git, read_core, read_state
 
 
 def emit(*, system_message: str = "", context: str = "", event: str = "") -> None:
@@ -39,7 +39,7 @@ def core_changed(repo: Path, rev: str = "HEAD") -> bool:
 
 def handle(payload: Dict[str, Any]) -> int:
     event = str(payload.get("hook_event_name") or "")
-    repo = find_repo(Path(str(payload.get("cwd") or ".")).resolve())
+    repo = find_project(Path(str(payload.get("cwd") or ".")).resolve())
     if not repo:
         return 0
 

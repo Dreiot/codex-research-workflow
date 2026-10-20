@@ -1,6 +1,7 @@
 # Experiment Layout and Run Manifest
 
-Resolve the single experiment root inside the exact project/Git root from `AGENTS.md`; otherwise use
+Resolve the single experiment root inside the project root (also the exact Git
+root when Git exists) from `AGENTS.md`; otherwise use
 `experiments/`. Do not pre-create unused directories.
 
 ```text
@@ -41,6 +42,9 @@ already authoritative; otherwise use
 ```
 
 Allowed statuses are `running`, `completed`, `failed`, and `interrupted`.
+Without Git, `git_head` and `worktree_dirty` are `null`; use a retained relevant
+source snapshot or another existing recoverable source version when the run
+supports a durable decision. No repository is created by run preparation.
 Exploratory preparation may start from a dirty worktree. Record the base commit
 and dirty status without hashing the worktree or unrelated untracked files.
 When reproduction depends on uncommitted code, preserve a patch or source

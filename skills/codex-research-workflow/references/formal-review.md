@@ -23,7 +23,7 @@ result, a core-method change, or a higher claim. Formal promotion is not a
 prerequisite for exploratory or publication-oriented experiment execution.
 The review must be independent of the Codex executor and candidate production;
 it does not require a particular model tier. Select a controller or reviewer by
-actual access to the exact GitHub range and evidence, not by model label or
+actual access to the exact candidate Git range and evidence, not by model label or
 surface. A Chat or Work controller with that access may perform the single
 qualified review and continue. If direct access is unavailable, request one
 bounded verification packet from a capable reviewer. Use a configured read-only
@@ -34,14 +34,17 @@ Formal verdicts are `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, and `BLOCKED`. P0/P1
 requires `REJECT`; P2 is non-blocking; `BLOCKED` means required evidence or
 environment is unavailable.
 
-Keep the promotion transaction minimal:
+The commit-backed transaction below requires existing Git. Its prerequisites
+do not authorize repository creation; ordinary local work can continue without
+Git. Keep the promotion transaction minimal:
 
-1. if the implementation or results are not already committed, commit and push
-   one natural candidate batch;
+1. for Git-backed promotion, if the implementation or results are not already
+   committed, commit one natural candidate batch and push when a remote is
+   configured; creating Git or GitHub still needs an explicit user request;
 2. review that exact candidate once;
 3. run `record-review` and `audit`, using `review_report: null` unless material
    findings need a separate durable report;
-4. commit and push one necessary authority update. Change `PROJECT_CORE.md` only
+4. commit one necessary authority update and push to the configured remote. Change `PROJECT_CORE.md` only
    when durable strategy or claim content actually changes.
 
 Accepted implementation candidates update accepted code. Accepted docs-only

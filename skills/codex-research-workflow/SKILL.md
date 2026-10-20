@@ -5,11 +5,15 @@ description: Initialize, migrate, audit, execute, review, and resume single-root
 
 # Codex Research Workflow
 
-Treat the Codex-opened project root and exact Git root as the same directory.
-`--repo` always names that project root. Do not support a parent workspace with a
-nested project repository; stop and require a user-approved root migration.
+`--repo` always names the Codex-opened project root. Git and GitHub are optional:
+create a local Git repository or a GitHub repository only when the user explicitly
+requests that creation, with the local repository rooted in this project.
+When Git already exists, its exact root must be this same directory. Do not
+support a parent workspace with a nested project repository; stop and require a
+user-approved root migration.
 
-Treat Git and checked-in evidence as authoritative. Use:
+Treat existing Git history and checked-in evidence as authoritative where
+available; otherwise use the local authority files and retained evidence. Use:
 
 - `AGENTS.md` for stable operating, permission, Git, review, storage, and claim rules.
 - `docs/PROJECT_CORE.md` for durable research direction, innovations, components,
@@ -38,8 +42,13 @@ authorize a change.
 At an ordinary new Goal, read the authorities and controlling material needed
 for that Goal, then perform a lightweight local precheck: exact Git root,
 branch, HEAD against the expected base, and conflicting index or worktree
-changes. Do not repeat the controller's remote review or run a full audit merely
-because a Goal started. Fetch and check the tracking ref, then run
+changes when Git exists; without Git, verify the project root, relevant authority
+files and source/evidence versions without inventing branch or commit identities.
+Git-specific commands and formal commit-identity checks retain their existing
+prerequisites; never create a repository to satisfy them implicitly.
+Do not repeat the controller's remote review or run a full audit merely
+because a Goal started. Fetch and check the tracking ref when a remote is
+configured, then run
 `workflow.py audit`, before commit or push, formal promotion, authority updates,
 explicit handoff, or when local state conflicts with the Goal.
 Inspect protected paths only when the Goal reads or changes data, results, or
@@ -166,8 +175,9 @@ needed. New persistent artifacts must not create ad hoc top-level output roots.
 - Keep persistent local runs under `runs/<experiment-id>/<run-id>/` with
   minimal provenance; keep raw and external datasets outside the experiment root.
 - Keep dedicated decision-complete evidence under
-  `evidence/<experiment-id>/<candidate-id>/` and track it in Git.
-- Keep large runs, temporary files, and cleanup plans ignored by Git.
+  `evidence/<experiment-id>/<candidate-id>/`; track it when Git is in use.
+- Keep large runs, temporary files, and cleanup plans separate from decision
+  evidence and ignored by Git when Git is in use.
 - Delete only temporary files created by the current run when they were marked
   temporary in advance, the run succeeded, and no reference remains.
 
@@ -263,6 +273,9 @@ py -3 scripts/workflow.py resume-prompt --repo <repo> --surface codex|work
 ```
 
 Read [initialization.md](references/initialization.md) for `init` or `migrate`.
+Default `init` creates local authority files only. Use `--create-git` only for an
+explicit local-repository request; `--github-repo OWNER/NAME --visibility ...`
+is an explicit GitHub-creation request and also enables local Git creation.
 `initialize` remains a compatibility alias for the former missing-file-only
 operation and is not used in new documentation.
 

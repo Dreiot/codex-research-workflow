@@ -1,6 +1,10 @@
 # Decision-Complete Evidence
 
 Codex-reported local results may support the next reversible exploratory step.
+Without Git, use accessible local reports, configurations, results and retained
+source versions for ordinary decisions; do not invent commit identities or
+create a repository implicitly. The commit-based packet helpers below retain
+their Git prerequisites, as does Git-backed formal promotion.
 Before changing a durable direction, objective, method, baseline, data split,
 metric, stopping rule, or claim, or adopting formal evidence, make the relevant
 evidence accessible and decision-complete.

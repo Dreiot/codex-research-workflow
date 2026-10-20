@@ -28,6 +28,8 @@ envelope:
 Required rules:
 
 - SHA fields are full 40-character lowercase Git SHAs or `null`.
+- Without Git, `branch` and SHA fields are `null`; do not invent a `main` branch
+  or an accepted commit. Git-backed formal-review requirements remain unchanged.
 - `review_verdict` is `NO_REVIEW` when no formal promotion review applies, or
   one of `ACCEPT`, `ACCEPT_WITH_P2`, `REJECT`, `BLOCKED` after such a review.
 - `open_findings` is a JSON array of concise strings.
@@ -74,4 +76,6 @@ accepted-code semantics are unambiguous.
   reports and Git rather than appending successive Gate sections.
 - Do not enforce a byte, line, or token budget. Historical accumulation is a
   warning; conflicting current Gate, verdict, or next action is an error.
-- A resumed task reads the three authorities and verifies necessary Git facts.
+- A resumed task reads the three authorities and verifies necessary Git facts
+  when Git exists; otherwise it verifies the project root and local source and
+  evidence versions.
