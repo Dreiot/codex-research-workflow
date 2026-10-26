@@ -161,4 +161,4 @@ python -m py_compile skills/codex-research-workflow/scripts/workflow.py skills/c
 python -m unittest discover -s tests -v
 ```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution checks. Licensed under [Apache-2.0](./LICENSE).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution checks. Licensed under the [MIT License](./LICENSE).
