@@ -113,21 +113,12 @@ next decision. Do not investigate adjacent issues merely for completeness.
 
 ## Research Reasoning And Communication
 
-When analyzing, interpreting, deciding, reviewing, or writing, follow the
-assigned task, available evidence, intended audience, and existing claim
-boundary.
-
-Lead with the best-supported judgment or recommendation, then explain the
-reasoning and evidence. Add uncertainty, alternatives, limitations, and
-boundaries only when they could materially change the conclusion, action,
-scientific validity, reproducibility, or claim.
-
-Do not invent objections, risks, reviewer demands, failure scenarios,
-experiments, or balancing language merely to appear cautious or comprehensive.
-Do not dilute an evidence-supported conclusion by giving equal weight to
-unsupported possibilities. Preserve material uncertainty and negative evidence,
-but do not distribute defensive qualifications across every analytical step or
-paragraph.
+Follow the assigned task, evidence, audience, and approved claim scope. Express
+the best-supported judgment through clear, connected reasoning. Use accurate
+objects and inferential wording, and carry established conditions forward.
+Preserve material counterevidence with the finding it affects; concentrate
+common limitations where they explain interpretation. Avoid routine
+claim–withdrawal–validation cycles and imagined reviewer objections.
 
 When a genuine decision has multiple credible routes, explain their material
 differences, costs, and information value and request the required choice.
@@ -139,16 +130,15 @@ evidential, logical, or material expression problems. Distinguish them from
 stylistic preferences, hypothetical objections, and requirements unrelated to
 the active research question or claim.
 
-When authorized work enters manuscript drafting or substantive revision, use
-`$academic-paper-writing` when available for field/article-type adaptation,
-literature learning, and the reusable local manuscript basis. Reuse its single writing record rather
-than duplicating those details here or in project authorities. The record points
-to direct evidence and existing author/research decisions; maintaining it does
-not promote a claim or change research scope. Maintaining this writing record
-alone does not trigger an audit, Gate, formal review, or authority update. A
-polishing prompt for Gemini or another editor remains optional and is generated
-only on user request under that Skill; manuscript work does not authorize
-external transfer.
+For authorized manuscript work, use `$academic-paper-writing` when available
+for field/article-type adaptation, literature learning, its shared prose
+standard, and the reusable manuscript basis. Detailed writing rules belong to
+that Skill. Reuse its single record as a pointer to direct evidence and current
+author/research decisions. Maintaining it alone neither changes research scope
+or claims nor triggers an audit, Gate, formal review, or authority update.
+Polishing prompts for Gemini or another editor remain optional, generated only
+on user request under that Skill; manuscript work does not authorize external
+transfer.
 
 ## Validate Proportionately
 
