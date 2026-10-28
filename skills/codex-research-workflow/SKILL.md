@@ -139,6 +139,17 @@ evidential, logical, or material expression problems. Distinguish them from
 stylistic preferences, hypothetical objections, and requirements unrelated to
 the active research question or claim.
 
+When authorized work enters manuscript drafting or substantive revision, use
+`$academic-paper-writing` when available for field/article-type adaptation,
+literature learning, and the reusable local manuscript basis. Reuse its single writing record rather
+than duplicating those details here or in project authorities. The record points
+to direct evidence and existing author/research decisions; maintaining it does
+not promote a claim or change research scope. Maintaining this writing record
+alone does not trigger an audit, Gate, formal review, or authority update. A
+polishing prompt for Gemini or another editor remains optional and is generated
+only on user request under that Skill; manuscript work does not authorize
+external transfer.
+
 ## Validate Proportionately
 
 Do not calculate or require a content hash by default. Prefer Git commit/blob
