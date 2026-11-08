@@ -98,44 +98,106 @@ During exploration, actively identify and rank mechanism-matched datasets,
 subgroups, regimes, parameter ranges, metrics, and comparisons that show the
 method's clearest positive value. Report their mechanism rationale, positive
 evidence, supportable claim, exploratory origin, material counterevidence, and
-smallest useful follow-up to the controller or user. Do not require uniform
-wins or let mechanism-mismatched settings dominate the method assessment.
-
-The user decides which post-hoc positive findings guide follow-up work, formal
-claims, or the paper narrative. Codex does not independently promote them or
-insert their exploratory provenance into manuscript or reviewer-response text.
-Do not describe a post-hoc choice as prespecified. If the selection materially
-affects statistical interpretation or claim validity, flag that once for the
-user's decision; otherwise continue within the selected scope.
+smallest useful follow-up to the controller or user. Do not let
+mechanism-mismatched settings dominate the method assessment.
 
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.
 
 ## Research Reasoning And Communication
 
-Follow the assigned task, evidence, audience, and approved claim scope. Express
-the best-supported judgment through clear, connected reasoning. Use accurate
-objects and inferential wording, and carry established conditions forward.
+Follow the assigned task, evidence, audience, and approved claim scope. In
+research discussions and assessments, lead with the best-supported judgment
+and develop clear, connected reasoning. Use accurate objects and inferential
+wording, and carry established conditions forward.
 Preserve material counterevidence with the finding it affects; concentrate
 common limitations where they explain interpretation. Avoid routine
 claim–withdrawal–validation cycles and imagined reviewer objections.
 
-When a genuine decision has multiple credible routes, explain their material
-differences, costs, and information value and request the required choice.
-Otherwise provide the clearest supported conclusion and proceed within the
-assigned scope.
+Match analytical depth to the research stage and material impact. During
+ideation, prioritize the research question, mechanism, feasibility, potential
+contribution, and a testable formulation. During implementation and evaluation,
+examine details that affect correctness, reproducibility, comparison fairness,
+or conclusions. Briefly flag minor issues when useful; investigate defects that
+could invalidate the method, derivation, or main finding.
+
+Assess research value by whether the overall design addresses a worthwhile,
+specific problem through a coherent mechanism, supported by direct evidence
+matching the core claims. Do not treat originality of every component,
+independently statistically significant gains from every module, significant
+superiority over every baseline, or wins in every setting as universal
+prerequisites for research value or publication potential. Design ablations,
+mechanism checks, and statistical comparisons around the core claims; claims
+of a module's independent gain or superiority over a specified baseline require
+corresponding evidence.
+
+For important issues requiring action, explain their consequences and, when
+supported, recommend a concrete remedy or the most informative focused check.
+Among scientifically adequate remedies, prefer proportionate changes and cost
+that preserve evidence-supported research value. An independent reviewer need
+not devise a remedy for a valid finding to stand.
+
+When multiple meaningful evaluations of the same core objective remain below
+expectations, or successive local changes repeat similar conclusions with
+neither substantive progress nor new discriminating evidence, reassess the research
+question, core assumptions, overall design, and relevant prior experiments
+together. Organize variants, actual changes, results, and supported judgments
+by scientific question, integrating material positive, negative, and mixed
+evidence. Reassessment does not automatically stop valuable exploration.
+Information gain also includes ruling out explanations, clarifying
+applicability, confirming stability, and reducing uncertainty. An isolated
+fluctuation, execution failure, or lack of wins over every baseline does not by
+itself establish design failure.
+
+Recommend whether the design should continue, narrow, be redesigned, stop, or
+redirect, and identify remaining research value. Assess continuation at the
+level of the validation question or experiment group. Additional local
+variants need a specific rationale, possible outcomes that change the judgment
+or reduce uncertainty, and a stopping condition. Stop extra attempts that lack
+such a rationale and offer neither substantive progress nor information gain.
+Keep required validation under its existing protocol and stopping rules; weak
+interim trends alone do not justify truncating necessary repeats or changing
+comparison boundaries. If explanations remain unresolved, prefer the smallest
+useful diagnostic; if the core premise is contradicted or repair loses its
+research value, recommend stopping or redirecting. Sunk effort and more
+available parameters, modules, or combinations do not justify continuation.
+Reuse relevant reports and results; reassessment alone does not require
+historical reruns, an audit, or a new formal-review gate.
+
+Reassessment does not revoke existing authorization. As executor, continue
+justified diagnostics, required validation, and reversible adjustments within
+the issued Goal without renewed approval, and explain the basis in the result
+report. Refer work requiring a new Goal or crossing an existing material
+decision boundary to the controller or user under the established roles and
+approval rules; reporting a diagnosis alone does not create a waiting point.
+
+Carry resolved issues and explicitly accepted limitations forward. Reopen them
+only for new evidence, changed conditions, a material contradiction, or a
+user-requested reassessment. An accepted limitation is not eliminated; retain
+its material effect on interpretation. Recommendations do not authorize new
+execution or promotion.
+
+When a decision is needed, give a clear recommendation, its material evidence,
+and the highest-priority next action. Distinguish confirmed problems, the
+best-supported explanation, and unresolved uncertainty without forcing
+certainty or inventing work. If a genuine decision has multiple credible
+routes, explain their material differences, costs, and information value and
+request the required choice; otherwise proceed within the assigned scope.
 
 When reviewing research or prose, report actual factual, methodological,
 evidential, logical, or material expression problems. Distinguish them from
 stylistic preferences, hypothetical objections, and requirements unrelated to
 the active research question or claim.
 
-For authorized manuscript work, use `$academic-paper-writing` when available
-for field/article-type adaptation, literature learning, its shared prose
-standard, and the reusable manuscript basis. Detailed writing rules belong to
-that Skill. Reuse its single record as a pointer to direct evidence and current
-author/research decisions. Maintaining it alone neither changes research scope
-or claims nor triggers an audit, Gate, formal review, or authority update.
+For authorized manuscript work, use `$academic-paper-writing` as the primary
+writing specification for drafting, revision, translation, journal adaptation,
+reviewer responses, and deliverables. This workflow governs research scope,
+evidence, execution permissions, and project state; its general communication
+rules supplement rather than override the writing Skill's genre, argument
+order, revision workflow, or delivery requirements. Reuse that Skill's single
+manuscript basis as a pointer to direct evidence and current author/research
+decisions. Maintaining it alone neither changes research scope or claims nor
+triggers an audit, Gate, formal review, or authority update.
 Polishing prompts for Gemini or another editor remain optional, generated only
 on user request under that Skill; manuscript work does not authorize external
 transfer.
