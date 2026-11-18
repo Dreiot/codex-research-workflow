@@ -34,7 +34,9 @@
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | 初始化、迁移、权威审计、实验清单、证据候选、审查状态和恢复 Prompt | 把每次探索提升为正式 Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | 元数据盘点、六类清理分类、不可变计划身份、迁移/删除/核验 | 自行推断科研价值，或从未审批清单直接删除 |
 
-每个可执行的控制器 Codex Goal 都调用 Workflow Skill。网页 Chat 和 Work 不会加载本机安装的 Skill；它们由 Project Instructions 与公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 独立设置角色。历史或批量清理才同时调用两个本地 Skill。
+通常由科研控制器（如 ChatGPT Pro）与 Codex 配合。控制器签发的每个可执行 Goal 都调用 Workflow Skill。用户在 Codex 中补充原 Goal 范围内的要求时，Codex 随原任务一并执行。用户也可以直接交办范围明确的科研任务。
+
+网页 Chat 和 Work 不会加载本机安装的 Skill；它们由 Project Instructions 与公开的 [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md) 独立设置角色。历史或批量清理才同时调用两个本地 Skill。
 
 ## 第一次成功运行
 

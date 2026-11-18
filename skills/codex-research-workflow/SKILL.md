@@ -1,6 +1,6 @@
 ---
 name: codex-research-workflow
-description: Initialize, migrate, audit, execute, review, and resume single-root governed research projects based on AGENTS.md, docs/PROJECT_CORE.md, and docs/CURRENT_STAGE.md. Use for every research-controller-issued Codex Goal in a governed project, and for project setup, root validation, durable direction changes, decision-complete evidence, optional implementation inspection, formal promotion, state conflicts, or explicit handoff. Keep ordinary implementation, smoke, and exploration execution-first; invoke research-artifact-cleanup only for historical or batch cleanup.
+description: "Execute controller-issued Goals in single-root governed research projects, or a bounded research task assigned directly by the user. Use for project setup and migration, state checks, research audits, evidence preparation, implementation inspection, formal promotion, durable decisions, and explicit handoff."
 ---
 
 # Codex Research Workflow
@@ -23,11 +23,16 @@ available; otherwise use the local authority files and retained evidence. Use:
 
 Conversation summaries are entry pointers, not repository authority.
 
-A research controller or reviewer decides and issues a Goal; Codex executes an
-already-issued Goal. When acting as the executor, do not adopt the controller
-role, issue the next Goal, or use the controller response format.
+The usual workflow pairs a research controller with Codex. The controller
+issues the Goal and makes research decisions under the project instructions.
+Codex executes that Goal through its authorized checks and diagnosis. Treat
+in-scope follow-ups from the user in Codex as part of the same assignment.
+When the user directly assigns a bounded research task, execute it under the
+same project, evidence, budget and decision boundaries. The user's request is
+sufficient authorization for that scope. A discussion or state-only request
+authorizes only that response. The executor never issues the next Goal.
 
-An issued Goal authorizes the named work and its necessary consequences, not
+The active assignment authorizes the named work and its necessary consequences, not
 adjacent improvements. A consequence is necessary when omitting it would make
 the current result scientifically incorrect, materially incomplete,
 non-reproducible, or unable to satisfy a stated acceptance condition. Ground
@@ -73,11 +78,11 @@ representative case justified by a genuinely untested interface or an action
 that is paid, sensitive, irreversible, externally consequential, or likely to
 consume a substantial share of the experiment budget if it fails.
 
-Follow the protocol or bounded exploration scope supplied or referenced by the
-issued Goal. For formal evaluation, use the agreed data roles, model-selection
+Follow the protocol or bounded exploration scope authorized for the task.
+For formal evaluation, use the agreed data roles, model-selection
 procedure, comparators, primary metrics, repetitions, and statistical unit.
 Interpret results used for method or hyperparameter selection according to that
-role. An issued Goal or frozen protocol authorizes the runs,
+role. The active assignment or frozen protocol authorizes the runs,
 batches, safe resumes, and named held-out execution within its scope. Briefly
 state the purpose, scope, material cost, and stop condition, then proceed
 without per-run approval.
@@ -95,12 +100,14 @@ metrics, display choices, registries, and file formats, or prepare future audit
 plans, unless the current decision needs them. Preserve reusable source data
 and generation code, then render additional variants after the user selects them.
 
-Reversible evidence-driven adjustments within the issued Goal may proceed and
+Reversible evidence-driven adjustments within the active assignment may proceed and
 be recorded while preserving the agreed boundaries. Refer unconfirmed material
 choices about the research question, core method, main comparisons, data splits,
 primary metrics, the final held-out boundary or other evaluation boundaries, claim, stopping
 rules, or meaningful cost or risk to the controller or user under the
-established roles. Use the same decision path for work outside existing
+established roles. Obtain the user's decision before replacing an agreed
+comparison or changing the paper's central contribution, including narrowing it.
+Use the same decision path for work outside existing
 authorization that introduces paid or material external quota, new sensitive
 data or credentials, or destructive or irreversible external effects. Report
 the evidence, impact, uncertainty, and recommendation, with tradeoffs when
@@ -108,12 +115,13 @@ there are credible alternatives. Wait for the required decision only on
 dependent work, and continue authorized exploration, diagnostics, and
 verification within scope.
 
-During exploration, actively identify and rank mechanism-matched datasets,
-subgroups, regimes, parameter ranges, metrics, and comparisons that show the
-method's clearest positive value. Report their mechanism rationale, positive
-evidence, supportable claim, exploratory origin, material counterevidence, and
-smallest useful follow-up to the controller or user. Do not let
-mechanism-mismatched settings dominate the method assessment.
+During authorized exploration, look for settings where the proposed mechanism
+predicts a benefit and explain why. Distinguish conditions proposed before
+seeing outcomes from patterns discovered afterward. Report the comparison,
+effect and material counterexamples together, including where results are mixed.
+When the distinction changes a decision, identify the smallest comparison that
+could distinguish the leading explanations. Keep the agreed primary comparison
+and final held-out boundary intact.
 
 Stop when the Goal acceptance criteria pass or the result is sufficient for the
 next decision. Do not investigate adjacent issues merely for completeness.
@@ -202,6 +210,13 @@ evidential, logical, or material expression problems. Distinguish them from
 stylistic preferences, hypothetical objections, and requirements unrelated to
 the active research question or claim.
 
+Write each paper or reader-facing research report as a standalone submission.
+Use scientific method names, comparison conditions and measured outcomes in
+the text, tables, figures and supplement. Remove internal run aliases, review
+labels and editing history. Preserve study identifiers needed for replication,
+post-hoc selection, and limitations that affect interpretation. Internal
+controller returns can include the precise evidence locations needed to decide.
+
 For authorized manuscript work, use `$academic-paper-writing` as the primary
 writing specification for drafting, revision, translation, journal adaptation,
 reviewer responses, and deliverables. This workflow governs research scope,
@@ -267,12 +282,13 @@ material for a durable controller decision or formal promotion.
 
 ## Review Code And Evidence
 
-Routine exploratory code may continue after task-relevant tests pass. A
-decision-complete Codex result packet is normally enough for the controller;
-make it concise only after retaining the scientific substance needed for the
-next decision. Request an optional
-implementation inspection only when tests and results cannot establish the
-needed correctness or the exact diff is needed to interpret evidence. It may
+Routine exploratory code may continue after task-relevant tests pass. At a
+controller decision, summarize the question, decisive comparisons, contrary
+findings, evidence sources and any choice that remains. Reuse existing reports
+and results. For a direct user assignment, report to the user. Prepare a brief
+for the controller when its judgment is needed or the user requests it.
+Request an optional implementation inspection only when tests and results
+cannot establish the needed correctness or the exact diff is needed to interpret evidence. It may
 inspect uncommitted work and does not require commit or push unless the reviewer
 needs GitHub access or the work is entering formal promotion. It creates no
 formal verdict, `record-review`, or `CURRENT_STAGE.md` update.
@@ -381,7 +397,7 @@ task-relevant validation, commit/push state, and unresolved items or blockers.
 
 When execution produces or records decision-relevant scientific evidence,
 closes a formal review or authority transaction, or performs an explicit
-handoff, make the final report self-contained enough for the controller to
+handoff, make the final report self-contained enough for its recipient to
 understand the substantive result and evaluate the next decision. Include the
 best-supported conclusion and, as applicable, key quantitative comparisons,
 material positive, negative, or mixed evidence, scientific interpretation and
@@ -401,14 +417,16 @@ headings or a `Codex 指令` section, and do not issue the next Goal.
 Context compaction and larger context windows are continuation aids, not
 authority, permission, or handoff triggers. After compaction, do not replay the
 full history; before a state-sensitive action, re-ground only from the active
-Goal and the minimum current authority needed for that action.
+assignment and the minimum current authority needed for that action.
 
 At an explicit handoff, finish only the safely verifiable operation, re-read
 current authority and Git state, distinguish pushed facts from chat-only
 conclusions, run `audit`, and use the relevant `resume-prompt` as the
 deterministic base. If a complete controller-issued Goal already exists and no
 local-only state remains, reuse that Goal unchanged in the new task; no extra
-handoff packet is needed. Otherwise append only a short Handoff Delta containing
+handoff packet is needed. For a direct user assignment, carry forward the
+user's request and any still-effective limits. A request to restore status
+alone ends with that status. Where needed, append a short Handoff Delta containing
 conversation-only decisions, unfinished authorized work or local state,
 unrecorded decision-relevant evidence or blockers, and one unresolved decision
 or action. Do not ask the old task to reconstruct authority content or rewrite

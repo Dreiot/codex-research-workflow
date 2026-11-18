@@ -158,7 +158,9 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Default to the shortest empirical loop",
             "named held-out execution without per-run approval",
             "Use the simplest correct, testable implementation",
-            "A Goal authorizes the named work and necessary consequences",
+            "Codex normally executes a controller-issued Goal, including in-scope user follow-ups",
+            "A bounded task assigned directly by the user is also sufficient authorization",
+            "The active assignment authorizes the named work and necessary consequences",
             "review-only Goals are read-only unless they explicitly authorize a change",
             "Include affected callers, configurations, focused tests",
             "Do not require a content hash by default",
@@ -168,7 +170,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             "Stop when acceptance criteria pass",
             "Exploratory implementation, tests, smoke",
             "do not require independent review or review-state commits",
-            "A decision-complete Codex result packet normally supports the next decision",
+            "Reuse existing evidence for controller decisions",
             "Optional implementation inspection does not require commit or push",
             "only for an explicit formal promotion",
             "accepted implementation candidate",
@@ -179,7 +181,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             "A clean review-state verification may be followed by the next Goal",
             "Verification of a formal review-state commit is mechanical closure",
             "Automatic context compaction or a larger context window",
-            "After compaction, re-ground only from the active Goal",
+            "After compaction, re-ground only from the active assignment",
             "Do not amend, rebase, force-push, rewrite history",
         ):
             self.assertIn(required_rule, agents_text)
@@ -239,10 +241,12 @@ class HandoffIntegrationTest(unittest.TestCase):
         codex_prompt = prompts["codex"]
         self.assertTrue(codex_prompt.startswith("$codex-research-workflow"))
         self.assertIn("这是状态恢复骨架，不是新的研究 Goal", codex_prompt)
-        self.assertIn("附加 Goal 所需的当前报告", codex_prompt)
+        self.assertIn("本次任务所需的当前报告", codex_prompt)
         self.assertIn("轻量核对项目根及相关来源版本", codex_prompt)
         self.assertIn("已有Git时再核对branch、HEAD", codex_prompt)
-        self.assertIn("未附 Controller Goal 时只恢复并报告状态", codex_prompt)
+        self.assertIn("通常接续原 Controller Goal", codex_prompt)
+        self.assertIn("用户已直接交办明确任务", codex_prompt)
+        self.assertIn("没有仍有效的执行授权时，只恢复并报告状态", codex_prompt)
         self.assertIn("不回放完整历史", codex_prompt)
         self.assertIn("不在旧长上下文中反复生成", codex_prompt)
         self.assertNotIn("默认执行探索流程", codex_prompt)
@@ -315,7 +319,7 @@ class HandoffIntegrationTest(unittest.TestCase):
         self.assertIn("final held-out boundary", skill)
         self.assertIn("lightweight local precheck", skill)
         self.assertIn("does not require commit or push", skill)
-        self.assertIn("An issued Goal authorizes the named work and its necessary consequences", skill)
+        self.assertIn("The active assignment authorizes the named work and its necessary consequences", skill)
         self.assertIn("review-only Goals are read-only unless they explicitly authorize a change", skill)
         self.assertIn("no stable identifier is sufficient", skill)
         self.assertIn("Do not hash a Git-tracked file again", skill)

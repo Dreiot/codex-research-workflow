@@ -34,7 +34,9 @@ minimal implementation → real-data run → metrics → diagnosis → direction
 | [`$codex-research-workflow`](./skills/codex-research-workflow/SKILL.md) | initialization, migration, authority audit, experiment manifests, evidence candidates, review state, resume prompts | inflate every exploratory step into a formal Gate |
 | [`$research-artifact-cleanup`](./skills/research-artifact-cleanup/SKILL.md) | metadata inventory, six cleanup classifications, immutable plan identity, relocate/delete/verify phases | infer scientific value or delete from an unapproved inventory |
 
-Every actionable controller-issued Codex Goal invokes the Workflow Skill. Browser Chat and Work do not load the installed local Skill; their roles are configured independently through Project Instructions and the public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md). Historical or batch cleanup invokes both local Skills.
+The usual workflow pairs a research controller (for example, ChatGPT Pro) with Codex. Every actionable controller-issued Codex Goal invokes the Workflow Skill. Codex handles in-scope follow-ups under that Goal and can also carry out a bounded research task assigned directly by the user.
+
+Browser Chat and Work do not load the installed local Skill; their roles are configured independently through Project Instructions and the public [Work Response Contract](./skills/codex-research-workflow/references/work-response-contract.md). Historical or batch cleanup invokes both local Skills.
 
 ## First successful run
 
