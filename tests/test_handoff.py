@@ -218,7 +218,7 @@ class HandoffIntegrationTest(unittest.TestCase):
             for authority in ("AGENTS.md", "PROJECT_CORE.md", "CURRENT_STAGE.md"):
                 self.assertIn(authority, prompts[surface])
             self.assertIn(f"- Project: `{self.repo.name}`", prompts[surface])
-            self.assertIn(f"- Project root: `{self.repo}`", prompts[surface])
+            self.assertIn(f"- Project root: `{self.repo.resolve()}`", prompts[surface])
             self.assertIn(f"- Expected HEAD: `{current_head}`", prompts[surface])
 
         work_prompt = prompts["work"]
